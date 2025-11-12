@@ -278,31 +278,31 @@
     }
 
     function addToCart(courseId, courseName, price) {
-      const isLoggedIn = <%= loggedIn != null && loggedIn ? "true" : "false" %>;
-      if (!isLoggedIn) {
-        alert('⚠️ Vui lòng đăng nhập để thêm khóa học vào giỏ hàng!');
-        window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-finance';
-        return;
-      }
-      
-      const cart = getCart();
-      const existing = cart.find(item => item.id === courseId);
-      
-      if (existing) {
-        alert('Khóa học này đã có trong giỏ hàng!');
-        return;
-      }
-
-      cart.push({
-        id: courseId,
-        name: courseName,
-        price: price,
-        quantity: 1
+      fetch('${pageContext.request.contextPath}/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=add&courseId=' + courseId
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.requireLogin) {
+          // User not logged in - show login prompt
+          if (confirm(data.message + '\n\nBạn có muốn đăng nhập ngay không?')) {
+            window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-finance';
+          }
+        } else if (data.success) {
+          alert('✅ Đã thêm "' + courseName + '" vào giỏ hàng!');
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          alert('ℹ️ ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Có lỗi xảy ra, vui lòng thử lại');
       });
-
-      saveCart(cart);
-      alert('Đã thêm "' + courseName + '" vào giỏ hàng!');
-      location.reload();
     }
 
     function isCoursePurchased(courseId) {

@@ -286,10 +286,17 @@
       })
       .then(response => response.json())
       .then(data => {
-        if (data.success) {
+        if (data.requireLogin) {
+          // User not logged in - show login prompt
+          if (confirm(data.message + '\n\nBạn có muốn đăng nhập ngay không?')) {
+            window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-python';
+          }
+        } else if (data.success) {
           showNotification('✅ Đã thêm "' + courseName + '" vào giỏ hàng!', 'success');
+          // Update cart count if exists
+          setTimeout(() => location.reload(), 1500);
         } else {
-          showNotification('ℹ️ Khóa học đã có trong giỏ hàng', 'info');
+          showNotification('ℹ️ ' + data.message, 'info');
         }
       })
       .catch(error => {

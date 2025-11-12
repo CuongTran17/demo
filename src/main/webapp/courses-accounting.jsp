@@ -282,31 +282,30 @@
     }
 
     function addToCart(courseId, courseName, price) {
-      const isLoggedIn = <%= loggedIn != null && loggedIn ? "true" : "false" %>;
-      if (!isLoggedIn) {
-        alert('⚠️ Vui lòng đăng nhập để thêm khóa học vào giỏ hàng!');
-        window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-accounting';
-        return;
-      }
-      
-      const cart = getCart();
-      const existing = cart.find(item => item.id === courseId);
-      
-      if (existing) {
-        alert('Khóa học này đã có trong giỏ hàng!');
-        return;
-      }
-
-      cart.push({
-        id: courseId,
-        name: courseName,
-        price: price,
-        quantity: 1
+      fetch('${pageContext.request.contextPath}/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=add&courseId=' + courseId
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.requireLogin) {
+          if (confirm(data.message + '\n\nBạn có muốn đăng nhập ngay không?')) {
+            window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-accounting';
+          }
+        } else if (data.success) {
+          alert('✅ Đã thêm "' + courseName + '" vào giỏ hàng!');
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          alert('ℹ️ ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Có lỗi xảy ra, vui lòng thử lại');
       });
-
-      saveCart(cart);
-      alert('Đã thêm "' + courseName + '" vào giỏ hàng!');
-      location.reload();
     }
     function isCoursePurchased(courseId){const p=localStorage.getItem('ptit_purchased_courses');return p?JSON.parse(p).includes(courseId):false}
     function updateCourseButtons(){document.querySelectorAll('.btn-add-cart').forEach(function(b){const m=b.getAttribute('onclick').match(/addToCart\('([^']+)'/);if(m&&isCoursePurchased(m[1])){b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg> Học ngay';b.className='btn-learn-now';b.setAttribute('onclick','learnCourse("'+m[1]+'")')}})}
