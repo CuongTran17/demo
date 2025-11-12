@@ -21,7 +21,7 @@
     <h1 class="article-title">Bài viết của chúng tôi</h1>
 
     <figure class="article-cover">
-      <img src="${pageContext.request.contextPath}/assets/img/article-cover.jpg" alt="Ảnh bìa bài viết" />
+      <img src="${pageContext.request.contextPath}/assets/img/blog/blog-cover.jpg" alt="Ảnh bìa bài viết" />
     </figure>
 
     <div class="article-meta">
@@ -31,40 +31,40 @@
     </div>
 
     <div class="article-body">
-      <p>Body text for your whole article or post. We put in some lorem ipsum to show how a filled-out page might look.</p>
-      <p>Exceptiont efficient emerging, elitism veniam anim adfae carefully curated ciorona conversation specialty perfect nosedivian farm-to-table, elit icelandic farm fresh cillum. Nulla disruptibles, essential kogi. Bespoke cliche tumeric blog live.</p>
-      <p>Exquisite sophisticated iconic cutting-edge liqueur dessert lorem ipsum dolor sit amet. Sharp affogato artisan chambray freshly roasted arabica delightful. Consumer ratings id, envy id. Quid sunt remarkable deserunt intricate airport cocktail classic oeso rogi grit.</p>
+      <p><b>Con Đường Của Một Developer Hiện Đại: Không Chỉ Là Code</b></p>
+      <p>Tuyệt vời và hiệu quả, sự nổi lên của lập trình đã tạo ra một kỷ nguyên mới. Đừng chỉ dừng lại ở cú pháp! Chúng ta đang bước vào không gian của kiến trúc phần mềm tinh tế (software architecture), nơi mà hiệu suất tối ưu và trải nghiệm người dùng (UX) là yếu tố sống còn. Từ những dự án farm-to-table (nông trại đến bàn ăn) dùng blockchain, cho đến các hệ thống AI đột phá, lập trình không còn là hoạt động đơn lẻ. Không có sự gián đoạn, chỉ có sự tiến hóa liên tục trong các công cụ, framework (ví dụ: React, Vue, Koci) và phương pháp luận Agile. Phát triển phần mềm hiện đại là sự kết hợp giữa kỹ thuật chuyên sâu và tư duy giải quyết vấn đề.</p>
 
       <div class="article-gallery">
-        <img src="${pageContext.request.contextPath}/assets/img/gallery-1.jpg" alt="Hình minh hoạ 1" />
-        <img src="${pageContext.request.contextPath}/assets/img/gallery-2.jpg" alt="Hình minh hoạ 2" />
+        <img src="${pageContext.request.contextPath}/assets/img/blog/gallery-1.jpg" alt="Hình minh hoạ 1" />
+        <img src="${pageContext.request.contextPath}/assets/img/blog/gallery-2.jpg" alt="Hình minh hoạ 2" />
       </div>
 
-      <p>Exquisite polaroid microfoam chicharrones impeccable latte art type of self proper parlour. Marvelous snoot open, narwhal pour-over clouded discerning. Oat wicorode style, et mastrous mock open.</p>
+      <p><b>Giải Mã Bí Ẩn: Từ Thuật Toán Đến Sản Phẩm Cuối Cùng</b></p>
+      <p>Tinh tế, sắc sảo và biểu tượng, thuật toán tiên tiến là "linh hồn" của mọi ứng dụng. Hãy tưởng tượng việc viết code như pha một ly Espresso hoàn hảo—mọi bước đều phải chính xác. Từ việc phân tích dữ liệu lớn (Big Data) đến việc thiết kế API tốc độ cao, quá trình này đòi hỏi sự tỉ mỉ của người thợ thủ công. Đánh giá của người dùng (ratings) là thước đo cuối cùng. Điều gì tạo nên một lập trình viên xuất sắc? Đó là khả năng chuyển hóa những ý tưởng phức tạp thành một giải pháp thanh lịch và dễ bảo trì (maintainable). Hãy dấn thân vào những thử thách của Data Structures và Design Patterns để nâng cấp tư duy của bạn.</p>
     </div>
 
     <section class="related">
-      <h2 class="related-title">Related articles or posts</h2>
+      <h2 class="related-title">Các bài viết liên quan/khác</h2>
       <div class="grid grid-3">
         <article class="card">
-          <img src="${pageContext.request.contextPath}/assets/img/related-1.jpg" alt="Bài viết liên quan 1" class="card-img" />
+          <img src="${pageContext.request.contextPath}/assets/img/blog/related-1.jpg" alt="Bài viết liên quan 1" class="card-img" />
           <div class="card-body">
-            <h3 class="card-title">Title</h3>
-            <p class="card-text">Author</p>
+            <h3 class="card-title">Sự thay đổi của thông tư 200</h3>
+            <p class="card-text">Simon Do</p>
           </div>
         </article>
         <article class="card">
-          <img src="${pageContext.request.contextPath}/assets/img/related-2.jpg" alt="Bài viết liên quan 2" class="card-img" />
+          <img src="${pageContext.request.contextPath}/assets/img/blog/related-2.png" alt="Bài viết liên quan 2" class="card-img" />
           <div class="card-body">
-            <h3 class="card-title">Title</h3>
-            <p class="card-text">Author</p>
+            <h3 class="card-title">Dev tool cùng chúng tôi</h3>
+            <p class="card-text">Hachan</p>
           </div>
         </article>
         <article class="card">
-          <img src="${pageContext.request.contextPath}/assets/img/related-3.jpg" alt="Bài viết liên quan 3" class="card-img" />
+          <img src="${pageContext.request.contextPath}/assets/img/blog/related-3.jpg" alt="Bài viết liên quan 3" class="card-img" />
           <div class="card-body">
-            <h3 class="card-title">Title</h3>
-            <p class="card-text">Author</p>
+            <h3 class="card-title">Marketing trong thời đại số</h3>
+            <p class="card-text">Jollie Pham</p>
           </div>
         </article>
       </div>
