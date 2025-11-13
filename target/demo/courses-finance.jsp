@@ -53,7 +53,7 @@
       <!-- Course 1 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/finance-basic.jpg" alt="Tài chính cơ bản" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-finance/Tài chính cơ bản.png" alt="Tài chính cơ bản" />
           <span class="badge-new">Mới nhất</span>
           <span class="badge-discount">-50%</span>
         </div>
@@ -84,7 +84,7 @@
       <!-- Course 2 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/investment.jpg" alt="Đầu tư chứng khoán" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-finance/Đầu tư chứng khoán.png" alt="Đầu tư chứng khoán" />
           <span class="badge-hot">Hot</span>
           <span class="badge-discount">-45%</span>
         </div>
@@ -115,7 +115,7 @@
       <!-- Course 3 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/banking.jpg" alt="Ngân hàng" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-finance/Ngân hàng.png" alt="Ngân hàng" />
           <span class="badge-discount">-48%</span>
         </div>
         <div class="course-content">
@@ -145,7 +145,7 @@
       <!-- Course 4 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/personal-finance.jpg" alt="Tài chính cá nhân" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-finance/Tài chính cá nhân.png" alt="Tài chính cá nhân" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -175,7 +175,7 @@
       <!-- Course 5 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/forex.jpg" alt="Forex" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-finance/Forex.png" alt="Forex" />
           <span class="badge-discount">-47%</span>
         </div>
         <div class="course-content">
@@ -205,7 +205,7 @@
       <!-- Course 6 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/financial-analysis.jpg" alt="Phân tích tài chính" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-finance/Phân tích tài chính.png" alt="Phân tích tài chính" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -278,31 +278,31 @@
     }
 
     function addToCart(courseId, courseName, price) {
-      const isLoggedIn = <%= loggedIn != null && loggedIn ? "true" : "false" %>;
-      if (!isLoggedIn) {
-        alert('⚠️ Vui lòng đăng nhập để thêm khóa học vào giỏ hàng!');
-        window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-finance';
-        return;
-      }
-      
-      const cart = getCart();
-      const existing = cart.find(item => item.id === courseId);
-      
-      if (existing) {
-        alert('Khóa học này đã có trong giỏ hàng!');
-        return;
-      }
-
-      cart.push({
-        id: courseId,
-        name: courseName,
-        price: price,
-        quantity: 1
+      fetch('${pageContext.request.contextPath}/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=add&courseId=' + courseId
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.requireLogin) {
+          // User not logged in - show login prompt
+          if (confirm(data.message + '\n\nBạn có muốn đăng nhập ngay không?')) {
+            window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-finance';
+          }
+        } else if (data.success) {
+          alert('✅ Đã thêm "' + courseName + '" vào giỏ hàng!');
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          alert('ℹ️ ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Có lỗi xảy ra, vui lòng thử lại');
       });
-
-      saveCart(cart);
-      alert('Đã thêm "' + courseName + '" vào giỏ hàng!');
-      location.reload();
     }
 
     function isCoursePurchased(courseId) {

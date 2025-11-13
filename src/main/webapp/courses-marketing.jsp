@@ -54,7 +54,7 @@
       <!-- Course 1 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/digital-marketing.jpg" alt="Digital Marketing" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Digital Marketing.png" alt="Digital Marketing" />
           <span class="badge-new">Mới nhất</span>
           <span class="badge-discount">-50%</span>
         </div>
@@ -85,7 +85,7 @@
       <!-- Course 2 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/facebook-ads.jpg" alt="Facebook Ads" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Facebook Ads.png" alt="Facebook Ads" />
           <span class="badge-hot">Hot</span>
           <span class="badge-discount">-48%</span>
         </div>
@@ -116,7 +116,7 @@
       <!-- Course 3 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/google-ads.jpg" alt="Google Ads" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Google Ads.png" alt="Google Ads" />
           <span class="badge-discount">-47%</span>
         </div>
         <div class="course-content">
@@ -146,7 +146,7 @@
       <!-- Course 4 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/content-marketing.jpg" alt="Content Marketing" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Content Marketing.png" alt="Content Marketing" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -176,7 +176,7 @@
       <!-- Course 5 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/social-media.jpg" alt="Social Media" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Social Media.png" alt="Social Media" />
           <span class="badge-discount">-48%</span>
         </div>
         <div class="course-content">
@@ -206,7 +206,7 @@
       <!-- Course 6 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/email-marketing.jpg" alt="Email Marketing" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Email Marketing.png" alt="Email Marketing" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">

@@ -63,9 +63,9 @@
       <!-- Course 1 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/python-procedural.jpg" alt="Procedural Python" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Procedural Python.png" alt="Procedural Python" />
           <span class="badge-new">Mới nhất</span>
-          <span class="badge-discount">-48%</span>
+          <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
           <h3 class="course-name">Procedural Python - Lập trình hàm trong Python</h3>
@@ -94,7 +94,7 @@
       <!-- Course 2 -->
       <article class="course-card course-card-horizontal">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/python-basics.jpg" alt="Python Basics" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Python Basics.png" alt="Python Basics" />
           <span class="badge-hot">Hot</span>
           <span class="badge-discount">-50%</span>
         </div>
@@ -125,7 +125,7 @@
       <!-- Course 3 -->
       <article class="course-card course-card-large">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/python.jpg" alt="Python" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Python.png" alt="Python" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -155,7 +155,7 @@
       <!-- Course 4 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/python-excel.jpg" alt="Python Excel" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Python Excel.png" alt="Python Excel" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -185,7 +185,7 @@
       <!-- Course 5 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/selenium-python.jpg" alt="Selenium Python" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Selenium Python.png" alt="Selenium Python" />
           <span class="badge-discount">-47%</span>
         </div>
         <div class="course-content">
@@ -215,7 +215,7 @@
       <!-- Course 6 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/python-oop.jpg" alt="Python OOP" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Python OOP.png" alt="Python OOP" />
           <span class="badge-discount">-48%</span>
         </div>
         <div class="course-content">
@@ -286,10 +286,17 @@
       })
       .then(response => response.json())
       .then(data => {
-        if (data.success) {
+        if (data.requireLogin) {
+          // User not logged in - show login prompt
+          if (confirm(data.message + '\n\nBạn có muốn đăng nhập ngay không?')) {
+            window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-python';
+          }
+        } else if (data.success) {
           showNotification('✅ Đã thêm "' + courseName + '" vào giỏ hàng!', 'success');
+          // Update cart count if exists
+          setTimeout(() => location.reload(), 1500);
         } else {
-          showNotification('ℹ️ Khóa học đã có trong giỏ hàng', 'info');
+          showNotification('ℹ️ ' + data.message, 'info');
         }
       })
       .catch(error => {

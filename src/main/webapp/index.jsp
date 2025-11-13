@@ -179,36 +179,6 @@
   <%@ include file="/includes/footer.jsp" %>
 
   <script>
-    const btn = document.getElementById('hamburger');
-    const menu = document.querySelector('.menu');
-    if(btn && menu){
-      btn.addEventListener('click', () => {
-        const open = btn.getAttribute('aria-expanded') === 'true';
-        btn.setAttribute('aria-expanded', String(!open));
-        menu.classList.toggle('open');
-      });
-    }
-    
-    // Dropdown menu toggle (click-based)
-    const ddTrigger = document.querySelector('.menu .has-dd');
-    const ddParent = ddTrigger ? ddTrigger.closest('.dropdown') : null;
-    if(ddTrigger && ddParent){
-      ddTrigger.addEventListener('click', (e)=>{
-        e.preventDefault();
-        ddParent.classList.toggle('open');
-        const expanded = ddTrigger.getAttribute('aria-expanded') === 'true';
-        ddTrigger.setAttribute('aria-expanded', String(!expanded));
-      });
-      
-      // Close dropdown when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!ddParent.contains(e.target)) {
-          ddParent.classList.remove('open');
-          ddTrigger.setAttribute('aria-expanded', 'false');
-        }
-      });
-    }
-
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {

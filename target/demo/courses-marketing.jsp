@@ -54,7 +54,7 @@
       <!-- Course 1 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/digital-marketing.jpg" alt="Digital Marketing" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Digital Marketing.png" alt="Digital Marketing" />
           <span class="badge-new">Mới nhất</span>
           <span class="badge-discount">-50%</span>
         </div>
@@ -85,7 +85,7 @@
       <!-- Course 2 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/facebook-ads.jpg" alt="Facebook Ads" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Facebook Ads.png" alt="Facebook Ads" />
           <span class="badge-hot">Hot</span>
           <span class="badge-discount">-48%</span>
         </div>
@@ -116,7 +116,7 @@
       <!-- Course 3 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/google-ads.jpg" alt="Google Ads" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Google Ads.png" alt="Google Ads" />
           <span class="badge-discount">-47%</span>
         </div>
         <div class="course-content">
@@ -146,7 +146,7 @@
       <!-- Course 4 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/content-marketing.jpg" alt="Content Marketing" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Content Marketing.png" alt="Content Marketing" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -176,7 +176,7 @@
       <!-- Course 5 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/social-media.jpg" alt="Social Media" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Social Media.png" alt="Social Media" />
           <span class="badge-discount">-48%</span>
         </div>
         <div class="course-content">
@@ -206,7 +206,7 @@
       <!-- Course 6 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/email-marketing.jpg" alt="Email Marketing" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-marketing/Email Marketing.png" alt="Email Marketing" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -279,31 +279,30 @@
     }
 
     function addToCart(courseId, courseName, price) {
-      const isLoggedIn = <%= loggedIn != null && loggedIn ? "true" : "false" %>;
-      if (!isLoggedIn) {
-        alert('⚠️ Vui lòng đăng nhập để thêm khóa học vào giỏ hàng!');
-        window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-marketing';
-        return;
-      }
-      
-      const cart = getCart();
-      const existing = cart.find(item => item.id === courseId);
-      
-      if (existing) {
-        alert('Khóa học này đã có trong giỏ hàng!');
-        return;
-      }
-
-      cart.push({
-        id: courseId,
-        name: courseName,
-        price: price,
-        quantity: 1
+      fetch('${pageContext.request.contextPath}/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=add&courseId=' + courseId
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.requireLogin) {
+          if (confirm(data.message + '\n\nBạn có muốn đăng nhập ngay không?')) {
+            window.location.href = '${pageContext.request.contextPath}/login.jsp?redirect=courses-marketing';
+          }
+        } else if (data.success) {
+          alert('✅ Đã thêm "' + courseName + '" vào giỏ hàng!');
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          alert('ℹ️ ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Có lỗi xảy ra, vui lòng thử lại');
       });
-
-      saveCart(cart);
-      alert('Đã thêm "' + courseName + '" vào giỏ hàng!');
-      location.reload();
     }
     function isCoursePurchased(courseId){const p=localStorage.getItem('ptit_purchased_courses');return p?JSON.parse(p).includes(courseId):false}
     function updateCourseButtons(){document.querySelectorAll('.btn-add-cart').forEach(function(b){const m=b.getAttribute('onclick').match(/addToCart\('([^']+)'/);if(m&&isCoursePurchased(m[1])){b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg> Học ngay';b.className='btn-learn-now';b.setAttribute('onclick','learnCourse("'+m[1]+'")')}})}

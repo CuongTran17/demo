@@ -58,7 +58,7 @@
       <!-- Course 1 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/blockchain-basic.jpg" alt="Blockchain cơ bản" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/Blockchain cơ bản.png" alt="Blockchain cơ bản" />
           <span class="badge-new">Mới nhất</span>
           <span class="badge-discount">-50%</span>
         </div>
@@ -89,7 +89,7 @@
       <!-- Course 2 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/smart-contract.jpg" alt="Smart Contract" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/Smart Contract.png" alt="Smart Contract" />
           <span class="badge-hot">Hot</span>
           <span class="badge-discount">-48%</span>
         </div>
@@ -120,7 +120,7 @@
       <!-- Course 3 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/defi.jpg" alt="DeFi" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/DeFi.png" alt="DeFi" />
           <span class="badge-discount">-47%</span>
         </div>
         <div class="course-content">
@@ -150,7 +150,7 @@
       <!-- Course 4 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/nft.jpg" alt="NFT" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/NFT.png" alt="NFT" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -180,7 +180,7 @@
       <!-- Course 5 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/web3.jpg" alt="Web3" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/Web3.png" alt="Web3" />
           <span class="badge-discount">-48%</span>
         </div>
         <div class="course-content">
@@ -210,7 +210,7 @@
       <!-- Course 6 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/crypto-trading.jpg" alt="Crypto Trading" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/Crypto Trading.png" alt="Crypto Trading" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">

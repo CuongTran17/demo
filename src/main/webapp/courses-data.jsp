@@ -55,7 +55,7 @@
       <!-- Course 1 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/data-basic.jpg" alt="Data Analytics cơ bản" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Data Analytics cơ bản.png" alt="Data Analytics cơ bản" />
           <span class="badge-new">Mới nhất</span>
           <span class="badge-discount">-48%</span>
         </div>
@@ -86,7 +86,7 @@
       <!-- Course 2 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/excel-data.jpg" alt="Excel for Data" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Excel for Data.png" alt="Excel for Data" />
           <span class="badge-hot">Hot</span>
           <span class="badge-discount">-50%</span>
         </div>
@@ -117,7 +117,7 @@
       <!-- Course 3 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/sql-data.jpg" alt="SQL" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-data/SQL.png" alt="SQL" />
           <span class="badge-discount">-47%</span>
         </div>
         <div class="course-content">
@@ -147,7 +147,7 @@
       <!-- Course 4 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/power-bi.jpg" alt="Power BI" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Power BI.png" alt="Power BI" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -177,7 +177,7 @@
       <!-- Course 5 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/python-data.jpg" alt="Python for Data" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Python for Data.png" alt="Python for Data" />
           <span class="badge-discount">-48%</span>
         </div>
         <div class="course-content">
@@ -207,7 +207,7 @@
       <!-- Course 6 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/tableau.jpg" alt="Tableau" />
+          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Tableau.png" alt="Tableau" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">

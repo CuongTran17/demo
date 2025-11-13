@@ -1,0 +1,63 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║          PTIT LEARNING - QUICK START GUIDE                     ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────┐
+│  ⚡ CÁCH NHANH NHẤT - CHỈ CẦN 1 CLICK!                         │
+└────────────────────────────────────────────────────────────────┘
+
+  📁 Mở File Explorer → C:\Users\AD\Downloads\demo
+  
+  🖱️ Double-click vào:
+  
+     ► start-project.bat        👈 Chạy dự án
+     ► stop-project.bat         👈 Dừng dự án
+
+
+┌────────────────────────────────────────────────────────────────┐
+│  📋 HOẶC CHẠY BẰNG TERMINAL                                    │
+└────────────────────────────────────────────────────────────────┘
+
+  Windows Terminal hoặc PowerShell:
+  
+  cd C:\Users\AD\Downloads\demo
+  .\start-project.bat
+
+
+┌────────────────────────────────────────────────────────────────┐
+│  🌐 SAU KHI CHẠY                                               │
+└────────────────────────────────────────────────────────────────┘
+
+  Trình duyệt sẽ tự động mở: http://localhost:8080/
+  
+  Đăng nhập:
+    Email: test@ptit.edu.vn
+    Mật khẩu: 123456
+
+
+┌────────────────────────────────────────────────────────────────┐
+│  🎯 TÓM TẮT                                                    │
+└────────────────────────────────────────────────────────────────┘
+
+  File quan trọng ở C:\Users\AD\Downloads\demo:
+  
+  ✓ start-project.bat          Chạy toàn bộ dự án
+  ✓ stop-project.bat           Dừng server
+  ✓ HOW-TO-RUN.md              Hướng dẫn chi tiết
+  ✓ setup-database.bat         Setup database (chỉ chạy 1 lần)
+  
+
+┌────────────────────────────────────────────────────────────────┐
+│  💡 TIPS                                                       │
+└────────────────────────────────────────────────────────────────┘
+
+  • Mỗi lần sửa code Java → Chạy lại start-project.bat
+  • Xem log lỗi tại: C:\tomcat10\logs\catalina.*.log
+  • Tomcat chạy ở cửa sổ riêng - ĐỪNG ĐÓNG cửa sổ đó!
+
+
+╔════════════════════════════════════════════════════════════════╗
+║  Bạn đã sẵn sàng! Chúc code vui vẻ! 🚀                         ║
+╚════════════════════════════════════════════════════════════════╝
