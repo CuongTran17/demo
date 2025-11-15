@@ -114,40 +114,59 @@ CREATE TABLE IF NOT EXISTS course_progress (
 -- Insert Sample Courses
 -- ============================================
 
--- Python Courses
+-- Python Courses (6 courses)
 INSERT IGNORE INTO courses (course_id, course_name, category, description, price, old_price, duration, students_count, level, is_new, discount_percentage) VALUES
-('python-basics', 'Python Basics', 'python', 'Khóa học Python cơ bản cho người mới bắt đầu', 999000, 1499000, '40 giờ', 1250, 'Beginner', 1, 33),
-('python-advanced', 'Python Advanced', 'python', 'Khóa học Python nâng cao', 1299000, 1999000, '60 giờ', 850, 'Advanced', 0, 35),
-('python-oop', 'Object-Oriented Python', 'python', 'Lập trình hướng đối tượng với Python', 1199000, 1799000, '50 giờ', 920, 'Intermediate', 0, 33),
-('python-web', 'Python Web Development', 'python', 'Phát triển web với Python và Django', 1499000, 2299000, '80 giờ', 760, 'Advanced', 1, 35),
-('python-data', 'Python for Data Science', 'python', 'Python cho Data Science', 1399000, 2099000, '70 giờ', 680, 'Intermediate', 0, 33),
-('python-procedural', 'Procedural Python', 'python', 'Lập trình thủ tục với Python', 1299000, NULL, '55 giờ', 540, 'Intermediate', 0, 0);
+('python-procedural', 'Procedural Python - Lập trình hàm trong Python', 'python', 'Học lập trình hàm trong Python từ cơ bản đến nâng cao, áp dụng vào dự án thực tế', 1299000, 2499000, '12 giờ', 1234, 'Beginner', 1, 48),
+('python-basics', 'Python Basics - Lập trình Python cơ bản', 'python', 'Khóa học Python cho người mới bắt đầu, từ zero đến hero', 999000, 1999000, '10 giờ', 2567, 'Beginner', 0, 50),
+('python-complete', 'Python Toàn Tập - Từ Zero đến Hero', 'python', 'Khóa học Python toàn diện nhất, bao gồm tất cả kiến thức cần thiết', 2499000, 4999000, '40 giờ', 5678, 'All', 0, 50),
+('python-excel', 'Python Excel cho người đi làm', 'python', 'Tự động hóa Excel bằng Python, tiết kiệm thời gian làm việc', 899000, 1799000, '8 giờ', 1890, 'Intermediate', 0, 50),
+('selenium-python', 'Selenium Python - Test Automation', 'python', 'Automation testing với Selenium và Python', 1599000, 2999000, '18 giờ', 987, 'Advanced', 0, 47),
+('python-oop', 'Python OOP - Lập trình hướng đối tượng', 'python', 'Lập trình hướng đối tượng với Python, từ cơ bản đến nâng cao', 1199000, 2399000, '14 giờ', 756, 'Intermediate', 0, 50);
 
--- Finance Courses
+-- Finance Courses (6 courses)
 INSERT IGNORE INTO courses (course_id, course_name, category, description, price, old_price, duration, students_count, level, is_new, discount_percentage) VALUES
-('finance-basic', 'Finance Basics', 'finance', 'Kiến thức tài chính cơ bản', 1299000, 1999000, '45 giờ', 980, 'Beginner', 0, 35),
-('finance-investment', 'Investment Strategies', 'finance', 'Chiến lược đầu tư hiệu quả', 1599000, 2499000, '65 giờ', 720, 'Intermediate', 1, 36),
-('finance-personal', 'Personal Finance', 'finance', 'Quản lý tài chính cá nhân', 1199000, 1799000, '40 giờ', 1100, 'Beginner', 0, 33);
+('finance-basic', 'Tài chính cơ bản', 'finance', 'Kiến thức nền tảng tài chính cho người mới bắt đầu', 799000, 1599000, '10 giờ', 2345, 'Beginner', 1, 50),
+('investment', 'Đầu tư chứng khoán từ A-Z', 'finance', 'Phân tích và chiến lược đầu tư chứng khoán', 1699000, 3099000, '20 giờ', 3890, 'Intermediate', 1, 45),
+('banking', 'Nghiệp vụ ngân hàng hiện đại', 'finance', 'Hoạt động ngân hàng và dịch vụ tài chính hiện đại', 1299000, 2599000, '15 giờ', 1567, 'Intermediate', 0, 50),
+('personal-finance', 'Tài chính cá nhân thông minh', 'finance', 'Quản lý tài chính cá nhân hiệu quả', 699000, 1399000, '12 giờ', 2567, 'Beginner', 0, 50),
+('forex', 'Trading Forex chuyên nghiệp', 'finance', 'Giao dịch ngoại hối Forex từ cơ bản đến nâng cao', 1599000, 3199000, '18 giờ', 1234, 'Advanced', 0, 50),
+('financial-analysis', 'Phân tích báo cáo tài chính', 'finance', 'Đọc và phân tích báo cáo tài chính doanh nghiệp', 1499000, 2999000, '16 giờ', 1876, 'Intermediate', 0, 50);
 
--- Data Analyst Courses
+-- Data Analyst Courses (6 courses)
 INSERT IGNORE INTO courses (course_id, course_name, category, description, price, old_price, duration, students_count, level, is_new, discount_percentage) VALUES
-('data-analysis', 'Data Analysis Fundamentals', 'data', 'Phân tích dữ liệu cơ bản', 1399000, 2099000, '55 giờ', 820, 'Beginner', 0, 33),
-('data-visualization', 'Data Visualization', 'data', 'Trực quan hóa dữ liệu', 1299000, 1999000, '50 giờ', 740, 'Intermediate', 1, 35);
+('data-basic', 'Data Analytics cơ bản', 'data', 'Khóa học phân tích dữ liệu cho người mới bắt đầu', 899000, 1799000, '12 giờ', 1567, 'Beginner', 1, 50),
+('excel-data', 'Excel cho Data Analyst', 'data', 'Excel nâng cao cho phân tích dữ liệu', 799000, 1599000, '10 giờ', 2134, 'Beginner', 0, 50),
+('sql-data', 'SQL cho Data Analyst', 'data', 'Học SQL từ cơ bản đến nâng cao cho Data Analyst', 1299000, 2599000, '16 giờ', 1876, 'Intermediate', 0, 50),
+('power-bi', 'Power BI toàn tập', 'data', 'Trực quan hóa dữ liệu với Power BI', 1499000, 2999000, '18 giờ', 1654, 'Intermediate', 0, 50),
+('python-data', 'Python cho Data Science', 'data', 'Python cho phân tích và khoa học dữ liệu', 1599000, 3199000, '20 giờ', 2234, 'Advanced', 0, 50),
+('tableau', 'Tableau Desktop chuyên nghiệp', 'data', 'Trực quan hóa dữ liệu với Tableau', 1399000, 2799000, '16 giờ', 1423, 'Intermediate', 0, 50);
 
--- Blockchain Courses
+-- Blockchain Courses (6 courses)
 INSERT IGNORE INTO courses (course_id, course_name, category, description, price, old_price, duration, students_count, level, is_new, discount_percentage) VALUES
-('blockchain-basics', 'Blockchain Fundamentals', 'blockchain', 'Kiến thức cơ bản về Blockchain', 1499000, 2299000, '60 giờ', 650, 'Beginner', 1, 35),
-('smart-contracts', 'Smart Contract Development', 'blockchain', 'Phát triển Smart Contract', 1799000, 2799000, '75 giờ', 480, 'Advanced', 0, 36);
+('blockchain-basic', 'Blockchain cơ bản', 'blockchain', 'Kiến thức nền tảng về công nghệ Blockchain', 1299000, 2599000, '14 giờ', 1234, 'Beginner', 1, 50),
+('smart-contract', 'Smart Contract với Solidity', 'blockchain', 'Lập trình Smart Contract trên Ethereum', 2099000, 4199000, '24 giờ', 876, 'Advanced', 0, 50),
+('defi', 'DeFi toàn tập', 'blockchain', 'Tài chính phi tập trung - DeFi từ A đến Z', 1799000, 3599000, '20 giờ', 1543, 'Intermediate', 0, 50),
+('nft', 'NFT và Metaverse', 'blockchain', 'NFT, Metaverse và tương lai của Web3', 1499000, 2999000, '16 giờ', 1876, 'Intermediate', 0, 50),
+('web3', 'Web3 Development', 'blockchain', 'Phát triển ứng dụng Web3 toàn diện', 2299000, 4599000, '28 giờ', 765, 'Advanced', 0, 50),
+('crypto-trading', 'Crypto Trading chuyên nghiệp', 'blockchain', 'Giao dịch tiền điện tử chuyên nghiệp', 1899000, 3799000, '22 giờ', 1234, 'Intermediate', 0, 50);
 
--- Accounting Courses
+-- Accounting Courses (6 courses)
 INSERT IGNORE INTO courses (course_id, course_name, category, description, price, old_price, duration, students_count, level, is_new, discount_percentage) VALUES
-('accounting-basic', 'Accounting Basics', 'accounting', 'Kế toán cơ bản', 1199000, 1799000, '45 giờ', 890, 'Beginner', 0, 33),
-('accounting-advanced', 'Advanced Accounting', 'accounting', 'Kế toán nâng cao', 1499000, 2299000, '70 giờ', 560, 'Advanced', 0, 35);
+('accounting-basic', 'Kế toán cơ bản', 'accounting', 'Nguyên lý kế toán cho người mới bắt đầu', 699000, 1399000, '10 giờ', 2345, 'Beginner', 1, 50),
+('accounting-misa', 'Kế toán trên phần mềm MISA', 'accounting', 'Thực hành kế toán với phần mềm MISA', 1299000, 2599000, '16 giờ', 1876, 'Intermediate', 0, 50),
+('tax-accounting', 'Kế toán thuế', 'accounting', 'Kế toán thuế doanh nghiệp và cá nhân', 1499000, 2999000, '18 giờ', 1543, 'Intermediate', 0, 50),
+('cost-accounting', 'Kế toán chi phí', 'accounting', 'Kế toán và quản trị chi phí doanh nghiệp', 899000, 1799000, '12 giờ', 1234, 'Intermediate', 0, 50),
+('excel-accounting', 'Excel cho kế toán', 'accounting', 'Excel nâng cao cho nghề kế toán', 799000, 1599000, '10 giờ', 2134, 'Beginner', 0, 50),
+('financial-statements', 'Lập và phân tích báo cáo tài chính', 'accounting', 'Lập và phân tích báo cáo tài chính doanh nghiệp', 1399000, 2799000, '16 giờ', 1654, 'Advanced', 0, 50);
 
--- Marketing Courses
+-- Marketing Courses (6 courses)
 INSERT IGNORE INTO courses (course_id, course_name, category, description, price, old_price, duration, students_count, level, is_new, discount_percentage) VALUES
-('marketing-digital', 'Digital Marketing', 'marketing', 'Marketing kỹ thuật số', 1399000, 2099000, '55 giờ', 1020, 'Beginner', 1, 33),
-('marketing-social', 'Social Media Marketing', 'marketing', 'Marketing trên mạng xã hội', 1299000, 1999000, '50 giờ', 880, 'Intermediate', 0, 35);
+('digital-marketing', 'Digital Marketing toàn diện', 'marketing', 'Marketing kỹ thuật số từ A đến Z', 1499000, 2999000, '20 giờ', 3456, 'Beginner', 1, 50),
+('facebook-ads', 'Facebook Ads chuyên nghiệp', 'marketing', 'Quảng cáo Facebook hiệu quả và tối ưu chi phí', 1299000, 2599000, '16 giờ', 2345, 'Intermediate', 0, 50),
+('google-ads', 'Google Ads & SEO', 'marketing', 'Quảng cáo Google và tối ưu hóa công cụ tìm kiếm', 1599000, 3199000, '18 giờ', 2134, 'Intermediate', 0, 50),
+('content-marketing', 'Content Marketing hiệu quả', 'marketing', 'Xây dựng chiến lược content marketing bài bản', 1199000, 2399000, '14 giờ', 1876, 'Intermediate', 0, 50),
+('social-media', 'Social Media Marketing', 'marketing', 'Marketing trên các nền tảng mạng xã hội', 899000, 1799000, '12 giờ', 2567, 'Beginner', 0, 50),
+('email-marketing', 'Email Marketing chuyên nghiệp', 'marketing', 'Chiến lược email marketing hiệu quả', 999000, 1999000, '10 giờ', 1654, 'Beginner', 0, 50);
 
 -- ============================================
 -- Insert Sample User (for testing)
