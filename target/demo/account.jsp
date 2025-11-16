@@ -89,12 +89,13 @@
                   <th>Ngày mua</th>
                   <th>Giá</th>
                   <th>Trạng thái</th>
+                  <th>Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 <% if (orders.isEmpty()) { %>
                   <tr>
-                    <td colspan="4" class="empty-message">Bạn chưa đăng ký khóa học nào</td>
+                    <td colspan="5" class="empty-message">Bạn chưa đăng ký khóa học nào</td>
                   </tr>
                 <% } else { %>
                   <% for (AccountServlet.OrderInfo order : orders) { %>
@@ -107,6 +108,18 @@
                           <span style="color: #28a745;">✓ Đã thanh toán</span>
                         <% } else { %>
                           <span style="color: #ffc107;">⏳ Đang xử lý</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if ("completed".equals(order.orderStatus)) { %>
+                          <a href="${pageContext.request.contextPath}/learning.jsp?course=<%= order.courseId %>" class="btn-learn-course">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M8 5v14l11-7z" fill="currentColor"/>
+                            </svg>
+                            Vào học
+                          </a>
+                        <% } else { %>
+                          <span style="color: #999;">Chưa thanh toán</span>
                         <% } %>
                       </td>
                     </tr>
@@ -303,6 +316,31 @@
       });
     });
   </script>
+
+  <style>
+    .btn-learn-course {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    .btn-learn-course:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    .btn-learn-course svg {
+      width: 16px;
+      height: 16px;
+    }
+  </style>
 
   <script src="${pageContext.request.contextPath}/assets/js/common.js"></script>
 </body>

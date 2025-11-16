@@ -606,7 +606,11 @@ a{color:inherit;text-decoration:none}
 .learning-main{flex:1;overflow-y:auto;background:#f8f8f8;height:100%}
 .video-container{background:#000;position:relative}
 .video-wrapper{position:relative;padding-bottom:56.25%;height:0;overflow:hidden}
-.video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+.video-wrapper iframe,.video-wrapper #videoPlayer{position:absolute;top:0;left:0;width:100%;height:100%}
+.video-progress-info{background:#1a1a1a;padding:12px 20px;display:flex;align-items:center;gap:16px}
+.progress-text{color:#fff;font-size:13px;font-weight:500;white-space:nowrap;min-width:90px}
+.progress-bar-thin{flex:1;height:6px;background:rgba(255,255,255,0.2);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;background:#007bff;border-radius:3px;transition:width 0.3s ease}
 .lesson-info{background:#fff;padding:24px;max-width:1200px;margin:0 auto}
 .lesson-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px}
 .lesson-badge{width:48px;height:48px;background:#007bff;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0}

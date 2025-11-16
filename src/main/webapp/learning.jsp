@@ -1,9 +1,11 @@
 ﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="com.example.dao.CartDAO" %>
 <%
     Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
     String userEmail = (String) session.getAttribute("userEmail");
     String userPhone = (String) session.getAttribute("userPhone");
     String userFullname = (String) session.getAttribute("userFullname");
+    Integer userId = (Integer) session.getAttribute("userId");
     
     // Kiểm tra đăng nhập - redirect nếu chưa đăng nhập
     if (loggedIn == null || !loggedIn) {
@@ -12,16 +14,28 @@
     }
     
     String displayInfo = "";
+    int cartCount = 0;
+    
     if (userPhone != null && userPhone.length() >= 3) {
         displayInfo = "***" + userPhone.substring(userPhone.length() - 3);
     } else if (userEmail != null) {
         displayInfo = userEmail;
     }
     
+    // Get cart count from database
+    if (userId != null) {
+        try {
+            CartDAO cartDAO = new CartDAO();
+            cartCount = cartDAO.getCartCount(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     // Get course info from URL parameter
     String courseId = request.getParameter("course");
     if (courseId == null) {
-        courseId = "history-vietnam";
+        courseId = "finance-basic"; // Default course
     }
 %>
 <!doctype html>
@@ -47,6 +61,24 @@
         </button>
         <a class="brand" href="${pageContext.request.contextPath}/">PTIT <strong>LEARNING</strong> <span class="by">by FIN1</span></a>
       </div>
+      
+      <!-- Search Box in Header -->
+      <form action="${pageContext.request.contextPath}/search.jsp" method="get" class="header-search-form">
+        <input 
+          type="text" 
+          name="q" 
+          class="header-search-input" 
+          placeholder="Tìm kiếm..."
+          aria-label="Tìm kiếm khóa học"
+        />
+        <button type="submit" class="header-search-btn" aria-label="Tìm kiếm">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </button>
+      </form>
+      
       <nav class="menu" aria-label="Chính">
         <div class="dropdown">
           <a href="javascript:void(0)" class="has-dd" id="coursesMenu" aria-haspopup="true" aria-expanded="false">Các khóa học</a>
@@ -66,34 +98,31 @@
         </div>
         <a href="${pageContext.request.contextPath}/blog.jsp">Blog</a>
         <a href="${pageContext.request.contextPath}/contact.jsp">Liên hệ</a>
-        <a href="${pageContext.request.contextPath}/cart">Giỏ hàng</a>
+        <a href="${pageContext.request.contextPath}/cart" class="cart-link">
+          Giỏ hàng
+          <% if (cartCount > 0) { %>
+            <span class="cart-badge"><%= cartCount %></span>
+          <% } %>
+        </a>
         <% if (loggedIn != null && loggedIn) { %>
           <a href="${pageContext.request.contextPath}/account" class="user-info"><%= displayInfo %></a>
         <% } else { %>
           <a href="${pageContext.request.contextPath}/login.jsp" class="btn btn-sm">Đăng nhập</a>
         <% } %>
       </nav>
-      <div class="learning-nav-right">
-        <button class="btn-share" title="Chia sẻ">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
-          Chia sẻ
-        </button>
-        <a href="${pageContext.request.contextPath}/account" class="btn-back">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5ZM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5 5 5Z"/></svg>
-          Khóa học của tôi
-        </a>
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="Mở menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
     </div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </header>
 
   <div class="learning-layout">
     <!-- Sidebar -->
     <aside class="learning-sidebar" id="learningSidebar">
       <div class="sidebar-header">
-        <h2 class="course-title" id="courseTitle">Lịch sử Đảng Cộng sản Việt Nam</h2>
+        <h2 class="course-title" id="courseTitle">Lộ trình xây dựng kiến thức tài chính</h2>
         <div class="course-progress">
           <div class="progress-info">
             <span>✓ Đã hoàn thành</span>
@@ -116,25 +145,24 @@
     <main class="learning-main">
       <div class="video-container">
         <div class="video-wrapper" id="videoWrapper">
-          <iframe 
-            id="videoPlayer"
-            width="100%" 
-            height="100%" 
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-            title="Video bài học"
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
+          <div id="videoPlayer"></div>
+        </div>
+        <div class="video-progress-info">
+          <div class="progress-text">
+            <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+          </div>
+          <div class="progress-bar-thin">
+            <div class="progress-bar-fill" id="videoProgressBar" style="width: 0%"></div>
+          </div>
         </div>
       </div>
 
       <!-- Lesson Info -->
       <div class="lesson-info">
         <div class="lesson-header">
-          <div class="lesson-badge" id="lessonBadge">E</div>
+          <div class="lesson-badge" id="lessonBadge">💰</div>
           <div class="lesson-details">
-            <h1 class="lesson-title" id="lessonTitle">[Lịch sử Đảng] 1.1</h1>
+            <h1 class="lesson-title" id="lessonTitle">LỘ TRÌNH XÂY DỰNG KIẾN THỨC TÀI CHÍNH</h1>
             <button class="btn-copy" onclick="copyLink()" title="Sao chép đường dẫn">
               📋 Sao chép đường dẫn
             </button>
@@ -150,14 +178,16 @@
         <div class="tab-content active" id="overview">
           <div class="lesson-description">
             <h3>Mô tả bài học</h3>
-            <p>Trong bài học này, bạn sẽ tìm hiểu về lịch sử hình thành và phát triển của Đảng Cộng sản Việt Nam, 
-            từ những ngày đầu thành lập cho đến vai trò lãnh đạo cách mạng Việt Nam giành độc lập dân tộc.</p>
+            <p>Khóa học <strong>"Lộ trình xây dựng kiến thức tài chính"</strong> của VNSC by Finhay sẽ giúp bạn:</p>
             <ul>
-              <li>Bối cảnh lịch sử thế giới và Việt Nam đầu thế kỷ XX</li>
-              <li>Quá trình hình thành phong trào công nhân Việt Nam</li>
-              <li>Sự ra đời của Đảng Cộng sản Việt Nam</li>
-              <li>Vai trò lãnh đạo của Đảng trong các giai đoạn lịch sử</li>
+              <li>📚 Nắm vững các thuật ngữ tài chính cơ bản</li>
+              <li>💹 Hiểu về thị trường tài chính và cách hoạt động</li>
+              <li>💰 Học cách tích lũy và quản lý tiền bạc hiệu quả</li>
+              <li>📈 Phân biệt các loại hình đầu tư: cổ phiếu, trái phiếu</li>
+              <li>🎯 Xây dựng kế hoạch tài chính cá nhân từ con số 0</li>
+              <li>🚀 Phát triển các cấp độ tài chính để trở thành nhà đầu tư chuyên nghiệp</li>
             </ul>
+            <p>Khóa học gồm <strong>13 video</strong> với tổng thời lượng khoảng <strong>1.5 giờ</strong>, phù hợp cho người mới bắt đầu tìm hiểu về tài chính cá nhân và đầu tư.</p>
           </div>
         </div>
 
@@ -186,43 +216,126 @@
   </div>
 
   <script>
-    // Sample course data
-    const courseData = {
-      title: "Lịch sử Đảng Cộng sản Việt Nam",
-      sections: [
-        {
-          title: "[Lịch sử Đảng] 1.1",
-          lessons: [
-            { id: 1, title: "[Lịch sử Đảng] 1.1", type: "lesson", completed: true, videoId: "dQw4w9WgXcQ" },
-            { id: 2, title: "Câu hỏi video 1", type: "quiz", completed: false },
-            { id: 3, title: "[Lịch sử Đảng] 1.2", type: "lesson", completed: false, videoId: "dQw4w9WgXcQ" },
-            { id: 4, title: "Câu hỏi video 2", type: "quiz", completed: false },
-            { id: 5, title: "[Lịch sử Đảng] 1.3", type: "lesson", completed: false, videoId: "dQw4w9WgXcQ" },
-            { id: 6, title: "Câu hỏi video 3", type: "quiz", completed: false },
-            { id: 7, title: "[Lịch sử Đảng] 1.4", type: "lesson", completed: false, videoId: "dQw4w9WgXcQ" },
-            { id: 8, title: "Câu hỏi video 4", type: "quiz", completed: false }
-          ]
-        },
-        {
-          title: "[Lịch sử Đảng] 2.1",
-          lessons: [
-            { id: 9, title: "[Lịch sử Đảng] 2.1", type: "lesson", completed: false, videoId: "dQw4w9WgXcQ" },
-            { id: 10, title: "Câu hỏi video 5", type: "quiz", completed: false },
-            { id: 11, title: "[Lịch sử Đảng] 2.2", type: "lesson", completed: false, videoId: "dQw4w9WgXcQ" },
-            { id: 12, title: "Câu hỏi video 6", type: "quiz", completed: false },
-            { id: 13, title: "[Lịch sử Đảng] 2.3", type: "lesson", completed: false, videoId: "dQw4w9WgXcQ" },
-            { id: 14, title: "Câu hỏi video 7", type: "quiz", completed: false }
-          ]
-        },
-        {
-          title: "[Lịch sử Đảng] 3.1",
-          lessons: [
-            { id: 15, title: "[Lịch sử Đảng] 3.1", type: "lesson", completed: false, videoId: "dQw4w9WgXcQ" }
-          ]
-        }
-      ]
+    // Get course ID from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentCourseId = urlParams.get('course') || 'finance-basic';
+    
+    // Course data for each course
+    const coursesData = {
+      'finance-basic': {
+        title: "Tài chính cơ bản cho người mới bắt đầu",
+        sections: [
+          {
+            title: "Phần 1: Kiến thức cơ bản",
+            lessons: [
+              { id: 1, title: "LỘ TRÌNH XÂY DỰNG KIẾN THỨC TÀI CHÍNH", type: "lesson", completed: true, videoId: "madrRu_iU6U", duration: "3:11" },
+              { id: 2, title: "BÀI 1: CÁC THUẬT NGỮ TÀI CHÍNH CƠ BẢN CẦN BIẾT", type: "lesson", completed: false, videoId: "wqcLaQo0m5s", duration: "4:15" },
+              { id: 3, title: "BÀI 2: HIỂU VỀ THỊ TRƯỜNG TÀI CHÍNH", type: "lesson", completed: false, videoId: "i0-K4fAvlMQ", duration: "5:03" },
+              { id: 4, title: "BÀI 3: BẢN CHẤT CỦA TÍCH LŨY TIỀN BẠC", type: "lesson", completed: false, videoId: "LBxgRZ04Fvc", duration: "3:55" }
+            ]
+          },
+          {
+            title: "Phần 2: Tích lũy và đầu tư",
+            lessons: [
+              { id: 5, title: "BÀI 4: TÍCH LŨY TIỀN NHƯ THẾ NÀO ĐỂ ĐẠT ĐƯỢC HIỆU QUẢ NHẤT?", type: "lesson", completed: false, videoId: "LDV41AlayVw", duration: "5:53" },
+              { id: 6, title: "BÀI 5: ĐẦU TƯ TỪ ĐÂU?", type: "lesson", completed: false, videoId: "ULEMECVelP0", duration: "6:28" },
+              { id: 7, title: "BÀI 6: PHÂN BIỆT CỔ PHIẾU VÀ TRÁI PHIẾU", type: "lesson", completed: false, videoId: "EVPC25qboNA", duration: "5:53" },
+              { id: 8, title: "BÀI 7: NÊN VỮNG LÝ THUYẾT RỒI MỚI ĐẦU TƯ HAY VỪA HỌC LÝ THUYẾT VỪA ĐẦU TƯ", type: "lesson", completed: false, videoId: "KiL4T9kYZDQ", duration: "5:14" }
+            ]
+          },
+          {
+            title: "Phần 3: Quản lý và phát triển tài chính",
+            lessons: [
+              { id: 9, title: "BÀI 8: THẾ NÀO LÀ TIÊU TIỀN ĐÚNG ĐẮN?", type: "lesson", completed: false, videoId: "dEXI-gGyAmI", duration: "6:05" },
+              { id: 10, title: "BÀI 9: PHÁT TRIỂN CÁC CẤP ĐỘ TÀI CHÍNH ĐỂ TRỞ THÀNH NHÀ ĐẦU TƯ CHUYÊN NGHIỆP", type: "lesson", completed: false, videoId: "11erHIGnSPo", duration: "5:03" },
+              { id: 11, title: "BÀI 10: 5 BÍ KÍP QUẢN LÝ TÀI CHÍNH SẼ THAY ĐỔI CUỘC SỐNG CỦA BẠN", type: "lesson", completed: false, videoId: "06yoYByxnrs", duration: "N/A" },
+              { id: 12, title: "BÀI 11: 5 KÊNH ĐẦU TƯ TÀI CHÍNH BẠN NÊN THỬ MỘT LẦN TRONG ĐỜI", type: "lesson", completed: false, videoId: "FF8V1azhbaw", duration: "7:53" },
+              { id: 13, title: "BÀI 12: CÁCH LẬP KẾ HOẠCH TÀI CHÍNH CÁ NHÂN TỪ CON SỐ 0 ĐẾN TỰ DO TÀI CHÍNH", type: "lesson", completed: false, videoId: "M_maFKUUYbE", duration: "8:46" }
+            ]
+          }
+        ]
+      },
+      'investment': {
+        title: "Đầu tư chứng khoán từ A-Z",
+        sections: [
+          {
+            title: "Phần 1: Kiến thức cơ bản",
+            lessons: [
+              { id: 1, title: "BÀI 1: GIỚI THIỆU VỀ THỊ TRƯỜNG CHỨNG KHOÁN", type: "lesson", completed: true, videoId: "TaiZS8-i6L0", duration: "N/A" },
+              { id: 2, title: "BÀI 2: CÁC LOẠI CHỨNG KHOÁN", type: "lesson", completed: false, videoId: "UB3RZ7RzJc8", duration: "N/A" },
+              { id: 3, title: "BÀI 3: CÁCH THỨC GIAO DỊCH CHỨNG KHOÁN", type: "lesson", completed: false, videoId: "B40G4nUjPv4", duration: "N/A" },
+              { id: 4, title: "BÀI 4: PHÂN TÍCH CƠ BẢN", type: "lesson", completed: false, videoId: "TTJUpK28t1Q", duration: "N/A" },
+              { id: 5, title: "BÀI 5: PHÂN TÍCH KỸ THUẬT", type: "lesson", completed: false, videoId: "qyLOuaCveK0", duration: "N/A" }
+            ]
+          },
+          {
+            title: "Phần 2: Chiến lược đầu tư",
+            lessons: [
+              { id: 6, title: "BÀI 6: XÂY DỰNG DANH MỤC ĐẦU TƯ", type: "lesson", completed: false, videoId: "gD0r43wbjnE", duration: "N/A" },
+              { id: 7, title: "BÀI 7: QUẢN LÝ RỦI RO", type: "lesson", completed: false, videoId: "qiRNtNvWPY4", duration: "N/A" },
+              { id: 8, title: "BÀI 8: TÂM LÝ HỌC TRONG ĐẦU TƯ", type: "lesson", completed: false, videoId: "nFD3tXtRpVA", duration: "N/A" },
+              { id: 9, title: "BÀI 9: CHIẾN LƯỢC ĐẦU TƯ DÀI HẠN", type: "lesson", completed: false, videoId: "NKm6UtxWWUc", duration: "N/A" },
+              { id: 10, title: "BÀI 10: CHIẾN LƯỢC ĐẦU TƯ NGẮN HẠN", type: "lesson", completed: false, videoId: "IVhlYPO0ae4", duration: "N/A" }
+            ]
+          },
+          {
+            title: "Phần 3: Nâng cao",
+            lessons: [
+              { id: 11, title: "BÀI 11: PHÁI SINH VÀ HỢP ĐỒNG TƯƠNG LAI", type: "lesson", completed: false, videoId: "Julqxj_n42w", duration: "N/A" },
+              { id: 12, title: "BÀI 12: ĐẦU TƯ QUỐC TẾ", type: "lesson", completed: false, videoId: "F9jnuEGA7V4", duration: "N/A" },
+              { id: 13, title: "BÀI 13: TỐI ƯU HÓA THUẾ", type: "lesson", completed: false, videoId: "EfMfrBahukA", duration: "N/A" },
+              { id: 14, title: "BÀI 14: XÂY DỰNG CHIẾN LƯỢC ĐẦU TƯ CÁ NHÂN", type: "lesson", completed: false, videoId: "qlraY5eO3-o", duration: "N/A" },
+              { id: 15, title: "BÀI 15: TỔNG KẾT VÀ HƯỚNG DẪN TIẾP THEO", type: "lesson", completed: false, videoId: "sNh8NWP0uCk", duration: "N/A" }
+            ]
+          }
+        ]
+      },
+      'banking': {
+        title: "Nghiệp vụ ngân hàng hiện đại",
+        sections: [
+          {
+            title: "Phần 1: Tổng quan ngân hàng",
+            lessons: [
+              { id: 1, title: "Vai trò của ngân hàng trong nền kinh tế", type: "lesson", completed: true, videoId: "TEMP_BANK_1", duration: "12:00" },
+              { id: 2, title: "Các loại hình dịch vụ ngân hàng", type: "lesson", completed: false, videoId: "TEMP_BANK_2", duration: "15:00" },
+              { id: 3, title: "Nghiệp vụ cho vay và huy động vốn", type: "lesson", completed: false, videoId: "TEMP_BANK_3", duration: "18:00" }
+            ]
+          },
+          {
+            title: "Phần 2: Nghiệp vụ chuyên sâu",
+            lessons: [
+              { id: 4, title: "Quản lý rủi ro tín dụng", type: "lesson", completed: false, videoId: "TEMP_BANK_4", duration: "20:00" },
+              { id: 5, title: "Dịch vụ ngân hàng điện tử", type: "lesson", completed: false, videoId: "TEMP_BANK_5", duration: "16:00" }
+            ]
+          }
+        ]
+      },
+      'personal-finance': {
+        title: "Tài chính cá nhân thông minh",
+        sections: [
+          {
+            title: "Phần 1: Quản lý tiền bạc cơ bản",
+            lessons: [
+              { id: 1, title: "Lập ngân sách cá nhân hiệu quả", type: "lesson", completed: true, videoId: "TEMP_PF_1", duration: "10:00" },
+              { id: 2, title: "Cách tiết kiệm và tích lũy", type: "lesson", completed: false, videoId: "TEMP_PF_2", duration: "12:00" },
+              { id: 3, title: "Quản lý nợ và thẻ tín dụng", type: "lesson", completed: false, videoId: "TEMP_PF_3", duration: "14:00" }
+            ]
+          },
+          {
+            title: "Phần 2: Đầu tư và quy hoạch tài chính",
+            lessons: [
+              { id: 4, title: "Xây dựng quỹ khẩn cấp", type: "lesson", completed: false, videoId: "TEMP_PF_4", duration: "11:00" },
+              { id: 5, title: "Bảo hiểm và bảo vệ tài sản", type: "lesson", completed: false, videoId: "TEMP_PF_5", duration: "13:00" },
+              { id: 6, title: "Lập kế hoạch hưu trí sớm", type: "lesson", completed: false, videoId: "TEMP_PF_6", duration: "15:00" }
+            ]
+          }
+        ]
+      }
     };
-
+    
+    // Get course data based on currentCourseId, fallback to finance-basic
+    const courseData = coursesData[currentCourseId] || coursesData['finance-basic'];
+    
     let currentLesson = courseData.sections[0].lessons[0];
 
     // Toggle sidebar
@@ -244,12 +357,14 @@
         
         section.lessons.forEach(function(lesson) {
           const activeClass = lesson.id === currentLesson.id ? 'active' : '';
-          const completedClass = lesson.completed ? 'completed' : '';
-          const icon = lesson.completed ? '✓' : (lesson.type === 'quiz' ? '❓' : '▶');
+          const isCompleted = isLessonCompleted(lesson.id);
+          const completedClass = isCompleted ? 'completed' : '';
+          const icon = isCompleted ? '✓' : '▶';
+          const duration = lesson.duration ? ' (' + lesson.duration + ')' : '';
           
           html += '<div class="lesson-item ' + activeClass + ' ' + completedClass + '" onclick="selectLesson(' + lesson.id + ')">';
           html += '<span class="lesson-icon">' + icon + '</span>';
-          html += '<span class="lesson-name">' + lesson.title + '</span>';
+          html += '<span class="lesson-name">' + lesson.title + duration + '</span>';
           html += '</div>';
         });
         
@@ -258,6 +373,53 @@
       
       lessonsList.innerHTML = html;
       updateProgress();
+    }
+
+    // YouTube Player instance
+    let player = null;
+    let progressInterval = null;
+    let watchStartTime = null;
+    let totalWatchTime = 0;
+    let youtubeAPIReady = false;
+
+    // Load YouTube IFrame API
+    function onYouTubeIframeAPIReady() {
+      console.log('YouTube IFrame API ready');
+      youtubeAPIReady = true;
+    }
+
+    // Get lesson completion from localStorage
+    function isLessonCompleted(lessonId) {
+      const key = 'completed_' + currentCourseId + '_' + lessonId;
+      return localStorage.getItem(key) === 'true';
+    }
+
+    // Save lesson completion to localStorage
+    function saveLessonCompletion(lessonId) {
+      const key = 'completed_' + currentCourseId + '_' + lessonId;
+      localStorage.setItem(key, 'true');
+    }
+
+    // Format time (seconds to mm:ss)
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return mins + ':' + (secs < 10 ? '0' : '') + secs;
+    }
+
+    // Update video progress UI
+    function updateVideoProgress() {
+      if (!player || !player.getCurrentTime) return;
+      
+      const currentTime = player.getCurrentTime();
+      const duration = player.getDuration();
+      
+      if (duration > 0) {
+        const progress = (currentTime / duration) * 100;
+        document.getElementById('videoProgressBar').style.width = progress + '%';
+        document.getElementById('currentTime').textContent = formatTime(currentTime);
+        document.getElementById('totalTime').textContent = formatTime(duration);
+      }
     }
 
     // Select lesson
@@ -273,15 +435,126 @@
       
       currentLesson = foundLesson;
       
-      // Update video
-      if (currentLesson.type === 'lesson' && currentLesson.videoId) {
-        document.getElementById('videoPlayer').src = 
-          'https://www.youtube.com/embed/' + currentLesson.videoId + '?autoplay=1';
-      }
-      
       // Update UI
       document.getElementById('lessonTitle').textContent = currentLesson.title;
       renderLessons();
+      
+      // Load video with YouTube IFrame API
+      if (currentLesson.type === 'lesson' && currentLesson.videoId) {
+        loadVideo(currentLesson.videoId, currentLesson.id);
+      }
+    }
+
+    // Load video with YouTube IFrame API
+    function loadVideo(videoId, lessonId) {
+      // Wait for YouTube API to be ready
+      if (!youtubeAPIReady) {
+        console.log('Waiting for YouTube API...');
+        setTimeout(function() {
+          loadVideo(videoId, lessonId);
+        }, 500);
+        return;
+      }
+      
+      // Clear existing progress interval
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+      
+      // Reset watch time tracking
+      watchStartTime = null;
+      totalWatchTime = 0;
+      
+      // Destroy existing player
+      if (player) {
+        player.destroy();
+      }
+      
+      // Create new player
+      player = new YT.Player('videoPlayer', {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        playerVars: {
+          'autoplay': 1,
+          'rel': 0,
+          'modestbranding': 1
+        },
+        events: {
+          'onReady': function(event) {
+            // Start progress tracking UI
+            progressInterval = setInterval(updateVideoProgress, 1000);
+          },
+          'onStateChange': function(event) {
+            // When video starts playing
+            if (event.data === YT.PlayerState.PLAYING) {
+              if (!watchStartTime) {
+                watchStartTime = Date.now();
+              }
+            }
+            
+            // When video is paused
+            if (event.data === YT.PlayerState.PAUSED) {
+              if (watchStartTime) {
+                totalWatchTime += (Date.now() - watchStartTime) / 1000;
+                watchStartTime = null;
+              }
+            }
+            
+            // Video ended - only save completion if watched till end
+            if (event.data === YT.PlayerState.ENDED) {
+              if (watchStartTime) {
+                totalWatchTime += (Date.now() - watchStartTime) / 1000;
+              }
+              
+              const duration = player.getDuration();
+              const watchedPercentage = (totalWatchTime / duration) * 100;
+              
+              // Must watch at least 95% to count as completed
+              if (watchedPercentage >= 95) {
+                saveLessonCompletion(lessonId);
+                currentLesson.completed = true;
+                renderLessons();
+                showNotification('✅ Đã hoàn thành bài học! Thời gian xem: ' + formatTime(totalWatchTime), 'success');
+              } else {
+                showNotification('⚠️ Vui lòng xem hết video để hoàn thành bài học', 'info');
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Show notification
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = 'notification notification-' + type;
+      notification.textContent = message;
+      
+      let bgColor = '#2196F3';
+      if (type === 'success') bgColor = '#4CAF50';
+      else if (type === 'error') bgColor = '#f44336';
+      else if (type === 'info') bgColor = '#FF9800';
+      
+      notification.style.cssText = 
+        'position: fixed;' +
+        'top: 100px;' +
+        'right: 20px;' +
+        'padding: 16px 24px;' +
+        'background: ' + bgColor + ';' +
+        'color: white;' +
+        'border-radius: 8px;' +
+        'box-shadow: 0 4px 12px rgba(0,0,0,0.15);' +
+        'font-weight: 600;' +
+        'z-index: 10000;' +
+        'animation: slideIn 0.3s ease;';
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(function() {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(function() { notification.remove(); }, 300);
+      }, 3000);
     }
 
     // Update progress
@@ -292,7 +565,7 @@
       courseData.sections.forEach(function(section) {
         section.lessons.forEach(function(lesson) {
           totalLessons++;
-          if (lesson.completed) completedLessons++;
+          if (isLessonCompleted(lesson.id)) completedLessons++;
         });
       });
       
@@ -384,9 +657,15 @@
     document.addEventListener('DOMContentLoaded', function() {
       renderLessons();
       document.getElementById('courseTitle').textContent = courseData.title;
+      // Load first lesson by default
+      if (courseData.sections.length > 0 && courseData.sections[0].lessons.length > 0) {
+        selectLesson(courseData.sections[0].lessons[0].id);
+      }
     });
   </script>
 
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script src="${pageContext.request.contextPath}/assets/js/common.js"></script>
 </body>
 </html>

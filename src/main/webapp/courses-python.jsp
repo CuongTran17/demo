@@ -335,6 +335,33 @@
         setTimeout(function() { notification.remove(); }, 300);
       }, 3000);
     }
+
+    function isCoursePurchased(courseId) {
+      const purchased = localStorage.getItem('ptit_purchased_courses');
+      if (!purchased) return false;
+      return JSON.parse(purchased).includes(courseId);
+    }
+
+    function updateCourseButtons() {
+      document.querySelectorAll('.btn-add-cart').forEach(function(button) {
+        const match = button.getAttribute('onclick').match(/addToCart\('([^']+)'/);
+        if (match && isCoursePurchased(match[1])) {
+          button.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg> Học ngay';
+          button.className = 'btn-learn-now';
+          button.setAttribute('onclick', 'learnCourse("' + match[1] + '")');
+        }
+      });
+    }
+
+    function learnCourse(courseId) {
+      window.location.href = '${pageContext.request.contextPath}/learning.jsp?course=' + courseId;
+    }
+
+    document.addEventListener('DOMContentLoaded', updateCourseButtons);
+
+    function scrollToCourses(){
+      var el = document.getElementById('all-courses'); if(!el) return; el.scrollIntoView({behavior:'smooth',block:'start'});
+    }
   </script>
   
   <style>

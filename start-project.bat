@@ -17,7 +17,7 @@ taskkill /F /IM java.exe >nul 2>&1
 timeout /t 3 /nobreak >nul
 
 echo [2/4] Building project with Maven...
-cd /d C:\Users\AD\Downloads\demo
+cd /d C:\Users\Lenovo\Downloads\demo
 call mvn clean package -DskipTests
 
 if errorlevel 1 (
@@ -29,13 +29,13 @@ if errorlevel 1 (
 
 echo.
 echo [3/4] Deploying to Tomcat...
-del /Q C:\tomcat10\webapps\ROOT.war 2>nul
-rmdir /S /Q C:\tomcat10\webapps\ROOT 2>nul
-copy target\ROOT.war C:\tomcat10\webapps\ROOT.war
+del /Q C:\Users\Lenovo\Downloads\apache-tomcat-10.1.48-windows-x64\apache-tomcat-10.1.48\webapps\ROOT.war 2>nul
+rmdir /S /Q C:\Users\Lenovo\Downloads\apache-tomcat-10.1.48-windows-x64\apache-tomcat-10.1.48\webapps\ROOT 2>nul
+copy target\ROOT.war C:\Users\Lenovo\Downloads\apache-tomcat-10.1.48-windows-x64\apache-tomcat-10.1.48\webapps\ROOT.war
 
 echo.
 echo [4/4] Starting Tomcat 10...
-start "Tomcat 10" C:\tomcat10\bin\catalina.bat run
+start "Tomcat 10" C:\Users\Lenovo\Downloads\apache-tomcat-10.1.48-windows-x64\apache-tomcat-10.1.48\bin\catalina.bat run
 
 echo.
 echo ========================================
