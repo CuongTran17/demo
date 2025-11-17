@@ -59,9 +59,11 @@ public class OrderDAO {
             String itemSql = "INSERT INTO order_items (order_id, course_id, price) VALUES (?, ?, ?)";
             itemStmt = conn.prepareStatement(itemSql);
             
-            // Insert user courses
-            String userCourseSql = "INSERT INTO user_courses (user_id, course_id, progress) VALUES (?, ?, 0)";
-            userCourseStmt = conn.prepareStatement(userCourseSql);
+            // Insert to course_progress table (correct table name)
+            String progressSql = "INSERT INTO course_progress (user_id, course_id, progress_percentage, status) " +
+                                "VALUES (?, ?, 0, 'in_progress') " +
+                                "ON DUPLICATE KEY UPDATE user_id = user_id";
+            userCourseStmt = conn.prepareStatement(progressSql);
             
             for (Course course : courses) {
                 // Add to order_items
@@ -70,7 +72,7 @@ public class OrderDAO {
                 itemStmt.setBigDecimal(3, course.getPrice());
                 itemStmt.addBatch();
                 
-                // Add to user_courses
+                // Add to course_progress
                 userCourseStmt.setInt(1, userId);
                 userCourseStmt.setString(2, course.getCourseId());
                 userCourseStmt.addBatch();
