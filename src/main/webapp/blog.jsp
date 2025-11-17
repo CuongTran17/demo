@@ -21,7 +21,7 @@
     <h1 class="article-title">Bài viết của chúng tôi</h1>
 
     <figure class="article-cover">
-      <img src="${pageContext.request.contextPath}/assets/img/blog/blog-cover.png" alt="Ảnh bìa bài viết" />
+      <img src="${pageContext.request.contextPath}/assets/img/blog/blog-cover.jpg" alt="Ảnh bìa bài viết" />
     </figure>
 
     <div class="article-meta">
@@ -35,8 +35,8 @@
       <p>Tuyệt vời và hiệu quả, sự nổi lên của lập trình đã tạo ra một kỷ nguyên mới. Đừng chỉ dừng lại ở cú pháp! Chúng ta đang bước vào không gian của kiến trúc phần mềm tinh tế (software architecture), nơi mà hiệu suất tối ưu và trải nghiệm người dùng (UX) là yếu tố sống còn. Từ những dự án farm-to-table (nông trại đến bàn ăn) dùng blockchain, cho đến các hệ thống AI đột phá, lập trình không còn là hoạt động đơn lẻ. Không có sự gián đoạn, chỉ có sự tiến hóa liên tục trong các công cụ, framework (ví dụ: React, Vue, Koci) và phương pháp luận Agile. Phát triển phần mềm hiện đại là sự kết hợp giữa kỹ thuật chuyên sâu và tư duy giải quyết vấn đề.</p>
 
       <div class="article-gallery">
-        <img src="${pageContext.request.contextPath}/assets/img/blog/gallery-1.png" alt="Hình minh hoạ 1" />
-        <img src="${pageContext.request.contextPath}/assets/img/blog/gallery-2.png" alt="Hình minh hoạ 2" />
+        <img src="${pageContext.request.contextPath}/assets/img/blog/gallery-1.jpg" alt="Hình minh hoạ 1" />
+        <img src="${pageContext.request.contextPath}/assets/img/blog/gallery-2.jpg" alt="Hình minh hoạ 2" />
       </div>
 
       <p><b>Giải Mã Bí Ẩn: Từ Thuật Toán Đến Sản Phẩm Cuối Cùng</b></p>
@@ -47,7 +47,7 @@
       <h2 class="related-title">Các bài viết liên quan/khác</h2>
       <div class="grid grid-3">
         <article class="card">
-          <img src="${pageContext.request.contextPath}/assets/img/blog/related-1.png" alt="Bài viết liên quan 1" class="card-img" />
+          <img src="${pageContext.request.contextPath}/assets/img/blog/related-1.jpg" alt="Bài viết liên quan 1" class="card-img" />
           <div class="card-body">
             <h3 class="card-title">Sự thay đổi của thông tư 200</h3>
             <p class="card-text">Simon Do</p>
@@ -61,7 +61,7 @@
           </div>
         </article>
         <article class="card">
-          <img src="${pageContext.request.contextPath}/assets/img/blog/related-3.png" alt="Bài viết liên quan 3" class="card-img" />
+          <img src="${pageContext.request.contextPath}/assets/img/blog/related-3.jpg" alt="Bài viết liên quan 3" class="card-img" />
           <div class="card-body">
             <h3 class="card-title">Marketing trong thời đại số</h3>
             <p class="card-text">Jollie Pham</p>

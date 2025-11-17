@@ -294,126 +294,39 @@
         title: "Nghiệp vụ ngân hàng hiện đại",
         sections: [
           {
-            title: "Phần 1: Cơ sở lý thuyết Nghiệp vụ Ngân hàng",
+            title: "Phần 1: Tổng quan ngân hàng",
             lessons: [
-              { id: 1, title: "Bài 1: Tổng quát nghiệp vụ ngân hàng", type: "lesson", completed: true, videoId: "txh5aG0eh0Q", duration: "1:20:57" },
-              { id: 2, title: "Bài 2: Huy động vốn", type: "lesson", completed: false, videoId: "A1HkkLZdVh0", duration: "1:12:08" },
-              { id: 3, title: "Bài 3: Nghiệp vụ thanh toán", type: "lesson", completed: false, videoId: "2V_wGy7a62o", duration: "1:16:02" }
+              { id: 1, title: "Vai trò của ngân hàng trong nền kinh tế", type: "lesson", completed: true, videoId: "TEMP_BANK_1", duration: "12:00" },
+              { id: 2, title: "Các loại hình dịch vụ ngân hàng", type: "lesson", completed: false, videoId: "TEMP_BANK_2", duration: "15:00" },
+              { id: 3, title: "Nghiệp vụ cho vay và huy động vốn", type: "lesson", completed: false, videoId: "TEMP_BANK_3", duration: "18:00" }
             ]
           },
           {
-            title: "Phần 2: Nghiệp vụ Tín dụng Ngân hàng",
+            title: "Phần 2: Nghiệp vụ chuyên sâu",
             lessons: [
-              { id: 4, title: "Bài 4: Phân tích tín dụng", type: "lesson", completed: false, videoId: "fk2OCqzWdTI", duration: "1:16:57" },
-              { id: 5, title: "Bài 5: Hợp đồng tín dụng và Cho vay ngắn hạn", type: "lesson", completed: false, videoId: "gOi65xm_YGA", duration: "2:12:50" },
-              { id: 6, title: "Bài 6: Cho vay trung hạn và dài hạn", type: "lesson", completed: false, videoId: "8GPhxPEC1y8", duration: "32:52" }
+              { id: 4, title: "Quản lý rủi ro tín dụng", type: "lesson", completed: false, videoId: "TEMP_BANK_4", duration: "20:00" },
+              { id: 5, title: "Dịch vụ ngân hàng điện tử", type: "lesson", completed: false, videoId: "TEMP_BANK_5", duration: "16:00" }
             ]
           }
         ]
       },
       'personal-finance': {
-        title: "Quản lý tài chính cá nhân thông minh",
+        title: "Tài chính cá nhân thông minh",
         sections: [
           {
-            title: "Phần 1: Hành trình Tự do Tài chính - Nền tảng",
+            title: "Phần 1: Quản lý tiền bạc cơ bản",
             lessons: [
-              { id: 1, title: "Phần 1: Giới thiệu về Tự do Tài chính", type: "lesson", completed: true, videoId: "HOPMqOCZ0jI", duration: "24:00" },
-              { id: 2, title: "Phần 2: 12 Bước đạt Tự do Tài chính - Tổng quan", type: "lesson", completed: false, videoId: "GlUvl-MWn6E", duration: "19:00" },
-              { id: 3, title: "Phần 3: Giai đoạn Căng thẳng và Bất an", type: "lesson", completed: false, videoId: "rqtDSOCUEj0", duration: "19:00" },
-              { id: 4, title: "Phần 4: Xây dựng Nền móng Tài chính", type: "lesson", completed: false, videoId: "lKhIompb0M0", duration: "35:00" },
-              { id: 5, title: "Phần 5: Giai đoạn Đầu tư và Phát triển", type: "lesson", completed: false, videoId: "JgTij31JCqM", duration: "29:00" },
-              { id: 6, title: "Phần 6: Xây dựng Thu nhập Thụ động", type: "lesson", completed: false, videoId: "a-gk85cFt4w", duration: "21:00" }
+              { id: 1, title: "Lập ngân sách cá nhân hiệu quả", type: "lesson", completed: true, videoId: "TEMP_PF_1", duration: "10:00" },
+              { id: 2, title: "Cách tiết kiệm và tích lũy", type: "lesson", completed: false, videoId: "TEMP_PF_2", duration: "12:00" },
+              { id: 3, title: "Quản lý nợ và thẻ tín dụng", type: "lesson", completed: false, videoId: "TEMP_PF_3", duration: "14:00" }
             ]
           },
           {
-            title: "Phần 2: Kiến thức và Kỹ năng Tài chính",
+            title: "Phần 2: Đầu tư và quy hoạch tài chính",
             lessons: [
-              { id: 7, title: "Nhận diện góc nhìn sai lệch về Tài chính", type: "lesson", completed: false, videoId: "012JjvAAE9s", duration: "19:00" },
-              { id: 8, title: "Xây dựng nền tảng Đầu tư vững chắc", type: "lesson", completed: false, videoId: "26o_z2gcpyU", duration: "17:00" },
-              { id: 9, title: "4 Mức độ Tiết kiệm hiệu quả", type: "lesson", completed: false, videoId: "DJr2hclTuLM", duration: "15:00" }
-            ]
-          },
-          {
-            title: "Phần 3: Ứng dụng và Thực hành",
-            lessons: [
-              { id: 10, title: "Những sự thật quan trọng về Tiền bạc", type: "lesson", completed: false, videoId: "6Snew5np1tE", duration: "17:00" },
-              { id: 11, title: "2 Loại Tài sản nên Tích lũy", type: "lesson", completed: false, videoId: "Ea8qJsQXHlI", duration: "20:00" },
-              { id: 12, title: "4 Cách Đầu tư để đạt Tự do Tài chính", type: "lesson", completed: false, videoId: "J2-no9gQhzg", duration: "21:00" },
-              { id: 13, title: "3 Điều vô giá Tự do Tài chính mang lại", type: "lesson", completed: false, videoId: "HBkZgvMe2EE", duration: "17:00" }
-            ]
-          }
-        ]
-      },
-      'forex': {
-        title: "Trading Forex cho người mới",
-        sections: [
-          {
-            title: "Phần 1: Kiến thức nền tảng Forex",
-            lessons: [
-              { id: 1, title: "Chiến lược Trading duy nhất bạn cần để sinh lời | Swing Trading", type: "lesson", completed: true, videoId: "HYCdwPCLc8U", duration: "17:47" },
-              { id: 2, title: "Cách Trade Forex cho người mới bắt đầu 2025 | Hướng dẫn đầy đủ", type: "lesson", completed: false, videoId: "Y6xyQRDbJvU", duration: "27:27" },
-              { id: 3, title: "6 Mô hình Nến Đảo chiều cần biết trước khi bắt đầu Trading", type: "lesson", completed: false, videoId: "ibgnOrk9MLo", duration: "8:56" },
-              { id: 4, title: "Bắt đầu Trading rất khó, cho đến khi bạn xem Video này", type: "lesson", completed: false, videoId: "iKKyxN9IIKg", duration: "9:42" },
-              { id: 5, title: "Cách sử dụng Tin tức để kiếm tiền Trading Forex | Phân tích Cơ bản", type: "lesson", completed: false, videoId: "x7Ki7QV7USU", duration: "7:44" },
-              { id: 6, title: "Cách bắt đầu Forex Trading từng bước cho người mới 2025 | Hướng dẫn đầy đủ", type: "lesson", completed: false, videoId: "4NBUlfnETBY", duration: "46:05" }
-            ]
-          },
-          {
-            title: "Phần 2: Kỹ năng Trading nâng cao",
-            lessons: [
-              { id: 7, title: "Cách trở thành Trader có lãi trong vòng chưa đầy 30 ngày", type: "lesson", completed: false, videoId: "WjsSd5Owf9A", duration: "18:10" },
-              { id: 8, title: "Cách bắt đầu Day Trading cho người mới 2025 | Khóa học miễn phí", type: "lesson", completed: false, videoId: "NFb0rX2LOp0", duration: "55:26" },
-              { id: 9, title: "Cách kiếm $250 mỗi ngày với Day Trading khi còn là NGƯỜI MỚI", type: "lesson", completed: false, videoId: "Vjda5pI5vKQ", duration: "21:42" },
-              { id: 10, title: "Chiến lược Support & Resistance rất khó, cho đến khi tôi hiểu điều này", type: "lesson", completed: false, videoId: "7KedELXv68I", duration: "21:31" },
-              { id: 11, title: "Những SAI LẦM Trading tồi tệ nhất và Cách sửa chúng", type: "lesson", completed: false, videoId: "vjlttwZOBMo", duration: "11:06" },
-              { id: 12, title: "Chiến lược Quản lý Rủi ro tốt nhất để kiếm hàng triệu từ Trading", type: "lesson", completed: false, videoId: "VzMlFZbWA0Y", duration: "12:38" }
-            ]
-          },
-          {
-            title: "Phần 3: Chiến lược Trading chuyên nghiệp",
-            lessons: [
-              { id: 13, title: "Chiến lược Forex dễ nhất để có lãi 2025 | Shift of Structure", type: "lesson", completed: false, videoId: "X0Ua4XeA2Xo", duration: "19:45" },
-              { id: 14, title: "Chiến lược Trading này đã giúp tôi kiếm $70,000 trong 1 ngày | Mô hình Head And Shoulders", type: "lesson", completed: false, videoId: "JA4N8nlycXY", duration: "12:59" },
-              { id: 15, title: "Tôi đã chuyển $1,100 thành $17,000 trong 1 tháng Trading Forex", type: "lesson", completed: false, videoId: "7otxB9VIiDs", duration: "11:12" },
-              { id: 16, title: "Hướng dẫn tối thượng về Chiến lược Price Action Trading cho người mới", type: "lesson", completed: false, videoId: "SvJ1ZmZKfc0", duration: "14:28" },
-              { id: 17, title: "Hướng dẫn Forex Trading cho người mới 2025 (3+ giờ)", type: "lesson", completed: false, videoId: "MFqvLMctU_U", duration: "3:41:12" },
-              { id: 18, title: "Tôi đã kiếm $346,000 trong 1 giao dịch để chứng minh không phải may mắn (phân tích đầy đủ)", type: "lesson", completed: false, videoId: "phphBbRex1M", duration: "24:52" }
-            ]
-          },
-          {
-            title: "Phần 4: Chiến thuật nâng cao và Tăng trưởng tài khoản",
-            lessons: [
-              { id: 19, title: "Cách bắt đầu SWING TRADING cho người mới 2025 | Hướng dẫn đầy đủ từng bước", type: "lesson", completed: false, videoId: "bYROdw0xJdc", duration: "28:26" },
-              { id: 20, title: "Cách tăng trưởng tài khoản Forex nhỏ nhanh đến mức cảm giác bất hợp pháp", type: "lesson", completed: false, videoId: "McRKOYBcAiI", duration: "19:41" },
-              { id: 21, title: "Bản thiết kế để trở thành Trader có lãi năm 2025", type: "lesson", completed: false, videoId: "2pEtH0g0z1o", duration: "32:27" },
-              { id: 22, title: "Khóa học Trading Forex toàn diện 2025", type: "lesson", completed: false, videoId: "8rqdN1FnY4s", duration: "1:16:38" }
-            ]
-          }
-        ]
-      },
-      'financial-analysis': {
-        title: "Phân tích báo cáo tài chính doanh nghiệp",
-        sections: [
-          {
-            title: "Phần 1: Tổng quan và Cơ sở",
-            lessons: [
-              { id: 1, title: "Bài 1: Phân tích báo cáo tài chính - Cách đọc báo cáo tài chính", type: "lesson", completed: true, videoId: "Bwzm0v53edk", duration: "1:56:00" },
-              { id: 2, title: "Bài 2: Phân tích bảng cân đối kế toán và báo cáo thu nhập", type: "lesson", completed: false, videoId: "2ENJjbxm7FI", duration: "1:15:38" },
-              { id: 3, title: "Bài 3: Báo cáo lưu chuyển tiền tệ", type: "lesson", completed: false, videoId: "CGa9BoLlO3o", duration: "40:44" }
-            ]
-          },
-          {
-            title: "Phần 2: Phân tích chuyên sâu",
-            lessons: [
-              { id: 4, title: "Bài 4: Phân tích khả năng thanh toán và hoạt động", type: "lesson", completed: false, videoId: "ia-zwIHhemg", duration: "1:04:37" },
-              { id: 5, title: "Bài 5: Phân tích tỷ số đòn bẩy tài chính", type: "lesson", completed: false, videoId: "9BZvmdLUv74", duration: "31:09" },
-              { id: 6, title: "Bài tập thực hành - Phân tích tổng hợp", type: "lesson", completed: false, videoId: "-Pyx4BG9CHk", duration: "12:24" }
-            ]
-          },
-          {
-            title: "Phần 3: Ứng dụng thực tế",
-            lessons: [
-              { id: 7, title: "Case study: Phân tích báo cáo tài chính doanh nghiệp thực tế", type: "lesson", completed: false, videoId: "4QFb-a2vO3s", duration: "57:47" }
+              { id: 4, title: "Xây dựng quỹ khẩn cấp", type: "lesson", completed: false, videoId: "TEMP_PF_4", duration: "11:00" },
+              { id: 5, title: "Bảo hiểm và bảo vệ tài sản", type: "lesson", completed: false, videoId: "TEMP_PF_5", duration: "13:00" },
+              { id: 6, title: "Lập kế hoạch hưu trí sớm", type: "lesson", completed: false, videoId: "TEMP_PF_6", duration: "15:00" }
             ]
           }
         ]
@@ -565,17 +478,10 @@
         playerVars: {
           'autoplay': 1,
           'rel': 0,
-          'modestbranding': 1,
-          'vq': 'hd1080'  // Force HD quality: hd1080, hd720, large (480p), medium (360p), small (240p)
+          'modestbranding': 1
         },
         events: {
           'onReady': function(event) {
-            // Set quality to highest available
-            var availableQualityLevels = player.getAvailableQualityLevels();
-            if (availableQualityLevels && availableQualityLevels.length > 0) {
-              player.setPlaybackQuality(availableQualityLevels[0]); // Set to highest quality
-            }
-            
             // Start progress tracking UI
             progressInterval = setInterval(updateVideoProgress, 1000);
           },

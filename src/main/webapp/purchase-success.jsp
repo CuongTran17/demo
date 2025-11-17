@@ -1,4 +1,4 @@
-﻿<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
     String userEmail = (String) session.getAttribute("userEmail");
