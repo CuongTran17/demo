@@ -228,8 +228,8 @@
           {
             title: "Phần 1: Kiến thức cơ bản",
             lessons: [
-              { id: 1, title: "LỘ TRÌNH XÂY DỰNG KIẾN THỨC TÀI CHÍNH", type: "lesson", completed: true, videoId: "madrRu_iU6U", duration: "3:11" },
-              { id: 2, title: "BÀI 1: CÁC THUẬT NGỮ TÀI CHÍNH CƠ BẢN CẦN BIẾT", type: "lesson", completed: false, videoId: "wqcLaQo0m5s", duration: "4:15" },
+              { id: 1, title: "LỘ TRÌNH XÂY DỰNG KIẾN THỨC TÀI CHÍNH", type: "lesson", videoId: "madrRu_iU6U", duration: "3:11" },
+              { id: 2, title: "BÀI 1: CÁC THUẬT NGỮ TÀI CHÍNH CƠ BẢN CẦN BIẾT", type: "lesson", videoId: "N2lvVUGtAGU", duration: "4:15" },
               { id: 3, title: "BÀI 2: HIỂU VỀ THỊ TRƯỜNG TÀI CHÍNH", type: "lesson", completed: false, videoId: "i0-K4fAvlMQ", duration: "5:03" },
               { id: 4, title: "BÀI 3: BẢN CHẤT CỦA TÍCH LŨY TIỀN BẠC", type: "lesson", completed: false, videoId: "LBxgRZ04Fvc", duration: "3:55" }
             ]
@@ -397,23 +397,23 @@
           {
             title: "Phần 1: Tổng quan và Cơ sở",
             lessons: [
-              { id: 1, title: "Bài 1: Phân tích báo cáo tài chính - Cách đọc báo cáo tài chính", type: "lesson", completed: true, videoId: "Bwzm0v53edk", duration: "1:56:00" },
-              { id: 2, title: "Bài 2: Phân tích bảng cân đối kế toán và báo cáo thu nhập", type: "lesson", completed: false, videoId: "2ENJjbxm7FI", duration: "1:15:38" },
+              { id: 1, title: "Bài 1: Phân tích báo cáo tài chính - Cách đọc báo cáo tài chính", type: "lesson", videoId: "Bwzm0v53edk", duration: "1:56:00" },
+              { id: 2, title: "Bài 2: Phân tích bảng cân đối kế toán và báo cáo thu nhập", type: "lesson", videoId: "2ENJjbxm7FI", duration: "1:15:38" },
               { id: 3, title: "Bài 3: Báo cáo lưu chuyển tiền tệ", type: "lesson", completed: false, videoId: "CGa9BoLlO3o", duration: "40:44" }
             ]
           },
           {
             title: "Phần 2: Phân tích chuyên sâu",
             lessons: [
-              { id: 4, title: "Bài 4: Phân tích khả năng thanh toán và hoạt động", type: "lesson", completed: false, videoId: "ia-zwIHhemg", duration: "1:04:37" },
-              { id: 5, title: "Bài 5: Phân tích tỷ số đòn bẩy tài chính", type: "lesson", completed: false, videoId: "9BZvmdLUv74", duration: "31:09" },
-              { id: 6, title: "Bài tập thực hành - Phân tích tổng hợp", type: "lesson", completed: false, videoId: "-Pyx4BG9CHk", duration: "12:24" }
+              { id: 4, title: "Bài 4: Phân tích khả năng thanh toán và hoạt động", type: "lesson", videoId: "ia-zwIHhemg", duration: "1:04:37" },
+              { id: 5, title: "Bài 5: Phân tích tỷ số đòn bẩy tài chính", type: "lesson", videoId: "9BZvmdLUv74", duration: "31:09" },
+              { id: 6, title: "Bài tập thực hành - Phân tích tổng hợp", type: "lesson", videoId: "-Pyx4BG9CHk", duration: "12:24" }
             ]
           },
           {
             title: "Phần 3: Ứng dụng thực tế",
             lessons: [
-              { id: 7, title: "Case study: Phân tích báo cáo tài chính doanh nghiệp thực tế", type: "lesson", completed: false, videoId: "4QFb-a2vO3s", duration: "57:47" }
+              { id: 7, title: "Case study: Phân tích báo cáo tài chính doanh nghiệp thực tế", type: "lesson", videoId: "4QFb-a2vO3s", duration: "57:47" }
             ]
           }
         ]
@@ -437,25 +437,48 @@
       const lessonsList = document.getElementById('lessonsList');
       let html = '';
       
+      // Build flat list of all lessons for proper sequential checking
+      let allLessons = [];
+      courseData.sections.forEach(function(section) {
+        section.lessons.forEach(function(lesson) {
+          allLessons.push({lesson: lesson, section: section});
+        });
+      });
+      
+      let currentSectionIndex = 0;
       courseData.sections.forEach(function(section) {
         html += '<div class="lesson-section">';
         html += '<div class="section-title">' + section.title + '</div>';
         html += '<div class="section-lessons">';
         
-        section.lessons.forEach(function(lesson) {
+        section.lessons.forEach(function(lesson, indexInSection) {
           const activeClass = lesson.id === currentLesson.id ? 'active' : '';
           const isCompleted = isLessonCompleted(lesson.id);
           const completedClass = isCompleted ? 'completed' : '';
-          const icon = isCompleted ? '✓' : '▶';
+          
+          // Check if previous lesson is completed (across all sections)
+          const globalIndex = allLessons.findIndex(function(item) { 
+            return item.lesson.id === lesson.id; 
+          });
+          const isPreviousCompleted = globalIndex === 0 || isLessonCompleted(allLessons[globalIndex - 1].lesson.id);
+          const isLocked = !isPreviousCompleted;
+          const lockedClass = isLocked ? 'locked' : '';
+          
+          // Icon: checkmark if completed, lock if locked, play button otherwise
+          let icon = '▶';
+          if (isCompleted) icon = '✓';
+          else if (isLocked) icon = '🔒';
+          
           const duration = lesson.duration ? ' (' + lesson.duration + ')' : '';
           
-          html += '<div class="lesson-item ' + activeClass + ' ' + completedClass + '" onclick="selectLesson(' + lesson.id + ')">';
+          html += '<div class="lesson-item ' + activeClass + ' ' + completedClass + ' ' + lockedClass + '" onclick="selectLesson(' + lesson.id + ', ' + isLocked + ')">';
           html += '<span class="lesson-icon">' + icon + '</span>';
           html += '<span class="lesson-name">' + lesson.title + duration + '</span>';
           html += '</div>';
         });
         
         html += '</div></div>';
+        currentSectionIndex++;
       });
       
       lessonsList.innerHTML = html;
@@ -510,7 +533,13 @@
     }
 
     // Select lesson
-    function selectLesson(lessonId) {
+    function selectLesson(lessonId, isLocked) {
+      // Check if lesson is locked
+      if (isLocked) {
+        showNotification('🔒 Bài học này bị khóa! Vui lòng hoàn thành bài học trước đó trước.', 'error');
+        return;
+      }
+      
       // Find lesson
       let foundLesson = null;
       courseData.sections.forEach(function(section) {
@@ -756,6 +785,17 @@
         selectLesson(courseData.sections[0].lessons[0].id);
       }
     });
+    
+    // Add reset progress button (for debugging - remove in production)
+    if (window.location.search.includes('reset=1')) {
+      // Clear all completion data for current course
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('completed_' + currentCourseId)) {
+          localStorage.removeItem(key);
+        }
+      });
+      window.location.href = window.location.pathname + '?course=' + currentCourseId;
+    }
   </script>
 
   <!-- YouTube IFrame API -->

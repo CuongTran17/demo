@@ -87,10 +87,11 @@ public class CourseDAO {
      */
     public List<Course> getUserCourses(int userId) {
         List<Course> courses = new ArrayList<>();
-        String sql = "SELECT c.* FROM courses c " +
-                    "INNER JOIN user_courses uc ON c.course_id = uc.course_id " +
-                    "WHERE uc.user_id = ? " +
-                    "ORDER BY uc.purchased_at DESC";
+        String sql = "SELECT DISTINCT c.* FROM courses c " +
+                    "INNER JOIN order_items oi ON c.course_id = oi.course_id " +
+                    "INNER JOIN orders o ON oi.order_id = o.order_id " +
+                    "WHERE o.user_id = ? AND o.status = 'completed' " +
+                    "ORDER BY o.created_at DESC";
         
         try (Connection conn = DatabaseConnection.getNewConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -113,7 +114,9 @@ public class CourseDAO {
      * Check if user has purchased a course
      */
     public boolean hasUserPurchasedCourse(int userId, String courseId) {
-        String sql = "SELECT COUNT(*) FROM user_courses WHERE user_id = ? AND course_id = ?";
+        String sql = "SELECT COUNT(*) FROM orders o " +
+                     "INNER JOIN order_items oi ON o.order_id = oi.order_id " +
+                     "WHERE o.user_id = ? AND oi.course_id = ? AND o.status = 'completed'";
         
         try (Connection conn = DatabaseConnection.getNewConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

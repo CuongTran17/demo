@@ -30,6 +30,10 @@ public class CartServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+        
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
@@ -69,6 +73,9 @@ public class CartServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        
         String action = request.getParameter("action");
         String courseId = request.getParameter("courseId");
         
@@ -80,8 +87,15 @@ public class CartServlet extends HttpServlet {
             // Check if user is logged in
             if (loggedIn == null || !loggedIn || userId == null) {
                 // User not logged in - require login
-                response.setContentType("application/json");
+                response.setContentType("application/json; charset=UTF-8");
                 response.getWriter().write("{\"success\": false, \"message\": \"Vui lòng đăng nhập để thêm vào giỏ hàng\", \"requireLogin\": true}");
+                return;
+            }
+            
+            // Check if user has already purchased this course
+            if (courseDAO.hasUserPurchasedCourse(userId, courseId)) {
+                response.setContentType("application/json; charset=UTF-8");
+                response.getWriter().write("{\"success\": false, \"message\": \"Bạn đã mua khóa học này rồi. Vui lòng kiểm tra trong 'Khóa học của tôi'\"}");
                 return;
             }
             
@@ -94,7 +108,7 @@ public class CartServlet extends HttpServlet {
                 session.setAttribute("cart", cartItems);
             }
             
-            response.setContentType("application/json");
+            response.setContentType("application/json; charset=UTF-8");
             if (success) {
                 response.getWriter().write("{\"success\": true, \"message\": \"Đã thêm vào giỏ hàng\"}");
             } else {
