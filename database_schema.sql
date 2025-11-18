@@ -218,4 +218,19 @@ ON DUPLICATE KEY UPDATE email=email;
 -- 3. All tables use InnoDB engine for transaction support
 -- 4. Foreign keys ensure referential integrity
 -- 5. Indexes added for performance optimization
+
+-- ============================================
+-- Update course thumbnails with actual image paths
+-- ============================================
+UPDATE courses SET thumbnail = 'assets/img/Index/python.png' WHERE category = 'python';
+UPDATE courses SET thumbnail = 'assets/img/courses-finance/Tài chính cơ bản.png' WHERE course_id = 'finance-basic';
+UPDATE courses SET thumbnail = 'assets/img/courses-finance/Đầu tư chứng khoán.png' WHERE course_id = 'investment';
+UPDATE courses SET thumbnail = 'assets/img/courses-finance/Ngân hàng.png' WHERE course_id = 'banking';
+UPDATE courses SET thumbnail = 'assets/img/courses-finance/Tài chính cá nhân.png' WHERE course_id = 'personal-finance';
+UPDATE courses SET thumbnail = 'assets/img/courses-finance/Forex.png' WHERE course_id = 'forex';
+UPDATE courses SET thumbnail = 'assets/img/courses-finance/Phân tích tài chính.png' WHERE course_id = 'financial-analysis';
+UPDATE courses SET thumbnail = 'assets/img/Index/python.png' WHERE category = 'data';
+UPDATE courses SET thumbnail = 'assets/img/Index/blockchian.png' WHERE category = 'blockchain';
+UPDATE courses SET thumbnail = 'assets/img/Index/kế toàn cơ bản.png' WHERE category = 'accounting';
+UPDATE courses SET thumbnail = 'assets/img/Index/combo sv kinh tế.png' WHERE category = 'marketing';
 -- ============================================

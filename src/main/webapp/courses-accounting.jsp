@@ -57,7 +57,7 @@
       <!-- Course 1 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-accounting/Kế toán cơ bản.png" alt="Kế toán cơ bản" />
+          <img src="/assets/img/courses-accounting/Kế toán cơ bản.png" alt="Kế toán cơ bản" />
           <span class="badge-new">Mới nhất</span>
           <span class="badge-discount">-50%</span>
         </div>
@@ -88,7 +88,7 @@
       <!-- Course 2 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-accounting/MISA.png" alt="MISA" />
+          <img src="/assets/img/courses-accounting/MISA.png" alt="MISA" />
           <span class="badge-hot">Hot</span>
           <span class="badge-discount">-48%</span>
         </div>
@@ -119,7 +119,7 @@
       <!-- Course 3 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-accounting/Kế toán thuế.png" alt="Kế toán thuế" />
+          <img src="/assets/img/courses-accounting/Kế toán thuế.png" alt="Kế toán thuế" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -149,7 +149,7 @@
       <!-- Course 4 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-accounting/Kế toán chi phí.png" alt="Kế toán chi phí" />
+          <img src="/assets/img/courses-accounting/Kế toán chi phí.png" alt="Kế toán chi phí" />
           <span class="badge-discount">-47%</span>
         </div>
         <div class="course-content">
@@ -179,7 +179,7 @@
       <!-- Course 5 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-accounting/Excel kế toán.png" alt="Excel kế toán" />
+          <img src="/assets/img/courses-accounting/Excel kế toán.png" alt="Excel kế toán" />
           <span class="badge-discount">-50%</span>
         </div>
         <div class="course-content">
@@ -209,7 +209,7 @@
       <!-- Course 6 -->
       <article class="course-card">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-accounting/Báo cáo tài chính.png" alt="Báo cáo tài chính" />
+          <img src="/assets/img/courses-accounting/Báo cáo tài chính.png" alt="Báo cáo tài chính" />
           <span class="badge-discount">-48%</span>
         </div>
         <div class="course-content">
