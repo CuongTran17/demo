@@ -60,7 +60,7 @@
       <h2 class="promo-title">THAM GIA CÙNG CHÚNG TÔI</h2>
       <p class="promo-sub">Hơn 10,000+ sinh viên đã tin tưởng và học tập cùng PTIT LEARNING. Trở thành một phần của cộng đồng ngay hôm nay!</p>
       <figure class="promo-media">
-        <img src="${pageContext.request.contextPath}/assets/img/promo.jpg" alt="Tham gia học tập" />
+        <img src="${pageContext.request.contextPath}/assets/img/auth/signup-promo.png" alt="Tham gia học tập" />
       </figure>
       <div class="promo-features">
         <h3>Lợi ích khi đăng ký:</h3>

@@ -57,7 +57,7 @@
       <h2 class="promo-title">HỌC VỚI GIÁ TRỊ TUYỆT VỜI</h2>
       <p class="promo-sub">Tiết kiệm đến 70% với gói combo giảm giá của chúng tôi so với việc mua từng khóa học riêng lẻ. Tham gia ngay!</p>
       <figure class="promo-media">
-        <img src="${pageContext.request.contextPath}/assets/img/promo.jpg" alt="Ưu đãi học tập" />
+        <img src="${pageContext.request.contextPath}/assets/img/auth/login-promo.png" alt="Ưu đãi học tập" />
       </figure>
       <div class="promo-features">
         <h3>Tài khoản mẫu để thử:</h3>
