@@ -2,8 +2,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.model.Course" %>
 <%@ page import="com.example.dao.CourseDAO" %>
-<%
-    response.setCharacterEncoding("UTF-8");
+<% response.setCharacterEncoding("UTF-8");
     response.setContentType("text/html; charset=UTF-8");
     
     Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
@@ -33,8 +32,7 @@
     
     // Search courses from database
     CourseDAO courseDAO = new CourseDAO();
-    List<Course> courses = courseDAO.searchCourses(keyword, category, priceRange, sortBy);
-%>
+    List<Course> courses = courseDAO.searchCourses(keyword, category, priceRange, sortBy); %>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -168,157 +166,155 @@
             <% for (Course course : courses) { %>
               <article class="search-course-card">
                 <div class="search-card-image">
-                  <% 
-                    String thumbnailPath = course.getThumbnail();
+                  <% String thumbnailPath = course.getThumbnail();
                     if (thumbnailPath == null || thumbnailPath.isEmpty()) {
                       // Default image based on category and course ID - khớp với courses pages
                       switch(course.getCategory()) {
                         case "python":
                           switch(course.getCourseId()) {
                             case "python-basics":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-python/Python Basics.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python Basics.png";
                               break;
                             case "python-complete":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-python/Python.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python.png";
                               break;
                             case "python-excel":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-python/Python Excel.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python Excel.png";
                               break;
                             case "selenium-python":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-python/Selenium Python.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Selenium Python.png";
                               break;
                             case "python-oop":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-python/Python OOP.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python OOP.png";
                               break;
                             case "python-procedural":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-python/Procedural Python.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Procedural Python.png";
                               break;
                             default:
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-python/Python Basics.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python Basics.png";
                           }
                           break;
                         case "finance":
                           switch(course.getCourseId()) {
                             case "finance-basic":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-finance/Tài chính cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Tài chính cơ bản.png";
                               break;
                             case "investment":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-finance/Đầu tư chứng khoán.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Đầu tư chứng khoán.png";
                               break;
                             case "banking":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-finance/Ngân hàng.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Ngân hàng.png";
                               break;
                             case "personal-finance":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-finance/Tài chính cá nhân.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Tài chính cá nhân.png";
                               break;
                             case "forex":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-finance/Forex.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Forex.png";
                               break;
                             case "financial-analysis":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-finance/Phân tích tài chính.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Phân tích tài chính.png";
                               break;
                             default:
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-finance/Tài chính cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Tài chính cơ bản.png";
                           }
                           break;
                         case "data":
                           switch(course.getCourseId()) {
                             case "data-basic":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-data/Data Analytics cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Data Analytics cơ bản.png";
                               break;
                             case "excel-data":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-data/Excel for Data.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Excel for Data.png";
                               break;
                             case "sql-data":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-data/SQL.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/SQL.png";
                               break;
                             case "power-bi":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-data/Power BI.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Power BI.png";
                               break;
                             case "python-data":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-data/Python for Data.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Python for Data.png";
                               break;
                             case "tableau":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-data/Tableau.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Tableau.png";
                               break;
                             default:
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-data/Data Analytics cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Data Analytics cơ bản.png";
                           }
                           break;
                         case "blockchain":
                           switch(course.getCourseId()) {
                             case "blockchain-basic":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-blockchain/Blockchain cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Blockchain cơ bản.png";
                               break;
                             case "smart-contract":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-blockchain/Smart Contract.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Smart Contract.png";
                               break;
                             case "defi":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-blockchain/DeFi.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/DeFi.png";
                               break;
                             case "ethereum":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-blockchain/Ethereum.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Ethereum.png";
                               break;
                             case "nft":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-blockchain/NFT.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/NFT.png";
                               break;
                             case "crypto-trading":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-blockchain/Crypto Trading.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Crypto Trading.png";
                               break;
                             default:
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-blockchain/Blockchain cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Blockchain cơ bản.png";
                           }
                           break;
                         case "accounting":
                           switch(course.getCourseId()) {
                             case "accounting-basic":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-accounting/Kế toán cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kế toán cơ bản.png";
                               break;
                             case "accounting-intermediate":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-accounting/Kế toán trung cấp.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kế toán trung cấp.png";
                               break;
                             case "accounting-tax":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-accounting/Kế toán thuế.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kế toán thuế.png";
                               break;
                             case "audit":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-accounting/Kiểm toán.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kiểm toán.png";
                               break;
                             case "excel-accounting":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-accounting/Excel kế toán.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Excel kế toán.png";
                               break;
                             default:
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-accounting/Kế toán cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kế toán cơ bản.png";
                           }
                           break;
                         case "marketing":
                           switch(course.getCourseId()) {
                             case "marketing-basic":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-marketing/Marketing cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Marketing cơ bản.png";
                               break;
                             case "digital-marketing":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-marketing/Digital Marketing.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Digital Marketing.png";
                               break;
                             case "facebook-ads":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-marketing/Facebook Ads.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Facebook Ads.png";
                               break;
                             case "google-ads":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-marketing/Google Ads.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Google Ads.png";
                               break;
                             case "content-marketing":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-marketing/Content Marketing.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Content Marketing.png";
                               break;
                             case "social-media":
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-marketing/Social Media.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Social Media.png";
                               break;
                             default:
-                              thumbnailPath = "${pageContext.request.contextPath}/assets/img/courses-marketing/Marketing cơ bản.png";
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Marketing cơ bản.png";
                           }
                           break;
                         default:
-                          thumbnailPath = "${pageContext.request.contextPath}/assets/img/Index/combo sv kinh tế.png";
+                          thumbnailPath = "" + request.getContextPath() + "/assets/img/Index/combo sv kinh tế.png";
                       }
-                    }
-                  %>
+                    } %>
                   <img src="<%= thumbnailPath %>" alt="<%= course.getCourseName() %>" loading="lazy" />
                   
                   <div class="search-card-badges">
@@ -333,8 +329,7 @@
                 
                 <div class="search-card-content">
                   <span class="search-card-category">
-                    <% 
-                      String categoryDisplay = "";
+                    <% String categoryDisplay = "";
                       switch(course.getCategory()) {
                         case "python": categoryDisplay = "Lập trình - CNTT"; break;
                         case "finance": categoryDisplay = "Tài chính"; break;
@@ -343,8 +338,7 @@
                         case "accounting": categoryDisplay = "Kế toán"; break;
                         case "marketing": categoryDisplay = "Marketing"; break;
                         default: categoryDisplay = course.getCategory();
-                      }
-                    %>
+                      } %>
                     <%= categoryDisplay %>
                   </span>
                   

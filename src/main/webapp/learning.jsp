@@ -503,16 +503,47 @@
       youtubeAPIReady = true;
     }
 
-    // Get lesson completion from localStorage
+    // Server-side lesson progress tracking
+    let completedLessonsCache = new Set();
+    
+    // Load completed lessons from server
+    async function loadCompletedLessons() {
+      try {
+        const response = await fetch('${pageContext.request.contextPath}/api/lesson-progress?courseId=' + currentCourseId);
+        if (response.ok) {
+          const data = await response.json();
+          completedLessonsCache = new Set(data.completedLessons);
+        }
+      } catch (error) {
+        console.error('Failed to load lesson progress:', error);
+      }
+    }
+    
+    // Check if lesson is completed
     function isLessonCompleted(lessonId) {
-      const key = 'completed_' + currentCourseId + '_' + lessonId;
-      return localStorage.getItem(key) === 'true';
+      return completedLessonsCache.has(lessonId);
     }
 
-    // Save lesson completion to localStorage
-    function saveLessonCompletion(lessonId) {
-      const key = 'completed_' + currentCourseId + '_' + lessonId;
-      localStorage.setItem(key, 'true');
+    // Save lesson completion to server
+    async function saveLessonCompletion(lessonId) {
+      try {
+        const formData = new FormData();
+        formData.append('courseId', currentCourseId);
+        formData.append('lessonId', lessonId);
+        formData.append('action', 'complete');
+        
+        const response = await fetch('${pageContext.request.contextPath}/api/lesson-progress', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (response.ok) {
+          completedLessonsCache.add(lessonId);
+        }
+      } catch (error) {
+        console.error('Failed to save lesson progress:', error);
+        showNotification('⚠️ Không thể lưu tiến độ. Vui lòng thử lại.', 'error');
+      }
     }
 
     // Format time (seconds to mm:ss)
@@ -810,12 +841,15 @@
     }
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Load completed lessons from server first
+      await loadCompletedLessons();
+      
       renderLessons();
       document.getElementById('courseTitle').textContent = courseData.title;
       // Load first lesson by default
       if (courseData.sections.length > 0 && courseData.sections[0].lessons.length > 0) {
-        selectLesson(courseData.sections[0].lessons[0].id);
+        selectLesson(courseData.sections[0].lessons[0].id, false);
       }
     });
   </script>
