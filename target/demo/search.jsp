@@ -2,7 +2,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.model.Course" %>
 <%@ page import="com.example.dao.CourseDAO" %>
-<%
+<% response.setCharacterEncoding("UTF-8");
+    response.setContentType("text/html; charset=UTF-8");
+    
     Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
     String userEmail = (String) session.getAttribute("userEmail");
     String userPhone = (String) session.getAttribute("userPhone");
@@ -30,210 +32,20 @@
     
     // Search courses from database
     CourseDAO courseDAO = new CourseDAO();
-    List<Course> courses = courseDAO.searchCourses(keyword, category, priceRange, sortBy);
-%>
+    List<Course> courses = courseDAO.searchCourses(keyword, category, priceRange, sortBy); %>
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Tìm kiếm khóa học – PTIT LEARNING</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/styles.css" />
-  <style>
-    /* Search Page Specific Styles */
-    body {
-      font-family: 'Be Vietnam Pro', sans-serif;
-    }
-    
-    .search-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    
-    .search-header .page-title {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-      color: #1a1a1a;
-      font-family: 'Be Vietnam Pro', sans-serif;
-    }
-    
-    .search-form {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    
-    .search-input-wrapper {
-      display: flex;
-      gap: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    
-    .search-input {
-      flex: 1;
-      padding: 15px 20px;
-      border: none;
-      font-size: 1rem;
-      outline: none;
-      font-family: 'Be Vietnam Pro', sans-serif;
-    }
-    
-    .search-btn {
-      padding: 15px 30px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: opacity 0.3s;
-      font-family: 'Be Vietnam Pro', sans-serif;
-    }
-    
-    .search-btn:hover {
-      opacity: 0.9;
-    }
-    
-    .search-layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 40px;
-      margin-top: 40px;
-    }
-    
-    .search-sidebar {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      height: fit-content;
-      position: sticky;
-      top: 100px;
-    }
-    
-    .filter-section {
-      margin-bottom: 30px;
-    }
-    
-    .filter-section:last-of-type {
-      margin-bottom: 20px;
-    }
-    
-    .filter-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 15px;
-      color: #1a1a1a;
-      font-family: 'Be Vietnam Pro', sans-serif;
-    }
-    
-    .filter-options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .filter-option {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      padding: 8px 0;
-      transition: color 0.2s;
-      font-family: 'Be Vietnam Pro', sans-serif;
-    }
-    
-    .filter-option:hover {
-      color: #667eea;
-    }
-    
-    .filter-option input[type="radio"] {
-      cursor: pointer;
-    }
-    
-    .btn-block {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    
-    .results-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    
-    .results-count {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #1a1a1a;
-      font-family: 'Be Vietnam Pro', sans-serif;
-    }
-    
-    .sort-options {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .sort-options label {
-      font-weight: 600;
-      color: #555;
-      font-family: 'Be Vietnam Pro', sans-serif;
-    }
-    
-    .sort-options select {
-      padding: 8px 15px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      outline: none;
-      font-family: 'Be Vietnam Pro', sans-serif;
-    }
-    
-    .no-results {
-      text-align: center;
-      padding: 60px 20px;
-    }
-    
-    .no-results-icon {
-      font-size: 60px;
-      margin-bottom: 20px;
-    }
-    
-    .no-results h2 {
-      color: #555;
-      margin-bottom: 10px;
-    }
-    
-    .no-results p {
-      color: #999;
-    }
-    
-    @media (max-width: 768px) {
-      .search-layout {
-        grid-template-columns: 1fr;
-      }
-      
-      .search-sidebar {
-        position: static;
-      }
-      
-      .results-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/search.css" />
 </head>
 <body>
   <%@ include file="/includes/header.jsp" %>
@@ -350,35 +162,207 @@
             <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
           </div>
         <% } else { %>
-          <div class="grid grid-3">
+          <div class="search-grid">
             <% for (Course course : courses) { %>
-              <article class="course-card">
-                <% if (course.isNew()) { %>
-                  <span class="badge badge-new">MỚI</span>
-                <% } %>
-                <% if (course.getDiscountPercentage() > 0) { %>
-                  <span class="badge badge-discount">-<%= course.getDiscountPercentage() %>%</span>
-                <% } %>
-                <figure class="card-thumb">
-                  <img src="${pageContext.request.contextPath}/<%= course.getThumbnail() %>" alt="<%= course.getCourseName() %>" loading="lazy" />
-                </figure>
-                <div class="card-body">
-                  <span class="card-category"><%= course.getCategory() %></span>
-                  <h3 class="card-title"><%= course.getCourseName() %></h3>
-                  <p class="card-desc"><%= course.getDescription() %></p>
-                  <div class="card-meta">
-                    <span>⏱️ <%= course.getDuration() %></span>
-                    <span>👥 <%= course.getStudentsCount() %> học viên</span>
-                    <span>📊 <%= course.getLevel() %></span>
+              <article class="search-course-card">
+                <div class="search-card-image">
+                  <% String thumbnailPath = course.getThumbnail();
+                    if (thumbnailPath == null || thumbnailPath.isEmpty()) {
+                      // Default image based on category and course ID - khớp với courses pages
+                      switch(course.getCategory()) {
+                        case "python":
+                          switch(course.getCourseId()) {
+                            case "python-basics":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python Basics.png";
+                              break;
+                            case "python-complete":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python.png";
+                              break;
+                            case "python-excel":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python Excel.png";
+                              break;
+                            case "selenium-python":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Selenium Python.png";
+                              break;
+                            case "python-oop":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python OOP.png";
+                              break;
+                            case "python-procedural":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Procedural Python.png";
+                              break;
+                            default:
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-python/Python Basics.png";
+                          }
+                          break;
+                        case "finance":
+                          switch(course.getCourseId()) {
+                            case "finance-basic":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Tài chính cơ bản.png";
+                              break;
+                            case "investment":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Đầu tư chứng khoán.png";
+                              break;
+                            case "banking":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Ngân hàng.png";
+                              break;
+                            case "personal-finance":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Tài chính cá nhân.png";
+                              break;
+                            case "forex":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Forex.png";
+                              break;
+                            case "financial-analysis":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Phân tích tài chính.png";
+                              break;
+                            default:
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-finance/Tài chính cơ bản.png";
+                          }
+                          break;
+                        case "data":
+                          switch(course.getCourseId()) {
+                            case "data-basic":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Data Analytics cơ bản.png";
+                              break;
+                            case "excel-data":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Excel for Data.png";
+                              break;
+                            case "sql-data":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/SQL.png";
+                              break;
+                            case "power-bi":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Power BI.png";
+                              break;
+                            case "python-data":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Python for Data.png";
+                              break;
+                            case "tableau":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Tableau.png";
+                              break;
+                            default:
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-data/Data Analytics cơ bản.png";
+                          }
+                          break;
+                        case "blockchain":
+                          switch(course.getCourseId()) {
+                            case "blockchain-basic":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Blockchain cơ bản.png";
+                              break;
+                            case "smart-contract":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Smart Contract.png";
+                              break;
+                            case "defi":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/DeFi.png";
+                              break;
+                            case "ethereum":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Ethereum.png";
+                              break;
+                            case "nft":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/NFT.png";
+                              break;
+                            case "crypto-trading":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Crypto Trading.png";
+                              break;
+                            default:
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-blockchain/Blockchain cơ bản.png";
+                          }
+                          break;
+                        case "accounting":
+                          switch(course.getCourseId()) {
+                            case "accounting-basic":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kế toán cơ bản.png";
+                              break;
+                            case "accounting-intermediate":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kế toán trung cấp.png";
+                              break;
+                            case "accounting-tax":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kế toán thuế.png";
+                              break;
+                            case "audit":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kiểm toán.png";
+                              break;
+                            case "excel-accounting":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Excel kế toán.png";
+                              break;
+                            default:
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-accounting/Kế toán cơ bản.png";
+                          }
+                          break;
+                        case "marketing":
+                          switch(course.getCourseId()) {
+                            case "marketing-basic":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Marketing cơ bản.png";
+                              break;
+                            case "digital-marketing":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Digital Marketing.png";
+                              break;
+                            case "facebook-ads":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Facebook Ads.png";
+                              break;
+                            case "google-ads":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Google Ads.png";
+                              break;
+                            case "content-marketing":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Content Marketing.png";
+                              break;
+                            case "social-media":
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Social Media.png";
+                              break;
+                            default:
+                              thumbnailPath = "" + request.getContextPath() + "/assets/img/courses-marketing/Marketing cơ bản.png";
+                          }
+                          break;
+                        default:
+                          thumbnailPath = "" + request.getContextPath() + "/assets/img/Index/combo sv kinh tế.png";
+                      }
+                    } %>
+                  <img src="<%= thumbnailPath %>" alt="<%= course.getCourseName() %>" loading="lazy" />
+                  
+                  <div class="search-card-badges">
+                    <% if (course.isNew()) { %>
+                      <span class="search-badge new">MỚI</span>
+                    <% } %>
+                    <% if (course.getDiscountPercentage() > 0) { %>
+                      <span class="search-badge discount">-<%= course.getDiscountPercentage() %>%</span>
+                    <% } %>
                   </div>
-                  <div class="card-footer">
-                    <div class="price-box">
+                </div>
+                
+                <div class="search-card-content">
+                  <span class="search-card-category">
+                    <% String categoryDisplay = "";
+                      switch(course.getCategory()) {
+                        case "python": categoryDisplay = "Lập trình - CNTT"; break;
+                        case "finance": categoryDisplay = "Tài chính"; break;
+                        case "data": categoryDisplay = "Data Analyst"; break;
+                        case "blockchain": categoryDisplay = "Blockchain"; break;
+                        case "accounting": categoryDisplay = "Kế toán"; break;
+                        case "marketing": categoryDisplay = "Marketing"; break;
+                        default: categoryDisplay = course.getCategory();
+                      } %>
+                    <%= categoryDisplay %>
+                  </span>
+                  
+                  <h3 class="search-card-title"><%= course.getCourseName() %></h3>
+                  
+                  <p class="search-card-description">
+                    <%= course.getDescription() != null ? course.getDescription() : "Khóa học chất lượng cao với nội dung cập nhật và thực tế, giúp bạn nâng cao kỹ năng chuyên môn." %>
+                  </p>
+                  
+                  <div class="search-card-meta">
+                    <span>⏱️ <%= course.getDuration() != null ? course.getDuration() : "16 giờ" %></span>
+                    <span>👥 <%= String.format("%,d", course.getStudentsCount()) %> học viên</span>
+                    <span>📊 <%= course.getLevel() != null ? course.getLevel() : "All" %></span>
+                    <span>⭐ 4.8 (Reviews)</span>
+                  </div>
+                  
+                  <div class="search-card-footer">
+                    <div class="search-price-box">
                       <% if (course.getOldPrice() != null && course.getOldPrice().compareTo(course.getPrice()) > 0) { %>
-                        <span class="price-old"><%= String.format("%,d", course.getOldPrice().longValue()) %>₫</span>
+                        <span class="search-price-old"><%= String.format("%,d", course.getOldPrice().longValue()) %>₫</span>
                       <% } %>
-                      <span class="price-current"><%= String.format("%,d", course.getPrice().longValue()) %>₫</span>
+                      <span class="search-price-current"><%= String.format("%,d", course.getPrice().longValue()) %>₫</span>
                     </div>
-                    <button class="btn btn-add-cart" onclick="addToCart('<%= course.getCourseId() %>', '<%= course.getCourseName() %>', <%= course.getPrice().longValue() %>)">
+                    <button class="search-add-cart" onclick="addToCart('<%= course.getCourseId() %>', '<%= course.getCourseName() %>', <%= course.getPrice().longValue() %>)">
                       🛒 Thêm vào giỏ
                     </button>
                   </div>
@@ -393,8 +377,12 @@
 
   <%@ include file="/includes/footer.jsp" %>
 
+  <script src="${pageContext.request.contextPath}/assets/js/common.js"></script>
   <script src="${pageContext.request.contextPath}/assets/js/cart.js"></script>
   <script>
+    // Get context path for URLs
+    const contextPath = '<%= request.getContextPath() %>';
+
     // Apply filters
     function applyFilters() {
       const category = document.querySelector('input[name="category"]:checked').value;
@@ -402,13 +390,13 @@
       const sort = document.getElementById('sortSelect').value;
       const keyword = document.querySelector('.search-input').value;
 
-      const baseUrl = '${pageContext.request.contextPath}/search.jsp';
+      const baseUrl = contextPath + '/search.jsp';
       window.location.href = baseUrl + '?q=' + encodeURIComponent(keyword) + '&category=' + category + '&price=' + price + '&sort=' + sort;
     }
 
     // Clear filters
     function clearFilters() {
-      window.location.href = '${pageContext.request.contextPath}/search.jsp';
+      window.location.href = contextPath + '/search.jsp';
     }
 
     // Apply sorting
@@ -417,12 +405,9 @@
       const price = document.querySelector('input[name="price"]:checked').value;
       const keyword = document.querySelector('.search-input').value;
 
-      const baseUrl = '${pageContext.request.contextPath}/search.jsp';
+      const baseUrl = contextPath + '/search.jsp';
       window.location.href = baseUrl + '?q=' + encodeURIComponent(keyword) + '&category=' + category + '&price=' + price + '&sort=' + sortValue;
     }
   </script>
-
-  <script src="${pageContext.request.contextPath}/assets/js/common.js"></script>
-  <script src="${pageContext.request.contextPath}/assets/js/cart.js"></script>
 </body>
 </html>

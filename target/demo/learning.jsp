@@ -216,6 +216,14 @@
   </div>
 
   <script>
+    // ============ DEBUG SESSION INFO ============
+    console.log('=== SESSION DEBUG ===');
+    console.log('Logged in:', <%= loggedIn != null && loggedIn %>);
+    console.log('User ID:', <%= userId != null ? userId : "null" %>);
+    console.log('User email:', '<%= userEmail != null ? userEmail : "null" %>');
+    console.log('====================');
+    // ============================================
+
     // Get course ID from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const currentCourseId = urlParams.get('course') || 'finance-basic';
@@ -228,29 +236,29 @@
           {
             title: "Phần 1: Kiến thức cơ bản",
             lessons: [
-              { id: 1, title: "LỘ TRÌNH XÂY DỰNG KIẾN THỨC TÀI CHÍNH", type: "lesson", completed: true, videoId: "madrRu_iU6U", duration: "3:11" },
-              { id: 2, title: "BÀI 1: CÁC THUẬT NGỮ TÀI CHÍNH CƠ BẢN CẦN BIẾT", type: "lesson", completed: false, videoId: "wqcLaQo0m5s", duration: "4:15" },
-              { id: 3, title: "BÀI 2: HIỂU VỀ THỊ TRƯỜNG TÀI CHÍNH", type: "lesson", completed: false, videoId: "i0-K4fAvlMQ", duration: "5:03" },
-              { id: 4, title: "BÀI 3: BẢN CHẤT CỦA TÍCH LŨY TIỀN BẠC", type: "lesson", completed: false, videoId: "LBxgRZ04Fvc", duration: "3:55" }
+              { id: 1, title: "LỘ TRÌNH XÂY DỰNG KIẾN THỨC TÀI CHÍNH", type: "lesson", videoId: "madrRu_iU6U", duration: "3:11" },
+              { id: 2, title: "BÀI 1: CÁC THUẬT NGỮ TÀI CHÍNH CƠ BẢN CẦN BIẾT", type: "lesson", videoId: "wqcLaQo0m5s", duration: "4:15" },
+              { id: 3, title: "BÀI 2: HIỂU VỀ THỊ TRƯỜNG TÀI CHÍNH", type: "lesson", videoId: "i0-K4fAvlMQ", duration: "5:03" },
+              { id: 4, title: "BÀI 3: BẢN CHẤT CỦA TÍCH LŨY TIỀN BẠC", type: "lesson", videoId: "LBxgRZ04Fvc", duration: "3:55" }
             ]
           },
           {
             title: "Phần 2: Tích lũy và đầu tư",
             lessons: [
-              { id: 5, title: "BÀI 4: TÍCH LŨY TIỀN NHƯ THẾ NÀO ĐỂ ĐẠT ĐƯỢC HIỆU QUẢ NHẤT?", type: "lesson", completed: false, videoId: "LDV41AlayVw", duration: "5:53" },
-              { id: 6, title: "BÀI 5: ĐẦU TƯ TỪ ĐÂU?", type: "lesson", completed: false, videoId: "ULEMECVelP0", duration: "6:28" },
-              { id: 7, title: "BÀI 6: PHÂN BIỆT CỔ PHIẾU VÀ TRÁI PHIẾU", type: "lesson", completed: false, videoId: "EVPC25qboNA", duration: "5:53" },
-              { id: 8, title: "BÀI 7: NÊN VỮNG LÝ THUYẾT RỒI MỚI ĐẦU TƯ HAY VỪA HỌC LÝ THUYẾT VỪA ĐẦU TƯ", type: "lesson", completed: false, videoId: "KiL4T9kYZDQ", duration: "5:14" }
+              { id: 5, title: "BÀI 4: TÍCH LŨY TIỀN NHƯ THẾ NÀO ĐỂ ĐẠT ĐƯỢC HIỆU QUẢ NHẤT?", type: "lesson", videoId: "LDV41AlayVw", duration: "5:53" },
+              { id: 6, title: "BÀI 5: ĐẦU TƯ TỪ ĐÂU?", type: "lesson", videoId: "ULEMECVelP0", duration: "6:28" },
+              { id: 7, title: "BÀI 6: PHÂN BIỆT CỔ PHIẾU VÀ TRÁI PHIẾU", type: "lesson", videoId: "EVPC25qboNA", duration: "5:53" },
+              { id: 8, title: "BÀI 7: NÊN VỮNG LÝ THUYẾT RỒI MỚI ĐẦU TƯ HAY VỪA HỌC LÝ THUYẾT VỪA ĐẦU TƯ", type: "lesson", videoId: "KiL4T9kYZDQ", duration: "5:14" }
             ]
           },
           {
             title: "Phần 3: Quản lý và phát triển tài chính",
             lessons: [
-              { id: 9, title: "BÀI 8: THẾ NÀO LÀ TIÊU TIỀN ĐÚNG ĐẮN?", type: "lesson", completed: false, videoId: "dEXI-gGyAmI", duration: "6:05" },
-              { id: 10, title: "BÀI 9: PHÁT TRIỂN CÁC CẤP ĐỘ TÀI CHÍNH ĐỂ TRỞ THÀNH NHÀ ĐẦU TƯ CHUYÊN NGHIỆP", type: "lesson", completed: false, videoId: "11erHIGnSPo", duration: "5:03" },
-              { id: 11, title: "BÀI 10: 5 BÍ KÍP QUẢN LÝ TÀI CHÍNH SẼ THAY ĐỔI CUỘC SỐNG CỦA BẠN", type: "lesson", completed: false, videoId: "06yoYByxnrs", duration: "N/A" },
-              { id: 12, title: "BÀI 11: 5 KÊNH ĐẦU TƯ TÀI CHÍNH BẠN NÊN THỬ MỘT LẦN TRONG ĐỜI", type: "lesson", completed: false, videoId: "FF8V1azhbaw", duration: "7:53" },
-              { id: 13, title: "BÀI 12: CÁCH LẬP KẾ HOẠCH TÀI CHÍNH CÁ NHÂN TỪ CON SỐ 0 ĐẾN TỰ DO TÀI CHÍNH", type: "lesson", completed: false, videoId: "M_maFKUUYbE", duration: "8:46" }
+              { id: 9, title: "BÀI 8: THẾ NÀO LÀ TIÊU TIỀN ĐÚNG ĐẮN?", type: "lesson", videoId: "dEXI-gGyAmI", duration: "6:05" },
+              { id: 10, title: "BÀI 9: PHÁT TRIỂN CÁC CẤP ĐỘ TÀI CHÍNH ĐỂ TRỞ THÀNH NHÀ ĐẦU TƯ CHUYÊN NGHIỆP", type: "lesson", videoId: "11erHIGnSPo", duration: "5:03" },
+              { id: 11, title: "BÀI 10: 5 BÍ KÍP QUẢN LÝ TÀI CHÍNH SẼ THAY ĐỔI CUỘC SỐNG CỦA BẠN", type: "lesson", videoId: "06yoYByxnrs", duration: "N/A" },
+              { id: 12, title: "BÀI 11: 5 KÊNH ĐẦU TƯ TÀI CHÍNH BẠN NÊN THỬ MỘT LẦN TRONG ĐỜI", type: "lesson", videoId: "FF8V1azhbaw", duration: "7:53" },
+              { id: 13, title: "BÀI 12: CÁCH LẬP KẾ HOẠCH TÀI CHÍNH CÁ NHÂN TỪ CON SỐ 0 ĐẾN TỰ DO TÀI CHÍNH", type: "lesson", videoId: "M_maFKUUYbE", duration: "8:46" }
             ]
           }
         ]
@@ -261,31 +269,31 @@
           {
             title: "Phần 1: Kiến thức cơ bản",
             lessons: [
-              { id: 1, title: "BÀI 1: GIỚI THIỆU VỀ THỊ TRƯỜNG CHỨNG KHOÁN", type: "lesson", completed: true, videoId: "TaiZS8-i6L0", duration: "N/A" },
-              { id: 2, title: "BÀI 2: CÁC LOẠI CHỨNG KHOÁN", type: "lesson", completed: false, videoId: "UB3RZ7RzJc8", duration: "N/A" },
-              { id: 3, title: "BÀI 3: CÁCH THỨC GIAO DỊCH CHỨNG KHOÁN", type: "lesson", completed: false, videoId: "B40G4nUjPv4", duration: "N/A" },
-              { id: 4, title: "BÀI 4: PHÂN TÍCH CƠ BẢN", type: "lesson", completed: false, videoId: "TTJUpK28t1Q", duration: "N/A" },
-              { id: 5, title: "BÀI 5: PHÂN TÍCH KỸ THUẬT", type: "lesson", completed: false, videoId: "qyLOuaCveK0", duration: "N/A" }
+              { id: 1, title: "BÀI 1: GIỚI THIỆU VỀ THỊ TRƯỜNG CHỨNG KHOÁN", type: "lesson", videoId: "TaiZS8-i6L0", duration: "N/A" },
+              { id: 2, title: "BÀI 2: CÁC LOẠI CHỨNG KHOÁN", type: "lesson", videoId: "UB3RZ7RzJc8", duration: "N/A" },
+              { id: 3, title: "BÀI 3: CÁCH THỨC GIAO DỊCH CHỨNG KHOÁN", type: "lesson", videoId: "B40G4nUjPv4", duration: "N/A" },
+              { id: 4, title: "BÀI 4: PHÂN TÍCH CƠ BẢN", type: "lesson", videoId: "TTJUpK28t1Q", duration: "N/A" },
+              { id: 5, title: "BÀI 5: PHÂN TÍCH KỸ THUẬT", type: "lesson", videoId: "qyLOuaCveK0", duration: "N/A" }
             ]
           },
           {
             title: "Phần 2: Chiến lược đầu tư",
             lessons: [
-              { id: 6, title: "BÀI 6: XÂY DỰNG DANH MỤC ĐẦU TƯ", type: "lesson", completed: false, videoId: "gD0r43wbjnE", duration: "N/A" },
-              { id: 7, title: "BÀI 7: QUẢN LÝ RỦI RO", type: "lesson", completed: false, videoId: "qiRNtNvWPY4", duration: "N/A" },
-              { id: 8, title: "BÀI 8: TÂM LÝ HỌC TRONG ĐẦU TƯ", type: "lesson", completed: false, videoId: "nFD3tXtRpVA", duration: "N/A" },
-              { id: 9, title: "BÀI 9: CHIẾN LƯỢC ĐẦU TƯ DÀI HẠN", type: "lesson", completed: false, videoId: "NKm6UtxWWUc", duration: "N/A" },
-              { id: 10, title: "BÀI 10: CHIẾN LƯỢC ĐẦU TƯ NGẮN HẠN", type: "lesson", completed: false, videoId: "IVhlYPO0ae4", duration: "N/A" }
+              { id: 6, title: "BÀI 6: XÂY DỰNG DANH MỤC ĐẦU TƯ", type: "lesson", videoId: "gD0r43wbjnE", duration: "N/A" },
+              { id: 7, title: "BÀI 7: QUẢN LÝ RỦI RO", type: "lesson", videoId: "qiRNtNvWPY4", duration: "N/A" },
+              { id: 8, title: "BÀI 8: TÂM LÝ HỌC TRONG ĐẦU TƯ", type: "lesson", videoId: "nFD3tXtRpVA", duration: "N/A" },
+              { id: 9, title: "BÀI 9: CHIẾN LƯỢC ĐẦU TƯ DÀI HẠN", type: "lesson", videoId: "NKm6UtxWWUc", duration: "N/A" },
+              { id: 10, title: "BÀI 10: CHIẾN LƯỢC ĐẦU TƯ NGẮN HẠN", type: "lesson", videoId: "IVhlYPO0ae4", duration: "N/A" }
             ]
           },
           {
             title: "Phần 3: Nâng cao",
             lessons: [
-              { id: 11, title: "BÀI 11: PHÁI SINH VÀ HỢP ĐỒNG TƯƠNG LAI", type: "lesson", completed: false, videoId: "Julqxj_n42w", duration: "N/A" },
-              { id: 12, title: "BÀI 12: ĐẦU TƯ QUỐC TẾ", type: "lesson", completed: false, videoId: "F9jnuEGA7V4", duration: "N/A" },
-              { id: 13, title: "BÀI 13: TỐI ƯU HÓA THUẾ", type: "lesson", completed: false, videoId: "EfMfrBahukA", duration: "N/A" },
-              { id: 14, title: "BÀI 14: XÂY DỰNG CHIẾN LƯỢC ĐẦU TƯ CÁ NHÂN", type: "lesson", completed: false, videoId: "qlraY5eO3-o", duration: "N/A" },
-              { id: 15, title: "BÀI 15: TỔNG KẾT VÀ HƯỚNG DẪN TIẾP THEO", type: "lesson", completed: false, videoId: "sNh8NWP0uCk", duration: "N/A" }
+              { id: 11, title: "BÀI 11: PHÁI SINH VÀ HỢP ĐỒNG TƯƠNG LAI", type: "lesson", videoId: "Julqxj_n42w", duration: "N/A" },
+              { id: 12, title: "BÀI 12: ĐẦU TƯ QUỐC TẾ", type: "lesson", videoId: "F9jnuEGA7V4", duration: "N/A" },
+              { id: 13, title: "BÀI 13: TỐI ƯU HÓA THUẾ", type: "lesson", videoId: "EfMfrBahukA", duration: "N/A" },
+              { id: 14, title: "BÀI 14: XÂY DỰNG CHIẾN LƯỢC ĐẦU TƯ CÁ NHÂN", type: "lesson", videoId: "qlraY5eO3-o", duration: "N/A" },
+              { id: 15, title: "BÀI 15: TỔNG KẾT VÀ HƯỚNG DẪN TIẾP THEO", type: "lesson", videoId: "sNh8NWP0uCk", duration: "N/A" }
             ]
           }
         ]
@@ -294,39 +302,126 @@
         title: "Nghiệp vụ ngân hàng hiện đại",
         sections: [
           {
-            title: "Phần 1: Tổng quan ngân hàng",
+            title: "Phần 1: Cơ sở lý thuyết Nghiệp vụ Ngân hàng",
             lessons: [
-              { id: 1, title: "Vai trò của ngân hàng trong nền kinh tế", type: "lesson", completed: true, videoId: "TEMP_BANK_1", duration: "12:00" },
-              { id: 2, title: "Các loại hình dịch vụ ngân hàng", type: "lesson", completed: false, videoId: "TEMP_BANK_2", duration: "15:00" },
-              { id: 3, title: "Nghiệp vụ cho vay và huy động vốn", type: "lesson", completed: false, videoId: "TEMP_BANK_3", duration: "18:00" }
+              { id: 1, title: "Bài 1: Tổng quát nghiệp vụ ngân hàng", type: "lesson", videoId: "txh5aG0eh0Q", duration: "1:20:57" },
+              { id: 2, title: "Bài 2: Huy động vốn", type: "lesson", videoId: "A1HkkLZdVh0", duration: "1:12:08" },
+              { id: 3, title: "Bài 3: Nghiệp vụ thanh toán", type: "lesson", videoId: "2V_wGy7a62o", duration: "1:16:02" }
             ]
           },
           {
-            title: "Phần 2: Nghiệp vụ chuyên sâu",
+            title: "Phần 2: Nghiệp vụ Tín dụng Ngân hàng",
             lessons: [
-              { id: 4, title: "Quản lý rủi ro tín dụng", type: "lesson", completed: false, videoId: "TEMP_BANK_4", duration: "20:00" },
-              { id: 5, title: "Dịch vụ ngân hàng điện tử", type: "lesson", completed: false, videoId: "TEMP_BANK_5", duration: "16:00" }
+              { id: 4, title: "Bài 4: Phân tích tín dụng", type: "lesson", videoId: "fk2OCqzWdTI", duration: "1:16:57" },
+              { id: 5, title: "Bài 5: Hợp đồng tín dụng và Cho vay ngắn hạn", type: "lesson", videoId: "gOi65xm_YGA", duration: "2:12:50" },
+              { id: 6, title: "Bài 6: Cho vay trung hạn và dài hạn", type: "lesson", videoId: "8GPhxPEC1y8", duration: "32:52" }
             ]
           }
         ]
       },
       'personal-finance': {
-        title: "Tài chính cá nhân thông minh",
+        title: "Quản lý tài chính cá nhân thông minh",
         sections: [
           {
-            title: "Phần 1: Quản lý tiền bạc cơ bản",
+            title: "Phần 1: Hành trình Tự do Tài chính - Nền tảng",
             lessons: [
-              { id: 1, title: "Lập ngân sách cá nhân hiệu quả", type: "lesson", completed: true, videoId: "TEMP_PF_1", duration: "10:00" },
-              { id: 2, title: "Cách tiết kiệm và tích lũy", type: "lesson", completed: false, videoId: "TEMP_PF_2", duration: "12:00" },
-              { id: 3, title: "Quản lý nợ và thẻ tín dụng", type: "lesson", completed: false, videoId: "TEMP_PF_3", duration: "14:00" }
+              { id: 1, title: "Phần 1: Giới thiệu về Tự do Tài chính", type: "lesson", videoId: "HOPMqOCZ0jI", duration: "24:00" },
+              { id: 2, title: "Phần 2: 12 Bước đạt Tự do Tài chính - Tổng quan", type: "lesson", videoId: "GlUvl-MWn6E", duration: "19:00" },
+              { id: 3, title: "Phần 3: Giai đoạn Căng thẳng và Bất an", type: "lesson", videoId: "rqtDSOCUEj0", duration: "19:00" },
+              { id: 4, title: "Phần 4: Xây dựng Nền móng Tài chính", type: "lesson", videoId: "lKhIompb0M0", duration: "35:00" },
+              { id: 5, title: "Phần 5: Giai đoạn Đầu tư và Phát triển", type: "lesson", videoId: "JgTij31JCqM", duration: "29:00" },
+              { id: 6, title: "Phần 6: Xây dựng Thu nhập Thụ động", type: "lesson", videoId: "a-gk85cFt4w", duration: "21:00" }
             ]
           },
           {
-            title: "Phần 2: Đầu tư và quy hoạch tài chính",
+            title: "Phần 2: Kiến thức và Kỹ năng Tài chính",
             lessons: [
-              { id: 4, title: "Xây dựng quỹ khẩn cấp", type: "lesson", completed: false, videoId: "TEMP_PF_4", duration: "11:00" },
-              { id: 5, title: "Bảo hiểm và bảo vệ tài sản", type: "lesson", completed: false, videoId: "TEMP_PF_5", duration: "13:00" },
-              { id: 6, title: "Lập kế hoạch hưu trí sớm", type: "lesson", completed: false, videoId: "TEMP_PF_6", duration: "15:00" }
+              { id: 7, title: "Nhận diện góc nhìn sai lệch về Tài chính", type: "lesson", videoId: "012JjvAAE9s", duration: "19:00" },
+              { id: 8, title: "Xây dựng nền tảng Đầu tư vững chắc", type: "lesson", videoId: "26o_z2gcpyU", duration: "17:00" },
+              { id: 9, title: "4 Mức độ Tiết kiệm hiệu quả", type: "lesson", videoId: "DJr2hclTuLM", duration: "15:00" }
+            ]
+          },
+          {
+            title: "Phần 3: Ứng dụng và Thực hành",
+            lessons: [
+              { id: 10, title: "Những sự thật quan trọng về Tiền bạc", type: "lesson", videoId: "6Snew5np1tE", duration: "17:00" },
+              { id: 11, title: "2 Loại Tài sản nên Tích lũy", type: "lesson", videoId: "Ea8qJsQXHlI", duration: "20:00" },
+              { id: 12, title: "4 Cách Đầu tư để đạt Tự do Tài chính", type: "lesson", videoId: "J2-no9gQhzg", duration: "21:00" },
+              { id: 13, title: "3 Điều vô giá Tự do Tài chính mang lại", type: "lesson", videoId: "HBkZgvMe2EE", duration: "17:00" }
+            ]
+          }
+        ]
+      },
+      'forex': {
+        title: "Trading Forex cho người mới",
+        sections: [
+          {
+            title: "Phần 1: Kiến thức nền tảng Forex",
+            lessons: [
+              { id: 1, title: "Chiến lược Trading duy nhất bạn cần để sinh lời | Swing Trading", type: "lesson", videoId: "HYCdwPCLc8U", duration: "17:47" },
+              { id: 2, title: "Cách Trade Forex cho người mới bắt đầu 2025 | Hướng dẫn đầy đủ", type: "lesson", videoId: "Y6xyQRDbJvU", duration: "27:27" },
+              { id: 3, title: "6 Mô hình Nến Đảo chiều cần biết trước khi bắt đầu Trading", type: "lesson", videoId: "ibgnOrk9MLo", duration: "8:56" },
+              { id: 4, title: "Bắt đầu Trading rất khó, cho đến khi bạn xem Video này", type: "lesson", videoId: "iKKyxN9IIKg", duration: "9:42" },
+              { id: 5, title: "Cách sử dụng Tin tức để kiếm tiền Trading Forex | Phân tích Cơ bản", type: "lesson", videoId: "x7Ki7QV7USU", duration: "7:44" },
+              { id: 6, title: "Cách bắt đầu Forex Trading từng bước cho người mới 2025 | Hướng dẫn đầy đủ", type: "lesson", videoId: "4NBUlfnETBY", duration: "46:05" }
+            ]
+          },
+          {
+            title: "Phần 2: Kỹ năng Trading nâng cao",
+            lessons: [
+              { id: 7, title: "Cách trở thành Trader có lãi trong vòng chưa đầy 30 ngày", type: "lesson", videoId: "WjsSd5Owf9A", duration: "18:10" },
+              { id: 8, title: "Cách bắt đầu Day Trading cho người mới 2025 | Khóa học miễn phí", type: "lesson", videoId: "NFb0rX2LOp0", duration: "55:26" },
+              { id: 9, title: "Cách kiếm $250 mỗi ngày với Day Trading khi còn là NGƯỜI MỚI", type: "lesson", videoId: "Vjda5pI5vKQ", duration: "21:42" },
+              { id: 10, title: "Chiến lược Support & Resistance rất khó, cho đến khi tôi hiểu điều này", type: "lesson", videoId: "7KedELXv68I", duration: "21:31" },
+              { id: 11, title: "Những SAI LẦM Trading tồi tệ nhất và Cách sửa chúng", type: "lesson", videoId: "vjlttwZOBMo", duration: "11:06" },
+              { id: 12, title: "Chiến lược Quản lý Rủi ro tốt nhất để kiếm hàng triệu từ Trading", type: "lesson", videoId: "VzMlFZbWA0Y", duration: "12:38" }
+            ]
+          },
+          {
+            title: "Phần 3: Chiến lược Trading chuyên nghiệp",
+            lessons: [
+              { id: 13, title: "Chiến lược Forex dễ nhất để có lãi 2025 | Shift of Structure", type: "lesson", videoId: "X0Ua4XeA2Xo", duration: "19:45" },
+              { id: 14, title: "Chiến lược Trading này đã giúp tôi kiếm $70,000 trong 1 ngày | Mô hình Head And Shoulders", type: "lesson", videoId: "JA4N8nlycXY", duration: "12:59" },
+              { id: 15, title: "Tôi đã chuyển $1,100 thành $17,000 trong 1 tháng Trading Forex", type: "lesson", videoId: "7otxB9VIiDs", duration: "11:12" },
+              { id: 16, title: "Hướng dẫn tối thượng về Chiến lược Price Action Trading cho người mới", type: "lesson", videoId: "SvJ1ZmZKfc0", duration: "14:28" },
+              { id: 17, title: "Hướng dẫn Forex Trading cho người mới 2025 (3+ giờ)", type: "lesson", videoId: "MFqvLMctU_U", duration: "3:41:12" },
+              { id: 18, title: "Tôi đã kiếm $346,000 trong 1 giao dịch để chứng minh không phải may mắn (phân tích đầy đủ)", type: "lesson", videoId: "phphBbRex1M", duration: "24:52" }
+            ]
+          },
+          {
+            title: "Phần 4: Chiến thuật nâng cao và Tăng trưởng tài khoản",
+            lessons: [
+              { id: 19, title: "Cách bắt đầu SWING TRADING cho người mới 2025 | Hướng dẫn đầy đủ từng bước", type: "lesson", videoId: "bYROdw0xJdc", duration: "28:26" },
+              { id: 20, title: "Cách tăng trưởng tài khoản Forex nhỏ nhanh đến mức cảm giác bất hợp pháp", type: "lesson", videoId: "McRKOYBcAiI", duration: "19:41" },
+              { id: 21, title: "Bản thiết kế để trở thành Trader có lãi năm 2025", type: "lesson", videoId: "2pEtH0g0z1o", duration: "32:27" },
+              { id: 22, title: "Khóa học Trading Forex toàn diện 2025", type: "lesson", videoId: "8rqdN1FnY4s", duration: "1:16:38" }
+            ]
+          }
+        ]
+      },
+      'financial-analysis': {
+        title: "Phân tích báo cáo tài chính doanh nghiệp",
+        sections: [
+          {
+            title: "Phần 1: Tổng quan và Cơ sở",
+            lessons: [
+              { id: 1, title: "Bài 1: Phân tích báo cáo tài chính - Cách đọc báo cáo tài chính", type: "lesson", videoId: "Bwzm0v53edk", duration: "1:56:00" },
+              { id: 2, title: "Bài 2: Phân tích bảng cân đối kế toán và báo cáo thu nhập", type: "lesson", videoId: "2ENJjbxm7FI", duration: "1:15:38" },
+              { id: 3, title: "Bài 3: Báo cáo lưu chuyển tiền tệ", type: "lesson", videoId: "CGa9BoLlO3o", duration: "40:44" }
+            ]
+          },
+          {
+            title: "Phần 2: Phân tích chuyên sâu",
+            lessons: [
+              { id: 4, title: "Bài 4: Phân tích khả năng thanh toán và hoạt động", type: "lesson", videoId: "ia-zwIHhemg", duration: "1:04:37" },
+              { id: 5, title: "Bài 5: Phân tích tỷ số đòn bẩy tài chính", type: "lesson", videoId: "9BZvmdLUv74", duration: "31:09" },
+              { id: 6, title: "Bài tập thực hành - Phân tích tổng hợp", type: "lesson", videoId: "-Pyx4BG9CHk", duration: "12:24" }
+            ]
+          },
+          {
+            title: "Phần 3: Ứng dụng thực tế",
+            lessons: [
+              { id: 7, title: "Case study: Phân tích báo cáo tài chính doanh nghiệp thực tế", type: "lesson", videoId: "4QFb-a2vO3s", duration: "57:47" }
             ]
           }
         ]
@@ -350,25 +445,53 @@
       const lessonsList = document.getElementById('lessonsList');
       let html = '';
       
+      // Build flat list of all lessons for proper sequential checking
+      let allLessons = [];
+      courseData.sections.forEach(function(section) {
+        section.lessons.forEach(function(lesson) {
+          allLessons.push({lesson: lesson, section: section});
+        });
+      });
+      
+      let currentSectionIndex = 0;
       courseData.sections.forEach(function(section) {
         html += '<div class="lesson-section">';
         html += '<div class="section-title">' + section.title + '</div>';
         html += '<div class="section-lessons">';
         
-        section.lessons.forEach(function(lesson) {
+        section.lessons.forEach(function(lesson, indexInSection) {
           const activeClass = lesson.id === currentLesson.id ? 'active' : '';
           const isCompleted = isLessonCompleted(lesson.id);
           const completedClass = isCompleted ? 'completed' : '';
-          const icon = isCompleted ? '✓' : '▶';
+          
+          // LOGIC: Chỉ bài đầu tiên mở khóa, các bài sau phải xem tuần tự
+          const globalIndex = allLessons.findIndex(function(item) { 
+            return item.lesson.id === lesson.id; 
+          });
+          
+          // Bài đầu tiên luôn mở, các bài sau PHẢI hoàn thành bài trước mới mở
+          let isLocked = false;
+          if (globalIndex > 0) {
+            isLocked = !isLessonCompleted(allLessons[globalIndex - 1].lesson.id);
+          }
+          
+          const lockedClass = isLocked ? 'locked' : '';
+          
+          // Icon: checkmark if completed, lock if locked, play button otherwise
+          let icon = '▶';
+          if (isCompleted) icon = '✓';
+          else if (isLocked) icon = '🔒';
+          
           const duration = lesson.duration ? ' (' + lesson.duration + ')' : '';
           
-          html += '<div class="lesson-item ' + activeClass + ' ' + completedClass + '" onclick="selectLesson(' + lesson.id + ')">';
+          html += '<div class="lesson-item ' + activeClass + ' ' + completedClass + ' ' + lockedClass + '" onclick="selectLesson(' + lesson.id + ', ' + isLocked + ')">';
           html += '<span class="lesson-icon">' + icon + '</span>';
           html += '<span class="lesson-name">' + lesson.title + duration + '</span>';
           html += '</div>';
         });
         
         html += '</div></div>';
+        currentSectionIndex++;
       });
       
       lessonsList.innerHTML = html;
@@ -381,6 +504,8 @@
     let watchStartTime = null;
     let totalWatchTime = 0;
     let youtubeAPIReady = false;
+    let currentLessonId = null;
+    let progressCheckInterval = null;
 
     // Load YouTube IFrame API
     function onYouTubeIframeAPIReady() {
@@ -388,17 +513,148 @@
       youtubeAPIReady = true;
     }
 
-    // Get lesson completion from localStorage
+    // Server-side lesson progress tracking
+    let completedLessonsCache = new Set();
+    
+    // Load completed lessons from server
+    async function loadCompletedLessons() {
+      try {
+        const url = '${pageContext.request.contextPath}/api/lesson-progress?courseId=' + currentCourseId;
+        console.log('Fetching progress from:', url);
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          credentials: 'same-origin'
+        });
+        console.log('Response status:', response.status);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Server returned:', data);
+          console.log('completedLessons field:', data.completedLessons);
+          console.log('Type:', typeof data.completedLessons);
+          
+          // Convert all to strings for consistency
+          if (data.completedLessons && Array.isArray(data.completedLessons)) {
+            completedLessonsCache = new Set(data.completedLessons.map(String));
+            console.log('Loaded completed lessons:', Array.from(completedLessonsCache));
+          } else {
+            console.error('completedLessons is not an array:', data.completedLessons);
+            completedLessonsCache = new Set();
+          }
+          updateProgress();
+        } else {
+          const errorText = await response.text();
+          console.error('Server error:', response.status, errorText);
+        }
+      } catch (error) {
+        console.error('Failed to load lesson progress:', error);
+      }
+    }
+    
+    // Check if lesson is completed
     function isLessonCompleted(lessonId) {
-      const key = 'completed_' + currentCourseId + '_' + lessonId;
-      return localStorage.getItem(key) === 'true';
+      return completedLessonsCache.has(String(lessonId));
     }
 
-    // Save lesson completion to localStorage
-    function saveLessonCompletion(lessonId) {
-      const key = 'completed_' + currentCourseId + '_' + lessonId;
-      localStorage.setItem(key, 'true');
+    // Save lesson completion to server
+    async function saveLessonCompletion(lessonId) {
+      // Prevent duplicate saves
+      if (isLessonCompleted(lessonId)) {
+        console.log('[SAVE] Lesson', lessonId, 'already completed, skipping');
+        return Promise.resolve();
+      }
+      
+      try {
+        const params = new URLSearchParams();
+        params.append('courseId', currentCourseId);
+        params.append('lessonId', String(lessonId));
+        params.append('action', 'complete');
+        
+        console.log('[SAVE] Saving lesson:', lessonId, 'for course:', currentCourseId);
+        console.log('[SAVE] POST data:', params.toString());
+        
+        const response = await fetch('${pageContext.request.contextPath}/api/lesson-progress', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: params.toString()
+        });
+        
+        console.log('[SAVE] Response status:', response.status);
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log('[SAVE] ✅ SUCCESS:', result);
+          
+          // Update cache immediately
+          completedLessonsCache.add(String(lessonId));
+          console.log('[SAVE] Cache updated. Completed lessons:', Array.from(completedLessonsCache));
+          
+          // Update UI immediately
+          updateProgress();
+          renderLessons();
+          
+          return Promise.resolve(result);
+        } else {
+          const errorText = await response.text();
+          console.error('[SAVE] ❌ FAILED:', response.status, errorText);
+          return Promise.reject(new Error(errorText));
+        }
+      } catch (error) {
+        console.error('[SAVE] ❌ ERROR:', error);
+        return Promise.reject(error);
+      }
     }
+
+    // Check if current video should be marked as complete
+    function checkAndSaveProgress() {
+      if (!player) {
+        console.log('[CHECK] No player');
+        return;
+      }
+      if (!currentLessonId) {
+        console.log('[CHECK] No currentLessonId');
+        return;
+      }
+      
+      try {
+        const duration = player.getDuration();
+        const currentTime = player.getCurrentTime();
+        const watchedPercentage = (currentTime / duration) * 100;
+        const isCompleted = isLessonCompleted(currentLessonId);
+        
+        console.log('[CHECK] Lesson:', currentLessonId, '| Time:', currentTime.toFixed(1) + 's /', duration.toFixed(1) + 's', '| Progress:', watchedPercentage.toFixed(1) + '%', '| Completed:', isCompleted);
+        
+        if (!duration || duration <= 0) {
+          console.log('[CHECK] Invalid duration');
+          return;
+        }
+        
+        // If watched 70% or more and NOT already completed, save it
+        if (watchedPercentage >= 70 && !isCompleted) {
+          console.log('[CHECK] ✅ TRIGGERING AUTO-SAVE for lesson', currentLessonId);
+          saveLessonCompletion(currentLessonId).then(function(result) {
+            console.log('[CHECK] ✅ Save completed successfully');
+            currentLesson.completed = true;
+          }).catch(function(error) {
+            console.error('[CHECK] ❌ Save failed:', error);
+          });
+        }
+      } catch (e) {
+        console.error('[CHECK] ❌ Error:', e);
+      }
+    }
+    
+    // Manual test function - call from console: testSave(1)
+    window.testSave = async function(lessonId) {
+      console.log('=== MANUAL TEST SAVE ===');
+      await saveLessonCompletion(lessonId || 1);
+      console.log('Done. Reloading data...');
+      await loadCompletedLessons();
+    };
 
     // Format time (seconds to mm:ss)
     function formatTime(seconds) {
@@ -423,7 +679,18 @@
     }
 
     // Select lesson
-    function selectLesson(lessonId) {
+    function selectLesson(lessonId, isLocked) {
+      // Save progress of current lesson before switching
+      if (currentLessonId && currentLessonId !== lessonId) {
+        checkAndSaveProgress();
+      }
+      
+      // Check if lesson is locked
+      if (isLocked) {
+        showNotification('🔒 Bài học này bị khóa! Vui lòng hoàn thành bài học trước đó trước.', 'error');
+        return;
+      }
+      
       // Find lesson
       let foundLesson = null;
       courseData.sections.forEach(function(section) {
@@ -434,6 +701,7 @@
       if (!foundLesson) return;
       
       currentLesson = foundLesson;
+      currentLessonId = lessonId;
       
       // Update UI
       document.getElementById('lessonTitle').textContent = currentLesson.title;
@@ -442,6 +710,31 @@
       // Load video with YouTube IFrame API
       if (currentLesson.type === 'lesson' && currentLesson.videoId) {
         loadVideo(currentLesson.videoId, currentLesson.id);
+      }
+    }
+    
+    // Auto-load next lesson after completion
+    function autoLoadNextLesson(completedLessonId) {
+      // Build flat list
+      let allLessons = [];
+      courseData.sections.forEach(function(section) {
+        section.lessons.forEach(function(lesson) {
+          allLessons.push(lesson);
+        });
+      });
+      
+      // Find next lesson
+      const currentIndex = allLessons.findIndex(function(l) { return l.id === completedLessonId; });
+      if (currentIndex >= 0 && currentIndex < allLessons.length - 1) {
+        const nextLesson = allLessons[currentIndex + 1];
+        setTimeout(function() {
+          showNotification('🎯 Đang chuyển sang bài tiếp theo...', 'info');
+          setTimeout(function() {
+            selectLesson(nextLesson.id, false);
+          }, 2000);
+        }, 1000);
+      } else {
+        showNotification('🎉 Chúc mừng! Bạn đã hoàn thành toàn bộ khóa học!', 'success');
       }
     }
 
@@ -459,6 +752,9 @@
       // Clear existing progress interval
       if (progressInterval) {
         clearInterval(progressInterval);
+      }
+      if (progressCheckInterval) {
+        clearInterval(progressCheckInterval);
       }
       
       // Reset watch time tracking
@@ -478,30 +774,45 @@
         playerVars: {
           'autoplay': 1,
           'rel': 0,
-          'modestbranding': 1
+          'modestbranding': 1,
+          'vq': 'hd1080'  // Force HD quality: hd1080, hd720, large (480p), medium (360p), small (240p)
         },
         events: {
           'onReady': function(event) {
+            // Set quality to highest available
+            var availableQualityLevels = player.getAvailableQualityLevels();
+            if (availableQualityLevels && availableQualityLevels.length > 0) {
+              player.setPlaybackQuality(availableQualityLevels[0]); // Set to highest quality
+            }
+            
             // Start progress tracking UI
             progressInterval = setInterval(updateVideoProgress, 1000);
+            
+            // Start periodic progress check every 5 seconds
+            progressCheckInterval = setInterval(checkAndSaveProgress, 5000);
           },
           'onStateChange': function(event) {
             // When video starts playing
             if (event.data === YT.PlayerState.PLAYING) {
+              console.log('[PLAYER] ▶️ Playing - Lesson:', lessonId);
               if (!watchStartTime) {
                 watchStartTime = Date.now();
+                console.log('[PLAYER] Started watch timer');
               }
             }
             
             // When video is paused
             if (event.data === YT.PlayerState.PAUSED) {
+              console.log('[PLAYER] ⏸️ Paused');
               if (watchStartTime) {
-                totalWatchTime += (Date.now() - watchStartTime) / 1000;
+                const sessionTime = (Date.now() - watchStartTime) / 1000;
+                totalWatchTime += sessionTime;
+                console.log('[PLAYER] Added', sessionTime.toFixed(1) + 's to total. Total now:', totalWatchTime.toFixed(1) + 's');
                 watchStartTime = null;
               }
             }
             
-            // Video ended - only save completion if watched till end
+            // Video ended - save completion and auto-load next
             if (event.data === YT.PlayerState.ENDED) {
               if (watchStartTime) {
                 totalWatchTime += (Date.now() - watchStartTime) / 1000;
@@ -510,14 +821,28 @@
               const duration = player.getDuration();
               const watchedPercentage = (totalWatchTime / duration) * 100;
               
-              // Must watch at least 95% to count as completed
-              if (watchedPercentage >= 95) {
-                saveLessonCompletion(lessonId);
-                currentLesson.completed = true;
-                renderLessons();
-                showNotification('✅ Đã hoàn thành bài học! Thời gian xem: ' + formatTime(totalWatchTime), 'success');
+              console.log('[ENDED] Video ended - Total watch time:', totalWatchTime.toFixed(1) + 's /', duration.toFixed(1) + 's', '| Percentage:', watchedPercentage.toFixed(1) + '%');
+              
+              // If watched at least 70%, mark as completed
+              if (watchedPercentage >= 70) {
+                console.log('[ENDED] ✅ Saving completion for lesson', lessonId);
+                saveLessonCompletion(lessonId).then(function(result) {
+                  console.log('[ENDED] ✅ Save successful, loading next lesson');
+                  currentLesson.completed = true;
+                  
+                  // Auto-load next lesson after short delay
+                  setTimeout(function() {
+                    autoLoadNextLesson(lessonId);
+                  }, 500);
+                }).catch(function(error) {
+                  console.error('[ENDED] ❌ Save failed:', error);
+                });
               } else {
-                showNotification('⚠️ Vui lòng xem hết video để hoàn thành bài học', 'info');
+                console.log('[ENDED] ⚠️ Not enough watch time (need 70%), but loading next anyway');
+                // Still load next lesson even if not completed
+                setTimeout(function() {
+                  autoLoadNextLesson(lessonId);
+                }, 500);
               }
             }
           }
@@ -654,12 +979,21 @@
     }
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
+      console.log('=== LEARNING PAGE INIT ===');
+      console.log('Course ID:', currentCourseId);
+      console.log('User logged in: <%= loggedIn %>');
+      console.log('User ID: <%= userId %>');
+      
+      // Load completed lessons from server first
+      console.log('Loading progress from server...');
+      await loadCompletedLessons();
+      
       renderLessons();
       document.getElementById('courseTitle').textContent = courseData.title;
       // Load first lesson by default
       if (courseData.sections.length > 0 && courseData.sections[0].lessons.length > 0) {
-        selectLesson(courseData.sections[0].lessons[0].id);
+        selectLesson(courseData.sections[0].lessons[0].id, false);
       }
     });
   </script>

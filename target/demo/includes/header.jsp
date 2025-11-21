@@ -55,6 +55,23 @@
     </form>
     
     <nav class="menu" aria-label="Chính">
+      <!-- Mobile Search -->
+      <form action="${pageContext.request.contextPath}/search.jsp" method="get" class="mobile-search-form">
+        <input 
+          type="text" 
+          name="q" 
+          class="mobile-search-input" 
+          placeholder="Tìm kiếm khóa học..."
+          aria-label="Tìm kiếm khóa học"
+        />
+        <button type="submit" class="mobile-search-btn" aria-label="Tìm kiếm">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </button>
+      </form>
+      
       <div class="dropdown">
         <a href="javascript:void(0)" class="has-dd" id="coursesMenu" aria-haspopup="true" aria-expanded="false">Các khóa học</a>
         <div class="dd" role="menu" aria-labelledby="coursesMenu">

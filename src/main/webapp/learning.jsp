@@ -216,6 +216,14 @@
   </div>
 
   <script>
+    // ============ DEBUG SESSION INFO ============
+    console.log('=== SESSION DEBUG ===');
+    console.log('Logged in:', <%= loggedIn != null && loggedIn %>);
+    console.log('User ID:', <%= userId != null ? userId : "null" %>);
+    console.log('User email:', '<%= userEmail != null ? userEmail : "null" %>');
+    console.log('====================');
+    // ============================================
+
     // Get course ID from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const currentCourseId = urlParams.get('course') || 'finance-basic';
@@ -496,6 +504,8 @@
     let watchStartTime = null;
     let totalWatchTime = 0;
     let youtubeAPIReady = false;
+    let currentLessonId = null;
+    let progressCheckInterval = null;
 
     // Load YouTube IFrame API
     function onYouTubeIframeAPIReady() {
@@ -509,10 +519,33 @@
     // Load completed lessons from server
     async function loadCompletedLessons() {
       try {
-        const response = await fetch('${pageContext.request.contextPath}/api/lesson-progress?courseId=' + currentCourseId);
+        const url = '${pageContext.request.contextPath}/api/lesson-progress?courseId=' + currentCourseId;
+        console.log('Fetching progress from:', url);
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          credentials: 'same-origin'
+        });
+        console.log('Response status:', response.status);
+        
         if (response.ok) {
           const data = await response.json();
-          completedLessonsCache = new Set(data.completedLessons);
+          console.log('Server returned:', data);
+          console.log('completedLessons field:', data.completedLessons);
+          console.log('Type:', typeof data.completedLessons);
+          
+          // Convert all to strings for consistency
+          if (data.completedLessons && Array.isArray(data.completedLessons)) {
+            completedLessonsCache = new Set(data.completedLessons.map(String));
+            console.log('Loaded completed lessons:', Array.from(completedLessonsCache));
+          } else {
+            console.error('completedLessons is not an array:', data.completedLessons);
+            completedLessonsCache = new Set();
+          }
+          updateProgress();
+        } else {
+          const errorText = await response.text();
+          console.error('Server error:', response.status, errorText);
         }
       } catch (error) {
         console.error('Failed to load lesson progress:', error);
@@ -521,30 +554,107 @@
     
     // Check if lesson is completed
     function isLessonCompleted(lessonId) {
-      return completedLessonsCache.has(lessonId);
+      return completedLessonsCache.has(String(lessonId));
     }
 
     // Save lesson completion to server
     async function saveLessonCompletion(lessonId) {
+      // Prevent duplicate saves
+      if (isLessonCompleted(lessonId)) {
+        console.log('[SAVE] Lesson', lessonId, 'already completed, skipping');
+        return Promise.resolve();
+      }
+      
       try {
-        const formData = new FormData();
-        formData.append('courseId', currentCourseId);
-        formData.append('lessonId', lessonId);
-        formData.append('action', 'complete');
+        const params = new URLSearchParams();
+        params.append('courseId', currentCourseId);
+        params.append('lessonId', String(lessonId));
+        params.append('action', 'complete');
+        
+        console.log('[SAVE] Saving lesson:', lessonId, 'for course:', currentCourseId);
+        console.log('[SAVE] POST data:', params.toString());
         
         const response = await fetch('${pageContext.request.contextPath}/api/lesson-progress', {
           method: 'POST',
-          body: formData
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: params.toString()
         });
         
+        console.log('[SAVE] Response status:', response.status);
+        
         if (response.ok) {
-          completedLessonsCache.add(lessonId);
+          const result = await response.json();
+          console.log('[SAVE] ✅ SUCCESS:', result);
+          
+          // Update cache immediately
+          completedLessonsCache.add(String(lessonId));
+          console.log('[SAVE] Cache updated. Completed lessons:', Array.from(completedLessonsCache));
+          
+          // Update UI immediately
+          updateProgress();
+          renderLessons();
+          
+          return Promise.resolve(result);
+        } else {
+          const errorText = await response.text();
+          console.error('[SAVE] ❌ FAILED:', response.status, errorText);
+          return Promise.reject(new Error(errorText));
         }
       } catch (error) {
-        console.error('Failed to save lesson progress:', error);
-        showNotification('⚠️ Không thể lưu tiến độ. Vui lòng thử lại.', 'error');
+        console.error('[SAVE] ❌ ERROR:', error);
+        return Promise.reject(error);
       }
     }
+
+    // Check if current video should be marked as complete
+    function checkAndSaveProgress() {
+      if (!player) {
+        console.log('[CHECK] No player');
+        return;
+      }
+      if (!currentLessonId) {
+        console.log('[CHECK] No currentLessonId');
+        return;
+      }
+      
+      try {
+        const duration = player.getDuration();
+        const currentTime = player.getCurrentTime();
+        const watchedPercentage = (currentTime / duration) * 100;
+        const isCompleted = isLessonCompleted(currentLessonId);
+        
+        console.log('[CHECK] Lesson:', currentLessonId, '| Time:', currentTime.toFixed(1) + 's /', duration.toFixed(1) + 's', '| Progress:', watchedPercentage.toFixed(1) + '%', '| Completed:', isCompleted);
+        
+        if (!duration || duration <= 0) {
+          console.log('[CHECK] Invalid duration');
+          return;
+        }
+        
+        // If watched 70% or more and NOT already completed, save it
+        if (watchedPercentage >= 70 && !isCompleted) {
+          console.log('[CHECK] ✅ TRIGGERING AUTO-SAVE for lesson', currentLessonId);
+          saveLessonCompletion(currentLessonId).then(function(result) {
+            console.log('[CHECK] ✅ Save completed successfully');
+            currentLesson.completed = true;
+          }).catch(function(error) {
+            console.error('[CHECK] ❌ Save failed:', error);
+          });
+        }
+      } catch (e) {
+        console.error('[CHECK] ❌ Error:', e);
+      }
+    }
+    
+    // Manual test function - call from console: testSave(1)
+    window.testSave = async function(lessonId) {
+      console.log('=== MANUAL TEST SAVE ===');
+      await saveLessonCompletion(lessonId || 1);
+      console.log('Done. Reloading data...');
+      await loadCompletedLessons();
+    };
 
     // Format time (seconds to mm:ss)
     function formatTime(seconds) {
@@ -570,6 +680,11 @@
 
     // Select lesson
     function selectLesson(lessonId, isLocked) {
+      // Save progress of current lesson before switching
+      if (currentLessonId && currentLessonId !== lessonId) {
+        checkAndSaveProgress();
+      }
+      
       // Check if lesson is locked
       if (isLocked) {
         showNotification('🔒 Bài học này bị khóa! Vui lòng hoàn thành bài học trước đó trước.', 'error');
@@ -586,6 +701,7 @@
       if (!foundLesson) return;
       
       currentLesson = foundLesson;
+      currentLessonId = lessonId;
       
       // Update UI
       document.getElementById('lessonTitle').textContent = currentLesson.title;
@@ -637,6 +753,9 @@
       if (progressInterval) {
         clearInterval(progressInterval);
       }
+      if (progressCheckInterval) {
+        clearInterval(progressCheckInterval);
+      }
       
       // Reset watch time tracking
       watchStartTime = null;
@@ -668,24 +787,32 @@
             
             // Start progress tracking UI
             progressInterval = setInterval(updateVideoProgress, 1000);
+            
+            // Start periodic progress check every 5 seconds
+            progressCheckInterval = setInterval(checkAndSaveProgress, 5000);
           },
           'onStateChange': function(event) {
             // When video starts playing
             if (event.data === YT.PlayerState.PLAYING) {
+              console.log('[PLAYER] ▶️ Playing - Lesson:', lessonId);
               if (!watchStartTime) {
                 watchStartTime = Date.now();
+                console.log('[PLAYER] Started watch timer');
               }
             }
             
             // When video is paused
             if (event.data === YT.PlayerState.PAUSED) {
+              console.log('[PLAYER] ⏸️ Paused');
               if (watchStartTime) {
-                totalWatchTime += (Date.now() - watchStartTime) / 1000;
+                const sessionTime = (Date.now() - watchStartTime) / 1000;
+                totalWatchTime += sessionTime;
+                console.log('[PLAYER] Added', sessionTime.toFixed(1) + 's to total. Total now:', totalWatchTime.toFixed(1) + 's');
                 watchStartTime = null;
               }
             }
             
-            // Video ended - only save completion if watched till end
+            // Video ended - save completion and auto-load next
             if (event.data === YT.PlayerState.ENDED) {
               if (watchStartTime) {
                 totalWatchTime += (Date.now() - watchStartTime) / 1000;
@@ -694,17 +821,28 @@
               const duration = player.getDuration();
               const watchedPercentage = (totalWatchTime / duration) * 100;
               
-              // Must watch at least 90% to count as completed (strict)
-              if (watchedPercentage >= 90) {
-                saveLessonCompletion(lessonId);
-                currentLesson.completed = true;
-                renderLessons();
-                showNotification('✅ Đã hoàn thành bài học!', 'success');
-                
-                // Auto-load next lesson if available
-                autoLoadNextLesson(lessonId);
+              console.log('[ENDED] Video ended - Total watch time:', totalWatchTime.toFixed(1) + 's /', duration.toFixed(1) + 's', '| Percentage:', watchedPercentage.toFixed(1) + '%');
+              
+              // If watched at least 70%, mark as completed
+              if (watchedPercentage >= 70) {
+                console.log('[ENDED] ✅ Saving completion for lesson', lessonId);
+                saveLessonCompletion(lessonId).then(function(result) {
+                  console.log('[ENDED] ✅ Save successful, loading next lesson');
+                  currentLesson.completed = true;
+                  
+                  // Auto-load next lesson after short delay
+                  setTimeout(function() {
+                    autoLoadNextLesson(lessonId);
+                  }, 500);
+                }).catch(function(error) {
+                  console.error('[ENDED] ❌ Save failed:', error);
+                });
               } else {
-                showNotification('⚠️ Vui lòng xem hết video để hoàn thành bài học (tối thiểu 90%)', 'info');
+                console.log('[ENDED] ⚠️ Not enough watch time (need 70%), but loading next anyway');
+                // Still load next lesson even if not completed
+                setTimeout(function() {
+                  autoLoadNextLesson(lessonId);
+                }, 500);
               }
             }
           }
@@ -842,7 +980,13 @@
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async function() {
+      console.log('=== LEARNING PAGE INIT ===');
+      console.log('Course ID:', currentCourseId);
+      console.log('User logged in: <%= loggedIn %>');
+      console.log('User ID: <%= userId %>');
+      
       // Load completed lessons from server first
+      console.log('Loading progress from server...');
       await loadCompletedLessons();
       
       renderLessons();
