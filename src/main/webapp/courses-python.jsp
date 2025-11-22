@@ -1,4 +1,8 @@
 ﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.example.model.Course" %>
+<%@ page import="java.text.NumberFormat" %>
+<%@ page import="java.util.Locale" %>
 <%
     Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
     String userEmail = (String) session.getAttribute("userEmail");
@@ -13,6 +17,15 @@
             displayInfo = userEmail;
         }
     }
+    
+    // Get courses from request attribute (set by servlet)
+    @SuppressWarnings("unchecked")
+    List<Course> courses = (List<Course>) request.getAttribute("courses");
+    if (courses == null) {
+        courses = new java.util.ArrayList<>();
+    }
+    
+    NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
 %>
 <!doctype html>
 <html lang="vi">
@@ -60,27 +73,56 @@
   <h2 id="all-courses" class="courses-title">Tất cả khóa học</h2>
 
     <div class="courses-grid">
-      <!-- Course 1 -->
-      <article class="course-card">
+      <% 
+      int courseIndex = 0;
+      String[] cardClasses = {"course-card", "course-card course-card-horizontal", "course-card course-card-large", "course-card", "course-card", "course-card"};
+      
+      for (Course course : courses) { 
+          String cardClass = cardClasses[courseIndex % cardClasses.length];
+          courseIndex++;
+          
+          // Get thumbnail image path
+          String imgPath = course.getThumbnail() != null && !course.getThumbnail().isEmpty() 
+              ? course.getThumbnail() 
+              : "${pageContext.request.contextPath}/assets/img/courses-python/" + course.getCourseName() + ".png";
+          
+          // Format level
+          String levelText = "Cơ bản";
+          if ("Intermediate".equalsIgnoreCase(course.getLevel()) || "Trung bình".equalsIgnoreCase(course.getLevel())) {
+              levelText = "Trung bình";
+          } else if ("Advanced".equalsIgnoreCase(course.getLevel()) || "Nâng cao".equalsIgnoreCase(course.getLevel())) {
+              levelText = "Nâng cao";
+          } else if ("All".equalsIgnoreCase(course.getLevel()) || "Tất cả".equalsIgnoreCase(course.getLevel())) {
+              levelText = "Tất cả";
+          }
+      %>
+      <!-- Course <%= courseIndex %> -->
+      <article class="<%= cardClass %>">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Procedural Python.png" alt="Procedural Python" />
+          <img src="<%= imgPath %>" alt="<%= course.getCourseName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/img/courses-python/default.png'" />
+          <% if (course.isNew()) { %>
           <span class="badge-new">Mới nhất</span>
-          <span class="badge-discount">-50%</span>
+          <% } %>
+          <% if (course.getDiscountPercentage() > 0) { %>
+          <span class="badge-discount">-<%= course.getDiscountPercentage() %>%</span>
+          <% } %>
         </div>
         <div class="course-content">
-          <h3 class="course-name">Procedural Python - Lập trình hàm trong Python</h3>
-          <p class="course-desc">Học lập trình hàm trong Python từ cơ bản đến nâng cao, áp dụng vào dự án thực tế</p>
+          <h3 class="course-name"><%= course.getCourseName() %></h3>
+          <p class="course-desc"><%= course.getDescription() != null ? course.getDescription() : "" %></p>
           <div class="course-meta">
-            <span class="duration">⏱ 12 giờ</span>
-            <span class="students">👥 1,234 học viên</span>
-            <span class="level">📊 Cơ bản</span>
+            <span class="duration">⏱ <%= course.getDuration() %></span>
+            <span class="students">👥 <%= currencyFormat.format(course.getStudentsCount()) %> học viên</span>
+            <span class="level">📊 <%= levelText %></span>
           </div>
           <div class="course-footer">
             <div class="course-price">
-              <span class="price-current">1.299.000₫</span>
-              <span class="price-old">2.499.000₫</span>
+              <span class="price-current"><%= currencyFormat.format(course.getPrice().longValue()) %>₫</span>
+              <% if (course.getOldPrice() != null && course.getOldPrice().compareTo(course.getPrice()) > 0) { %>
+              <span class="price-old"><%= currencyFormat.format(course.getOldPrice().longValue()) %>₫</span>
+              <% } %>
             </div>
-            <button class="btn-add-cart" onclick="addToCart('python-procedural', 'Procedural Python', 1299000)">
+            <button class="btn-add-cart course-action-btn" data-course-id="<%= course.getCourseId() %>" onclick="addToCart('<%= course.getCourseId() %>', '<%= course.getCourseName().replace("'", "\\'") %>', <%= course.getPrice().longValue() %>)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -90,163 +132,45 @@
           </div>
         </div>
       </article>
-
-      <!-- Course 2 -->
-      <article class="course-card course-card-horizontal">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Python Basics.png" alt="Python Basics" />
-          <span class="badge-hot">Hot</span>
-          <span class="badge-discount">-50%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Python Basics - Python Cơ Bản</h3>
-          <p class="course-desc">Khóa học Python cơ bản dành cho người mới bắt đầu, không cần kiến thức lập trình trước</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 15 giờ</span>
-            <span class="students">👥 2,845 học viên</span>
-            <span class="level">📊 Cơ bản</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">999.000₫</span>
-              <span class="price-old">1.999.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('python-basics', 'Python Basics', 999000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 3 -->
-      <article class="course-card course-card-large">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Python.png" alt="Python" />
-          <span class="badge-discount">-50%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Python Toàn Tập - Từ Zero đến Hero</h3>
-          <p class="course-desc">Khóa học Python toàn diện nhất, bao gồm tất cả kiến thức từ cơ bản đến nâng cao</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 40 giờ</span>
-            <span class="students">👥 5,678 học viên</span>
-            <span class="level">📊 Tất cả</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">2.499.000₫</span>
-              <span class="price-old">4.999.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('python-complete', 'Python Toàn Tập', 2499000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 4 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Python Excel.png" alt="Python Excel" />
-          <span class="badge-discount">-50%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Python Excel cho người đi làm</h3>
-          <p class="course-desc">Tự động hóa công việc Excel bằng Python, tiết kiệm hàng giờ làm việc mỗi ngày</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 8 giờ</span>
-            <span class="students">👥 1,890 học viên</span>
-            <span class="level">📊 Trung bình</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">899.000₫</span>
-              <span class="price-old">1.799.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('python-excel', 'Python Excel', 899000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 5 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Selenium Python.png" alt="Selenium Python" />
-          <span class="badge-discount">-47%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Selenium Python - Test Automation</h3>
-          <p class="course-desc">Học automation testing với Selenium và Python cho web application</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 18 giờ</span>
-            <span class="students">👥 987 học viên</span>
-            <span class="level">📊 Nâng cao</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">1.599.000₫</span>
-              <span class="price-old">2.999.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('selenium-python', 'Selenium Python', 1599000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 6 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-python/Python OOP.png" alt="Python OOP" />
-          <span class="badge-discount">-48%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Lập trình hướng đối tượng Python OOP</h3>
-          <p class="course-desc">Nắm vững OOP trong Python, xây dựng ứng dụng có cấu trúc tốt và dễ bảo trì</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 10 giờ</span>
-            <span class="students">👥 1,456 học viên</span>
-            <span class="level">📊 Trung bình</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">1.199.000₫</span>
-              <span class="price-old">2.299.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('python-oop', 'Python OOP', 1199000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
+      <% } %>
+      
+      <% if (courses.isEmpty()) { %>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+        <h3>Chưa có khóa học nào</h3>
+        <p style="color: #666;">Các khóa học Python sẽ sớm được cập nhật</p>
+      </div>
+      <% } %>
     </div>
   </main>
 
   <%@ include file="/includes/footer.jsp" %>
 
   <script>
+    // Check purchased courses on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      <% if (loggedIn != null && loggedIn) { %>
+        fetch('${pageContext.request.contextPath}/api/purchased-courses')
+          .then(response => response.json())
+          .then(data => {
+            if (data.purchasedCourses && data.purchasedCourses.length > 0) {
+              const purchasedIds = data.purchasedCourses;
+              
+              document.querySelectorAll('.course-action-btn').forEach(btn => {
+                const courseId = btn.getAttribute('data-course-id');
+                if (purchasedIds.includes(courseId)) {
+                  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Vào học';
+                  btn.className = 'btn-learn-now';
+                  btn.onclick = function() {
+                    window.location.href = '${pageContext.request.contextPath}/learning.jsp?courseId=' + courseId;
+                  };
+                }
+              });
+            }
+          })
+          .catch(error => console.error('Error checking purchased courses:', error));
+      <% } %>
+    });
+    
     // Set context variables for shared scripts
     window.contextPath = '${pageContext.request.contextPath}';
     window.isUserLoggedIn = <%= loggedIn != null && loggedIn ? "true" : "false" %>;
@@ -335,29 +259,6 @@
         setTimeout(function() { notification.remove(); }, 300);
       }, 3000);
     }
-
-    function isCoursePurchased(courseId) {
-      const purchased = localStorage.getItem('ptit_purchased_courses');
-      if (!purchased) return false;
-      return JSON.parse(purchased).includes(courseId);
-    }
-
-    function updateCourseButtons() {
-      document.querySelectorAll('.btn-add-cart').forEach(function(button) {
-        const match = button.getAttribute('onclick').match(/addToCart\('([^']+)'/);
-        if (match && isCoursePurchased(match[1])) {
-          button.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg> Học ngay';
-          button.className = 'btn-learn-now';
-          button.setAttribute('onclick', 'learnCourse("' + match[1] + '")');
-        }
-      });
-    }
-
-    function learnCourse(courseId) {
-      window.location.href = '${pageContext.request.contextPath}/learning.jsp?course=' + courseId;
-    }
-
-    document.addEventListener('DOMContentLoaded', updateCourseButtons);
 
     function scrollToCourses(){
       var el = document.getElementById('all-courses'); if(!el) return; el.scrollIntoView({behavior:'smooth',block:'start'});

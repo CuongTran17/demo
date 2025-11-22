@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 
 -- ============================================
 -- Table: course_progress
--- Description: Track user learning progress
+-- Description: Track user learning progress for each course
 -- ============================================
 CREATE TABLE IF NOT EXISTS course_progress (
     progress_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -104,10 +104,114 @@ CREATE TABLE IF NOT EXISTS course_progress (
     total_hours DECIMAL(5,2) DEFAULT 0.00,
     last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     status VARCHAR(20) DEFAULT 'in_progress',
-    UNIQUE KEY unique_user_course_progress (user_id, course_id),
+    UNIQUE KEY unique_user_course_progress (user_id, course_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Table: lessons
+-- Description: Store lesson content for each course
+-- ============================================
+CREATE TABLE IF NOT EXISTS lessons (
+    lesson_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_id VARCHAR(50) NOT NULL,
+    section_id INT NOT NULL DEFAULT 1,
+    lesson_title VARCHAR(255) NOT NULL,
+    lesson_content TEXT,
+    video_url VARCHAR(500),
+    duration VARCHAR(20),
+    lesson_order INT DEFAULT 1,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    INDEX idx_course_section (course_id, section_id),
+    INDEX idx_lesson_order (lesson_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Table: lesson_progress
+-- Description: Track individual lesson completion status
+-- ============================================
+CREATE TABLE IF NOT EXISTS lesson_progress (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    course_id VARCHAR(100) NOT NULL,
+    lesson_id VARCHAR(100) NOT NULL,
+    completed TINYINT(1) DEFAULT 0,
+    completed_at DATETIME DEFAULT NULL,
+    UNIQUE KEY unique_progress (user_id, course_id, lesson_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Table: user_courses
+-- Description: Track purchased courses for each user
+-- ============================================
+CREATE TABLE IF NOT EXISTS user_courses (
+    user_course_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    course_id VARCHAR(50) NOT NULL,
+    purchased_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    progress INT DEFAULT 0,
+    UNIQUE KEY unique_user_course (user_id, course_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
+    INDEX idx_course_id (course_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Table: teacher_courses
+-- Description: Assign courses to teachers for management
+-- ============================================
+CREATE TABLE IF NOT EXISTS teacher_courses (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    teacher_id INT NOT NULL,
+    course_id VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_teacher_course (teacher_id, course_id),
+    FOREIGN KEY (teacher_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Table: assignments
+-- Description: Store assignments created by teachers
+-- ============================================
+CREATE TABLE IF NOT EXISTS assignments (
+    assignment_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_id VARCHAR(50) NOT NULL,
+    teacher_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    due_date DATETIME DEFAULT NULL,
+    max_score INT DEFAULT 100,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (teacher_id) REFERENCES users(user_id) ON DELETE CASCADE,
     INDEX idx_course_id (course_id),
-    INDEX idx_status (status)
+    INDEX idx_teacher_id (teacher_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Table: submissions
+-- Description: Store student submissions for assignments
+-- ============================================
+CREATE TABLE IF NOT EXISTS submissions (
+    submission_id INT PRIMARY KEY AUTO_INCREMENT,
+    assignment_id INT NOT NULL,
+    student_id INT NOT NULL,
+    submission_content TEXT,
+    file_path VARCHAR(500),
+    score INT DEFAULT NULL,
+    feedback TEXT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    graded_at TIMESTAMP DEFAULT NULL,
+    UNIQUE KEY unique_student_assignment (assignment_id, student_id),
+    FOREIGN KEY (assignment_id) REFERENCES assignments(assignment_id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    INDEX idx_student_id (student_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
@@ -205,19 +309,45 @@ ON DUPLICATE KEY UPDATE email=email;
 -- ============================================
 -- NOTES:
 -- ============================================
--- 1. Default test user credentials:
---    Email: test@ptit.edu.vn
---    Password: 123456
+-- 1. Default user accounts:
+--    Test User:
+--      Email: test@ptit.edu.vn
+--      Password: 123456
+--    
+--    Admin Account:
+--      Email: admin@ptit.edu.vn
+--      Password: admin123
+--    
+--    Teacher Account:
+--      Email: teacher@ptit.edu.vn
+--      Password: teacher123
 --
 -- 2. Sample data includes:
---    - 18 courses across 6 categories
---    - 1 test user with 3 purchased courses
---    - 2 completed orders
---    - Course progress tracking
+--    - 36 courses across 6 categories (Python, Finance, Data, Blockchain, Accounting, Marketing)
+--    - 1 test user with purchased courses
+--    - Course progress tracking system
+--    - Teacher-course assignment system
 --
--- 3. All tables use InnoDB engine for transaction support
--- 4. Foreign keys ensure referential integrity
--- 5. Indexes added for performance optimization
+-- 3. Database features:
+--    - All tables use InnoDB engine for transaction support
+--    - Foreign keys with CASCADE DELETE ensure referential integrity
+--    - Indexes added for performance optimization on frequently queried columns
+--    - UTF8MB4 encoding supports full Unicode including emojis
+--
+-- 4. Progress tracking:
+--    - lesson_progress: Tracks individual lesson completions (completed = 0/1)
+--    - course_progress: Aggregates overall progress_percentage and total_hours
+--    - Automatic progress calculation via LessonProgressServlet
+--
+-- 5. Access control:
+--    - Admin: Can access /admin for user/teacher/course management
+--    - Teacher: Can access /teacher for student progress tracking
+--    - Students: Can access courses, cart, orders, learning pages
+--
+-- 6. Assignment system:
+--    - Teachers create assignments for their assigned courses
+--    - Students submit assignments with content/files
+--    - Teachers grade submissions and provide feedback
 
 -- ============================================
 -- Update course thumbnails with actual image paths

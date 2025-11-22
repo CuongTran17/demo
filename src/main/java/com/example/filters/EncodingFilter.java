@@ -37,8 +37,9 @@ public class EncodingFilter implements Filter {
         
         String requestURI = httpRequest.getRequestURI();
         
-        // Only set content type for JSP/HTML files, not for CSS/JS/images
-        if (requestURI.endsWith(".jsp") || requestURI.endsWith(".html") || requestURI.equals("/") || !requestURI.contains(".")) {
+        // Only set content type for JSP/HTML files, not for CSS/JS/images or servlets
+        if (requestURI.endsWith(".jsp") || requestURI.endsWith(".html") || requestURI.equals("/") || 
+            (!requestURI.contains(".") && !requestURI.startsWith("/teacher"))) {
             // Set response encoding only for HTML/JSP pages
             httpResponse.setCharacterEncoding(encoding);
             httpResponse.setContentType("text/html; charset=" + encoding);

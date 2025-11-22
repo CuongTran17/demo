@@ -1,10 +1,14 @@
 ﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.example.model.Course" %>
+<%@ page import="java.text.NumberFormat" %>
+<%@ page import="java.util.Locale" %>
 <%
     Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
     String userEmail = (String) session.getAttribute("userEmail");
     String userPhone = (String) session.getAttribute("userPhone");
     String userFullname = (String) session.getAttribute("userFullname");
-    
+
     String displayInfo = "";
     if (loggedIn != null && loggedIn) {
         if (userPhone != null && userPhone.length() >= 3) {
@@ -13,6 +17,15 @@
             displayInfo = userEmail;
         }
     }
+
+    // Get courses from request attribute (set by servlet)
+    @SuppressWarnings("unchecked")
+    List<Course> courses = (List<Course>) request.getAttribute("courses");
+    if (courses == null) {
+        courses = new java.util.ArrayList<>();
+    }
+
+    NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
 %>
 <!doctype html>
 <html lang="vi">
@@ -55,27 +68,56 @@
   <h2 id="all-courses" class="courses-title">Tất cả khóa học</h2>
 
     <div class="courses-grid">
-      <!-- Course 1 -->
-      <article class="course-card">
+      <%
+      int courseIndex = 0;
+      String[] cardClasses = {"course-card", "course-card course-card-horizontal", "course-card course-card-large", "course-card", "course-card", "course-card"};
+
+      for (Course course : courses) {
+          String cardClass = cardClasses[courseIndex % cardClasses.length];
+          courseIndex++;
+
+          // Get thumbnail image path
+          String imgPath = course.getThumbnail() != null && !course.getThumbnail().isEmpty()
+              ? course.getThumbnail()
+              : "${pageContext.request.contextPath}/assets/img/courses-blockchain/" + course.getCourseName() + ".png";
+
+          // Format level
+          String levelText = "Cơ bản";
+          if ("Intermediate".equalsIgnoreCase(course.getLevel()) || "Trung bình".equalsIgnoreCase(course.getLevel())) {
+              levelText = "Trung bình";
+          } else if ("Advanced".equalsIgnoreCase(course.getLevel()) || "Nâng cao".equalsIgnoreCase(course.getLevel())) {
+              levelText = "Nâng cao";
+          } else if ("All".equalsIgnoreCase(course.getLevel()) || "Tất cả".equalsIgnoreCase(course.getLevel())) {
+              levelText = "Tất cả";
+          }
+      %>
+      <!-- Course <%= courseIndex %> -->
+      <article class="<%= cardClass %>">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/Blockchain cơ bản.png" alt="Blockchain cơ bản" />
+          <img src="<%= imgPath %>" alt="<%= course.getCourseName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/img/courses-blockchain/default.png'" />
+          <% if (course.isNew()) { %>
           <span class="badge-new">Mới nhất</span>
-          <span class="badge-discount">-50%</span>
+          <% } %>
+          <% if (course.getDiscountPercentage() > 0) { %>
+          <span class="badge-discount">-<%= course.getDiscountPercentage() %>%</span>
+          <% } %>
         </div>
         <div class="course-content">
-          <h3 class="course-name">Blockchain cơ bản cho người mới</h3>
-          <p class="course-desc">Hiểu về công nghệ blockchain và ứng dụng thực tế trong cuộc sống</p>
+          <h3 class="course-name"><%= course.getCourseName() %></h3>
+          <p class="course-desc"><%= course.getDescription() != null ? course.getDescription() : "" %></p>
           <div class="course-meta">
-            <span class="duration">⏱ 12 giờ</span>
-            <span class="students">👥 2,345 học viên</span>
-            <span class="level">📊 Cơ bản</span>
+            <span class="duration">⏱ <%= course.getDuration() %></span>
+            <span class="students">👥 <%= currencyFormat.format(course.getStudentsCount()) %> học viên</span>
+            <span class="level">📊 <%= levelText %></span>
           </div>
           <div class="course-footer">
             <div class="course-price">
-              <span class="price-current">1.299.000₫</span>
-              <span class="price-old">2.599.000₫</span>
+              <span class="price-current"><%= currencyFormat.format(course.getPrice().longValue()) %>₫</span>
+              <% if (course.getOldPrice() != null && course.getOldPrice().compareTo(course.getPrice()) > 0) { %>
+              <span class="price-old"><%= currencyFormat.format(course.getOldPrice().longValue()) %>₫</span>
+              <% } %>
             </div>
-            <button class="btn-add-cart" onclick="addToCart('blockchain-basic', 'Blockchain cơ bản', 1299000)">
+            <button class="btn-add-cart course-action-btn" data-course-id="<%= course.getCourseId() %>" onclick="addToCart('<%= course.getCourseId() %>', '<%= course.getCourseName().replace("'", "\\'") %>', <%= course.getPrice().longValue() %>)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -85,163 +127,45 @@
           </div>
         </div>
       </article>
+      <% } %>
 
-      <!-- Course 2 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/Smart Contract.png" alt="Smart Contract" />
-          <span class="badge-hot">Hot</span>
-          <span class="badge-discount">-48%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Lập trình Smart Contract với Solidity</h3>
-          <p class="course-desc">Xây dựng hợp đồng thông minh trên Ethereum blockchain platform</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 20 giờ</span>
-            <span class="students">👥 3,567 học viên</span>
-            <span class="level">📊 Nâng cao</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">2.099.000₫</span>
-              <span class="price-old">3.999.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('smart-contract', 'Smart Contract Solidity', 2099000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 3 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/DeFi.png" alt="DeFi" />
-          <span class="badge-discount">-47%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">DeFi - Tài chính phi tập trung toàn tập</h3>
-          <p class="course-desc">Khám phá thế giới DeFi và các giao thức phổ biến nhất hiện nay</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 16 giờ</span>
-            <span class="students">👥 2,890 học viên</span>
-            <span class="level">📊 Trung bình</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">1.799.000₫</span>
-              <span class="price-old">3.399.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('defi', 'DeFi toàn tập', 1799000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 4 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/NFT.png" alt="NFT" />
-          <span class="badge-discount">-50%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">NFT và Metaverse thế hệ mới</h3>
-          <p class="course-desc">Tạo và giao dịch NFT, khám phá thế giới Metaverse đầy tiềm năng</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 14 giờ</span>
-            <span class="students">👥 4,123 học viên</span>
-            <span class="level">📊 Trung bình</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">1.499.000₫</span>
-              <span class="price-old">2.999.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('nft', 'NFT và Metaverse', 1499000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 5 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/Web3.png" alt="Web3" />
-          <span class="badge-discount">-48%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Web3 Development - DApp toàn tập</h3>
-          <p class="course-desc">Xây dựng ứng dụng phi tập trung (DApp) với Web3 technology</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 22 giờ</span>
-            <span class="students">👥 1,987 học viên</span>
-            <span class="level">📊 Nâng cao</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">2.299.000₫</span>
-              <span class="price-old">4.399.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('web3', 'Web3 Development', 2299000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 6 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-blockchain/Crypto Trading.png" alt="Crypto Trading" />
-          <span class="badge-discount">-50%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Crypto Trading và Đầu tư chuyên nghiệp</h3>
-          <p class="course-desc">Chiến lược giao dịch và quản lý danh mục crypto hiệu quả</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 18 giờ</span>
-            <span class="students">👥 3,456 học viên</span>
-            <span class="level">📊 Nâng cao</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">1.899.000₫</span>
-              <span class="price-old">3.799.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('crypto-trading', 'Crypto Trading', 1899000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
+      <% if (courses.isEmpty()) { %>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+        <h3>Chưa có khóa học nào</h3>
+        <p style="color: #666;">Các khóa học Blockchain sẽ sớm được cập nhật</p>
+      </div>
+      <% } %>
     </div>
   </main>
 
   <%@ include file="/includes/footer.jsp" %>
 
   <script>
+    // Check purchased courses on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      <% if (loggedIn != null && loggedIn) { %>
+        fetch('${pageContext.request.contextPath}/api/purchased-courses')
+          .then(response => response.json())
+          .then(data => {
+            if (data.purchasedCourses && data.purchasedCourses.length > 0) {
+              const purchasedIds = data.purchasedCourses;
+              
+              document.querySelectorAll('.course-action-btn').forEach(btn => {
+                const courseId = btn.getAttribute('data-course-id');
+                if (purchasedIds.includes(courseId)) {
+                  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Vào học';
+                  btn.className = 'btn-learn-now';
+                  btn.onclick = function() {
+                    window.location.href = '${pageContext.request.contextPath}/learning.jsp?courseId=' + courseId;
+                  };
+                }
+              });
+            }
+          })
+          .catch(error => console.error('Error checking purchased courses:', error));
+      <% } %>
+    });
+    
     const btn = document.getElementById('hamburger');
     const menu = document.querySelector('.menu');
     if(btn && menu){
@@ -308,10 +232,6 @@
         alert('❌ Có lỗi xảy ra, vui lòng thử lại');
       });
     }
-    function isCoursePurchased(courseId){const p=localStorage.getItem('ptit_purchased_courses');return p?JSON.parse(p).includes(courseId):false}
-    function updateCourseButtons(){document.querySelectorAll('.btn-add-cart').forEach(function(b){const m=b.getAttribute('onclick').match(/addToCart\('([^']+)'/);if(m&&isCoursePurchased(m[1])){b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg> Học ngay';b.className='btn-learn-now';b.setAttribute('onclick','learnCourse("'+m[1]+'")')}})}
-    function learnCourse(courseId){window.location.href='${pageContext.request.contextPath}/learning.jsp?course='+courseId}
-    document.addEventListener('DOMContentLoaded', updateCourseButtons);
 
     function scrollToCourses(){
       var el = document.getElementById('all-courses'); if(!el) return; el.scrollIntoView({behavior:'smooth',block:'start'});

@@ -1,4 +1,8 @@
 ﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.example.model.Course" %>
+<%@ page import="java.text.NumberFormat" %>
+<%@ page import="java.util.Locale" %>
 <%
     Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
     String userEmail = (String) session.getAttribute("userEmail");
@@ -13,6 +17,15 @@
             displayInfo = userEmail;
         }
     }
+
+    // Get courses from request attribute (set by servlet)
+    @SuppressWarnings("unchecked")
+    List<Course> courses = (List<Course>) request.getAttribute("courses");
+    if (courses == null) {
+        courses = new java.util.ArrayList<>();
+    }
+
+    NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
 %>
 <!doctype html>
 <html lang="vi">
@@ -52,27 +65,56 @@
   <h2 id="all-courses" class="courses-title">Tất cả khóa học</h2>
 
     <div class="courses-grid">
-      <!-- Course 1 -->
-      <article class="course-card">
+      <%
+      int courseIndex = 0;
+      String[] cardClasses = {"course-card", "course-card course-card-horizontal", "course-card course-card-large", "course-card", "course-card", "course-card"};
+
+      for (Course course : courses) {
+          String cardClass = cardClasses[courseIndex % cardClasses.length];
+          courseIndex++;
+
+          // Get thumbnail image path
+          String imgPath = course.getThumbnail() != null && !course.getThumbnail().isEmpty()
+              ? course.getThumbnail()
+              : "${pageContext.request.contextPath}/assets/img/courses-data/" + course.getCourseName() + ".png";
+
+          // Format level
+          String levelText = "Cơ bản";
+          if ("Intermediate".equalsIgnoreCase(course.getLevel()) || "Trung bình".equalsIgnoreCase(course.getLevel())) {
+              levelText = "Trung bình";
+          } else if ("Advanced".equalsIgnoreCase(course.getLevel()) || "Nâng cao".equalsIgnoreCase(course.getLevel())) {
+              levelText = "Nâng cao";
+          } else if ("All".equalsIgnoreCase(course.getLevel()) || "Tất cả".equalsIgnoreCase(course.getLevel())) {
+              levelText = "Tất cả";
+          }
+      %>
+      <!-- Course <%= courseIndex %> -->
+      <article class="<%= cardClass %>">
         <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Data Analytics cơ bản.png" alt="Data Analytics cơ bản" />
+          <img src="<%= imgPath %>" alt="<%= course.getCourseName() %>" onerror="this.src='${pageContext.request.contextPath}/assets/img/courses-data/default.png'" />
+          <% if (course.isNew()) { %>
           <span class="badge-new">Mới nhất</span>
-          <span class="badge-discount">-48%</span>
+          <% } %>
+          <% if (course.getDiscountPercentage() > 0) { %>
+          <span class="badge-discount">-<%= course.getDiscountPercentage() %>%</span>
+          <% } %>
         </div>
         <div class="course-content">
-          <h3 class="course-name">Data Analytics cơ bản từ A-Z</h3>
-          <p class="course-desc">Khám phá thế giới dữ liệu và phân tích dữ liệu cơ bản cho người mới</p>
+          <h3 class="course-name"><%= course.getCourseName() %></h3>
+          <p class="course-desc"><%= course.getDescription() != null ? course.getDescription() : "" %></p>
           <div class="course-meta">
-            <span class="duration">⏱ 14 giờ</span>
-            <span class="students">👥 3,456 học viên</span>
-            <span class="level">📊 Cơ bản</span>
+            <span class="duration">⏱ <%= course.getDuration() %></span>
+            <span class="students">👥 <%= currencyFormat.format(course.getStudentsCount()) %> học viên</span>
+            <span class="level">📊 <%= levelText %></span>
           </div>
           <div class="course-footer">
             <div class="course-price">
-              <span class="price-current">899.000₫</span>
-              <span class="price-old">1.699.000₫</span>
+              <span class="price-current"><%= currencyFormat.format(course.getPrice().longValue()) %>₫</span>
+              <% if (course.getOldPrice() != null && course.getOldPrice().compareTo(course.getPrice()) > 0) { %>
+              <span class="price-old"><%= currencyFormat.format(course.getOldPrice().longValue()) %>₫</span>
+              <% } %>
             </div>
-            <button class="btn-add-cart" onclick="addToCart('data-basic', 'Data Analytics cơ bản', 899000)">
+            <button class="btn-add-cart course-action-btn" data-course-id="<%= course.getCourseId() %>" onclick="addToCart('<%= course.getCourseId() %>', '<%= course.getCourseName().replace("'", "\\'") %>', <%= course.getPrice().longValue() %>)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -82,163 +124,45 @@
           </div>
         </div>
       </article>
+      <% } %>
 
-      <!-- Course 2 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Excel for Data.png" alt="Excel for Data" />
-          <span class="badge-hot">Hot</span>
-          <span class="badge-discount">-50%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Excel nâng cao cho Data Analyst</h3>
-          <p class="course-desc">Pivot Table, Power Query, Data Visualization và phân tích dữ liệu</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 10 giờ</span>
-            <span class="students">👥 5,234 học viên</span>
-            <span class="level">📊 Trung bình</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">799.000₫</span>
-              <span class="price-old">1.599.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('excel-data', 'Excel cho Data Analyst', 799000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 3 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-data/SQL.png" alt="SQL" />
-          <span class="badge-discount">-47%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">SQL cho Data Analyst chuyên nghiệp</h3>
-          <p class="course-desc">Truy vấn dữ liệu chuyên nghiệp với SQL và database management</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 16 giờ</span>
-            <span class="students">👥 4,123 học viên</span>
-            <span class="level">📊 Trung bình</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">1.299.000₫</span>
-              <span class="price-old">2.399.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('sql-data', 'SQL cho Data Analyst', 1299000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 4 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Power BI.png" alt="Power BI" />
-          <span class="badge-discount">-50%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Power BI từ cơ bản đến nâng cao</h3>
-          <p class="course-desc">Tạo dashboard và báo cáo trực quan với Power BI Desktop</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 18 giờ</span>
-            <span class="students">👥 3,789 học viên</span>
-            <span class="level">📊 Nâng cao</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">1.499.000₫</span>
-              <span class="price-old">2.999.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('power-bi', 'Power BI toàn tập', 1499000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 5 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Python for Data.png" alt="Python for Data" />
-          <span class="badge-discount">-48%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Python cho Data Science toàn tập</h3>
-          <p class="course-desc">Pandas, NumPy, Matplotlib và Seaborn cho phân tích dữ liệu</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 20 giờ</span>
-            <span class="students">👥 4,567 học viên</span>
-            <span class="level">📊 Nâng cao</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">1.599.000₫</span>
-              <span class="price-old">2.999.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('python-data', 'Python Data Science', 1599000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Course 6 -->
-      <article class="course-card">
-        <div class="course-thumbnail">
-          <img src="${pageContext.request.contextPath}/assets/img/courses-data/Tableau.png" alt="Tableau" />
-          <span class="badge-discount">-50%</span>
-        </div>
-        <div class="course-content">
-          <h3 class="course-name">Tableau Desktop Specialist Certification</h3>
-          <p class="course-desc">Trực quan hóa dữ liệu chuyên nghiệp với Tableau Desktop</p>
-          <div class="course-meta">
-            <span class="duration">⏱ 15 giờ</span>
-            <span class="students">👥 2,890 học viên</span>
-            <span class="level">📊 Nâng cao</span>
-          </div>
-          <div class="course-footer">
-            <div class="course-price">
-              <span class="price-current">1.399.000₫</span>
-              <span class="price-old">2.799.000₫</span>
-            </div>
-            <button class="btn-add-cart" onclick="addToCart('tableau', 'Tableau Desktop', 1399000)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              Thêm vào giỏ
-            </button>
-          </div>
-        </div>
-      </article>
+      <% if (courses.isEmpty()) { %>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+        <h3>Chưa có khóa học nào</h3>
+        <p style="color: #666;">Các khóa học Data sẽ sớm được cập nhật</p>
+      </div>
+      <% } %>
     </div>
   </main>
 
   <%@ include file="/includes/footer.jsp" %>
 
   <script>
+    // Check purchased courses on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      <% if (loggedIn != null && loggedIn) { %>
+        fetch('${pageContext.request.contextPath}/api/purchased-courses')
+          .then(response => response.json())
+          .then(data => {
+            if (data.purchasedCourses && data.purchasedCourses.length > 0) {
+              const purchasedIds = data.purchasedCourses;
+              
+              document.querySelectorAll('.course-action-btn').forEach(btn => {
+                const courseId = btn.getAttribute('data-course-id');
+                if (purchasedIds.includes(courseId)) {
+                  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Vào học';
+                  btn.className = 'btn-learn-now';
+                  btn.onclick = function() {
+                    window.location.href = '${pageContext.request.contextPath}/learning.jsp?courseId=' + courseId;
+                  };
+                }
+              });
+            }
+          })
+          .catch(error => console.error('Error checking purchased courses:', error));
+      <% } %>
+    });
+    
     const btn = document.getElementById('hamburger');
     const menu = document.querySelector('.menu');
     if(btn && menu){
@@ -305,10 +229,6 @@
         alert('❌ Có lỗi xảy ra, vui lòng thử lại');
       });
     }
-    function isCoursePurchased(courseId){const p=localStorage.getItem('ptit_purchased_courses');return p?JSON.parse(p).includes(courseId):false}
-    function updateCourseButtons(){document.querySelectorAll('.btn-add-cart').forEach(function(b){const m=b.getAttribute('onclick').match(/addToCart\('([^']+)'/);if(m&&isCoursePurchased(m[1])){b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg> Học ngay';b.className='btn-learn-now';b.setAttribute('onclick','learnCourse("'+m[1]+'")')}})}
-    function learnCourse(courseId){window.location.href='${pageContext.request.contextPath}/learning.jsp?course='+courseId}
-    document.addEventListener('DOMContentLoaded', updateCourseButtons);
 
     function scrollToCourses(){
       var el = document.getElementById('all-courses'); if(!el) return; el.scrollIntoView({behavior:'smooth',block:'start'});

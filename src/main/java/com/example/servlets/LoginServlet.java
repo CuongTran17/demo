@@ -93,7 +93,19 @@ public class LoginServlet extends HttpServlet {
                 response.addCookie(rememberCookie);
             }
             
-            // Redirect to original page or home
+            // Check if this is admin account - redirect to admin dashboard
+            if ("admin@ptit.edu.vn".equals(user.getEmail())) {
+                response.sendRedirect(request.getContextPath() + "/admin");
+                return;
+            }
+            
+            // Check if this is teacher account - redirect to teacher dashboard
+            if (user.getEmail() != null && user.getEmail().matches("teacher\\d*@ptit\\.edu\\.vn")) {
+                response.sendRedirect(request.getContextPath() + "/teacher");
+                return;
+            }
+            
+            // Redirect to original page or home (for students)
             String redirectUrl = request.getContextPath() + "/";
             if (redirect != null && !redirect.isEmpty()) {
                 redirectUrl = request.getContextPath() + "/" + redirect + ".jsp";
@@ -147,7 +159,15 @@ public class LoginServlet extends HttpServlet {
                                 List<String> userCart = cartDAO.getUserCart(user.getUserId());
                                 session.setAttribute("cart", userCart);
                                 
-                                response.sendRedirect(request.getContextPath() + "/");
+                                // Check if admin - redirect to admin dashboard
+                                if ("admin@ptit.edu.vn".equals(user.getEmail())) {
+                                    response.sendRedirect(request.getContextPath() + "/admin");
+                                } else if (user.getEmail() != null && user.getEmail().matches("teacher\\d*@ptit\\.edu\\.vn")) {
+                                    // Check if teacher - redirect to teacher dashboard
+                                    response.sendRedirect(request.getContextPath() + "/teacher");
+                                } else {
+                                    response.sendRedirect(request.getContextPath() + "/");
+                                }
                                 return;
                             }
                         }

@@ -39,26 +39,57 @@ function saveCart(cart) {
 
 // Check if course is purchased
 function isCoursePurchased(courseId) {
-  const purchased = localStorage.getItem('ptit_purchased_courses');
-  if (!purchased) return false;
-  return JSON.parse(purchased).includes(courseId);
+  // Must be logged in to have purchased courses
+  if (!window.isUserLoggedIn) return false;
+  
+  // Check from server-side purchased list
+  if (window.purchasedCourses && Array.isArray(window.purchasedCourses)) {
+    return window.purchasedCourses.includes(courseId);
+  }
+  
+  return false;
+}
+
+// Fetch purchased courses from server
+function fetchPurchasedCourses() {
+  return fetch(window.contextPath + '/api/purchased-courses')
+    .then(response => response.json())
+    .then(data => {
+      if (data.loggedIn && data.purchasedCourses) {
+        window.purchasedCourses = data.purchasedCourses;
+        return data.purchasedCourses;
+      }
+      window.purchasedCourses = [];
+      return [];
+    })
+    .catch(error => {
+      console.error('Error fetching purchased courses:', error);
+      window.purchasedCourses = [];
+      return [];
+    });
 }
 
 // Update course buttons on page load
 function updateCourseButtons() {
-  document.querySelectorAll('.btn-add-cart').forEach(function(button) {
-    const onclickAttr = button.getAttribute('onclick');
-    if (!onclickAttr) return;
-    
-    const match = onclickAttr.match(/addToCart\('([^']+)'/);
-    if (!match) return;
-    
-    const courseId = match[1];
-    if (isCoursePurchased(courseId)) {
-      button.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg> Học ngay';
-      button.className = 'btn-learn-now';
-      button.setAttribute('onclick', 'learnCourse("' + courseId + '")');
-    }
+  // Only update if user is logged in
+  if (!window.isUserLoggedIn) return;
+  
+  // Fetch purchased courses first, then update buttons
+  fetchPurchasedCourses().then(() => {
+    document.querySelectorAll('.btn-add-cart').forEach(function(button) {
+      const onclickAttr = button.getAttribute('onclick');
+      if (!onclickAttr) return;
+      
+      const match = onclickAttr.match(/addToCart\('([^']+)'/);
+      if (!match) return;
+      
+      const courseId = match[1];
+      if (isCoursePurchased(courseId)) {
+        button.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg> Học ngay';
+        button.className = 'btn-learn-now';
+        button.setAttribute('onclick', 'learnCourse("' + courseId + '")');
+      }
+    });
   });
 }
 

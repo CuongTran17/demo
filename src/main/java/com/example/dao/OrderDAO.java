@@ -132,4 +132,32 @@ public class OrderDAO {
             return null;
         }
     }
+    
+    /**
+     * Get list of purchased course IDs by user
+     */
+    public List<String> getPurchasedCoursesByUser(int userId) {
+        List<String> purchasedCourses = new java.util.ArrayList<>();
+        String sql = "SELECT DISTINCT oi.course_id " +
+                     "FROM orders o " +
+                     "INNER JOIN order_items oi ON o.order_id = oi.order_id " +
+                     "WHERE o.user_id = ? AND o.status = 'completed'";
+        
+        try (Connection conn = DatabaseConnection.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                purchasedCourses.add(rs.getString("course_id"));
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return purchasedCourses;
+    }
 }
+
