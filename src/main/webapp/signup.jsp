@@ -19,20 +19,27 @@
       <h1 class="auth-title">Tạo tài khoản mới</h1>
       <p class="auth-sub">Điền thông tin để bắt đầu hành trình học tập của bạn!</p>
 
+      <% String error = (String) request.getAttribute("error"); %>
+      <% if (error != null) { %>
+        <div class="alert alert-danger" role="alert">
+          <strong>⚠️ Lỗi:</strong> <%= error %>
+        </div>
+      <% } %>
+
       <form class="auth-form" id="signupForm" method="post" action="${pageContext.request.contextPath}/signup" novalidate>
         <label class="field">
           <span>Họ và tên *</span>
-          <input type="text" name="fullname" id="fullname" required />
+          <input type="text" name="fullname" id="fullname" value="<%= request.getAttribute("fullname") != null ? request.getAttribute("fullname") : "" %>" required />
           <small class="field-error"></small>
         </label>
         <label class="field">
           <span>Email *</span>
-          <input type="email" name="email" id="email" autocomplete="email" required />
+          <input type="email" name="email" id="email" value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : "" %>" autocomplete="email" required />
           <small class="field-error"></small>
         </label>
         <label class="field">
           <span>Số điện thoại *</span>
-          <input type="tel" name="phone" id="phone" pattern="[0-9]{10}" placeholder="0123456789" required />
+          <input type="tel" name="phone" id="phone" value="<%= request.getAttribute("phone") != null ? request.getAttribute("phone") : "" %>" pattern="[0-9]{10}" placeholder="0123456789" required />
           <small class="field-error"></small>
         </label>
         <label class="field">
@@ -211,6 +218,21 @@
   </script>
   
   <style>
+    .alert {
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .alert-danger {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+    .alert strong {
+      font-weight: 600;
+    }
     .field { position: relative; margin-bottom: 20px; }
     .field-error { 
       display: block; 

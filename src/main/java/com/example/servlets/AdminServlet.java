@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.dao.PendingChangeDAO;
+import com.example.dao.UserDAO;
 import com.example.model.PendingChange;
 import com.example.util.DatabaseConnection;
 
@@ -295,7 +296,7 @@ public class AdminServlet extends HttpServlet {
             String sql = "INSERT INTO users (email, password_hash, fullname, phone) VALUES (?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, email);
-                stmt.setString(2, password); // In production, should hash the password
+                stmt.setString(2, UserDAO.hashPassword(password)); // Hash the password
                 stmt.setString(3, fullname);
                 stmt.setString(4, phone);
                 stmt.executeUpdate();
