@@ -111,8 +111,8 @@ public class CheckoutServlet extends HttpServlet {
                 }
             }
             
-            // Determine order status based on payment method
-            String orderStatus = "vietqr".equals(paymentMethod) ? "pending_payment" : "completed";
+            // All orders need admin approval
+            String orderStatus = "pending_payment";
             
             // Create order with note and status
             int orderId = orderDAO.createOrderWithNote(userId, coursesToPurchase, paymentMethod, orderNote, orderStatus);

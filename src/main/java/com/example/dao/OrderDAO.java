@@ -267,26 +267,89 @@ public class OrderDAO {
     }
     
     /**
-     * Update order status
+     * Update order status and grant course access if approved
      * @param orderId Order ID
      * @param status New status
      * @return true if successful, false otherwise
      */
     public boolean updateOrderStatus(int orderId, String status) {
-        String sql = "UPDATE orders SET status = ? WHERE order_id = ?";
+        Connection conn = null;
+        PreparedStatement updateStmt = null;
+        PreparedStatement selectStmt = null;
+        PreparedStatement progressStmt = null;
+        ResultSet rs = null;
         
-        try (Connection conn = DatabaseConnection.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try {
+            conn = DatabaseConnection.getNewConnection();
+            conn.setAutoCommit(false);
             
-            stmt.setString(1, status);
-            stmt.setInt(2, orderId);
+            // Update order status
+            String updateSql = "UPDATE orders SET status = ? WHERE order_id = ?";
+            updateStmt = conn.prepareStatement(updateSql);
+            updateStmt.setString(1, status);
+            updateStmt.setInt(2, orderId);
+            int rowsAffected = updateStmt.executeUpdate();
             
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            if (rowsAffected == 0) {
+                conn.rollback();
+                return false;
+            }
+            
+            // If approved, grant course access
+            if ("completed".equals(status)) {
+                // Get order items and user_id
+                String selectSql = "SELECT oi.course_id, o.user_id " +
+                                  "FROM order_items oi " +
+                                  "JOIN orders o ON oi.order_id = o.order_id " +
+                                  "WHERE oi.order_id = ?";
+                selectStmt = conn.prepareStatement(selectSql);
+                selectStmt.setInt(1, orderId);
+                rs = selectStmt.executeQuery();
+                
+                // Insert into course_progress for each course
+                String progressSql = "INSERT INTO course_progress (user_id, course_id, progress_percentage, status) " +
+                                    "VALUES (?, ?, 0, 'in_progress') " +
+                                    "ON DUPLICATE KEY UPDATE user_id = user_id";
+                progressStmt = conn.prepareStatement(progressSql);
+                
+                while (rs.next()) {
+                    int userId = rs.getInt("user_id");
+                    String courseId = rs.getString("course_id");
+                    
+                    progressStmt.setInt(1, userId);
+                    progressStmt.setString(2, courseId);
+                    progressStmt.addBatch();
+                }
+                
+                progressStmt.executeBatch();
+            }
+            
+            conn.commit();
+            return true;
             
         } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             e.printStackTrace();
             return false;
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (selectStmt != null) selectStmt.close();
+                if (updateStmt != null) updateStmt.close();
+                if (progressStmt != null) progressStmt.close();
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
     

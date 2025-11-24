@@ -106,6 +106,10 @@
                       <td>
                         <% if ("completed".equals(order.orderStatus)) { %>
                           <span style="color: #28a745;">✓ Đã thanh toán</span>
+                        <% } else if ("rejected".equals(order.orderStatus)) { %>
+                          <span style="color: #dc3545;">✗ Lỗi thanh toán</span>
+                        <% } else if ("pending_payment".equals(order.orderStatus)) { %>
+                          <span style="color: #ffc107;">⏳ Đang chờ duyệt</span>
                         <% } else { %>
                           <span style="color: #ffc107;">⏳ Đang xử lý</span>
                         <% } %>
@@ -118,6 +122,10 @@
                             </svg>
                             Vào học
                           </a>
+                        <% } else if ("rejected".equals(order.orderStatus)) { %>
+                          <span style="color: #dc3545;">Đơn hàng bị từ chối</span>
+                        <% } else if ("pending_payment".equals(order.orderStatus)) { %>
+                          <span style="color: #ffc107;">Đang chờ admin duyệt</span>
                         <% } else { %>
                           <span style="color: #999;">Chưa thanh toán</span>
                         <% } %>

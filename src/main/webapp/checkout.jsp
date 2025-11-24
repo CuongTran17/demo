@@ -153,8 +153,7 @@
             </div>
             <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107;">
               <p style="margin: 0; color: #856404; font-size: 0.95em;">
-                ⚠️ Sau khi chuyển khoản, đơn hàng sẽ được gửi tới Admin để duyệt. 
-                Vui lòng chuyển đúng số tiền và nội dung.
+                ⚠️ Sau khi chuyển khoản, đơn hàng sẽ được gửi tới Admin để duyệt. Bạn sẽ có quyền truy cập khóa học sau khi Admin duyệt đơn hàng.
               </p>
             </div>
           </div>
@@ -344,12 +343,20 @@
     function placeOrder() {
       const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
       
-      // Show confirmation for VietQR payment
+      // Show confirmation
+      let confirmMsg = 'Xác nhận đặt hàng?\n\n';
       if (paymentMethod === 'vietqr') {
-        const confirmed = confirm('⚠️ Vui lòng xác nhận:\n\n✓ Bạn đã chuyển khoản theo mã QR\n✓ Đơn hàng sẽ được gửi tới Admin để duyệt\n✓ Bạn sẽ nhận được thông báo khi đơn hàng được duyệt\n\nNhấn OK để tiếp tục.');
-        if (!confirmed) {
-          return;
-        }
+        confirmMsg += '⚠️ Vui lòng chuyển khoản theo mã QR.\n';
+        confirmMsg += 'Đơn hàng sẽ được gửi tới Admin để duyệt.\n';
+        confirmMsg += 'Bạn sẽ nhận được quyền truy cập sau khi Admin duyệt.';
+      } else {
+        confirmMsg += 'Đơn hàng sẽ được gửi tới Admin để duyệt.\n';
+        confirmMsg += 'Bạn sẽ nhận được quyền truy cập sau khi Admin duyệt.';
+      }
+      
+      const confirmed = confirm(confirmMsg);
+      if (!confirmed) {
+        return;
       }
       
       // Submit order to servlet
