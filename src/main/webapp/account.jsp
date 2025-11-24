@@ -30,6 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/styles.css?v=2" />
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/mobile-tables.css" />
 </head>
 <body>
   <%@ include file="/includes/header.jsp" %>
