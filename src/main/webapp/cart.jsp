@@ -54,12 +54,12 @@
             <div class="dd-inner">
               <div class="dd-head">Tất cả các khóa học</div>
               <div class="dd-grid">
-                <a href="${pageContext.request.contextPath}/courses-python.jsp">Lập trình - CNTT</a>
-                <a href="${pageContext.request.contextPath}/courses-finance.jsp">Tài chính</a>
-                <a href="${pageContext.request.contextPath}/courses-data.jsp">Data analyst</a>
-                <a href="${pageContext.request.contextPath}/courses-blockchain.jsp">Blockchain</a>
-                <a href="${pageContext.request.contextPath}/courses-accounting.jsp">Kế toán</a>
-                <a href="${pageContext.request.contextPath}/courses-marketing.jsp">Marketing</a>
+                <a href="${pageContext.request.contextPath}/courses?category=python">Lập trình - CNTT</a>
+                <a href="${pageContext.request.contextPath}/courses?category=finance">Tài chính</a>
+                <a href="${pageContext.request.contextPath}/courses?category=data">Data analyst</a>
+                <a href="${pageContext.request.contextPath}/courses?category=blockchain">Blockchain</a>
+                <a href="${pageContext.request.contextPath}/courses?category=accounting">Kế toán</a>
+                <a href="${pageContext.request.contextPath}/courses?category=marketing">Marketing</a>
               </div>
             </div>
           </div>

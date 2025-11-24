@@ -19,6 +19,7 @@ SET CHARACTER SET utf8mb4;
 -- ============================================
 DROP TABLE IF EXISTS submissions;
 DROP TABLE IF EXISTS assignments;
+DROP TABLE IF EXISTS pending_changes;
 DROP TABLE IF EXISTS teacher_courses;
 DROP TABLE IF EXISTS lesson_progress;
 DROP TABLE IF EXISTS lessons;
@@ -91,6 +92,7 @@ CREATE TABLE orders (
     user_id INT NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL,
     payment_method VARCHAR(50),
+    order_note TEXT,
     status VARCHAR(20) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
@@ -520,4 +522,27 @@ GROUP BY u.user_id;
 -- END OF SCRIPT
 -- Version: 2.0
 -- Last Updated: 2025-11-22
+-- ============================================
+
+-- ============================================
+-- Table: pending_changes
+-- Description: Store pending changes that require admin approval
+-- ============================================
+CREATE TABLE IF NOT EXISTS pending_changes (
+    change_id INT PRIMARY KEY AUTO_INCREMENT,
+    teacher_id INT NOT NULL,
+    change_type VARCHAR(50) NOT NULL,
+    target_id VARCHAR(100),
+    change_data TEXT,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reviewed_by INT,
+    reviewed_at TIMESTAMP NULL,
+    review_note TEXT,
+    FOREIGN KEY (teacher_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewed_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    INDEX idx_teacher_id (teacher_id),
+    INDEX idx_status (status),
+    INDEX idx_change_type (change_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 -- ============================================

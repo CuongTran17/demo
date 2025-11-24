@@ -56,21 +56,21 @@
       <h2 class="section-title">Combo tiết kiệm học tập</h2>
       <p class="section-sub">Một bộ khóa học chất lượng cao với mức giá ưu đãi, giúp bạn tiết kiệm chi phí và tận dụng tối đa thời gian học tập.</p>
       <div class="grid grid-3">
-        <a href="${pageContext.request.contextPath}/courses-python.jsp" class="card card-link">
+        <a href="${pageContext.request.contextPath}/courses?category=python" class="card card-link">
           <img src="${pageContext.request.contextPath}/assets/img/Index/combo sv lập trình.png" alt="Combo sinh viên lập trình" class="card-img" />
           <div class="card-body">
             <h3 class="card-title">Combo sinh viên lập trình</h3>
             <p class="card-text">Bộ combo dành cho sinh viên lập trình với các khóa học từ cơ bản đến nâng cao.</p>
           </div>
         </a>
-        <a href="${pageContext.request.contextPath}/courses-finance.jsp" class="card card-link">
+        <a href="${pageContext.request.contextPath}/courses?category=finance" class="card card-link">
           <img src="${pageContext.request.contextPath}/assets/img/Index/combo sv kinh tế.png" alt="Combo sinh viên kinh tế" class="card-img" />
           <div class="card-body">
             <h3 class="card-title">Combo sinh viên kinh tế</h3>
             <p class="card-text">Combo học tập toàn diện cho sinh viên ngành kinh tế và quản trị.</p>
           </div>
         </a>
-        <a href="${pageContext.request.contextPath}/courses-accounting.jsp" class="card card-link">
+        <a href="${pageContext.request.contextPath}/courses?category=accounting" class="card card-link">
           <img src="${pageContext.request.contextPath}/assets/img/Index/kế toàn cơ bản.png" alt="Combo kế toán cơ bản" class="card-img" />
           <div class="card-body">
             <h3 class="card-title">Kế toán cơ bản</h3>
@@ -108,14 +108,14 @@
     <div class="container">
       <h2 class="section-title">Các khóa học phổ biến nhất</h2>
       <div class="grid grid-2">
-        <a href="${pageContext.request.contextPath}/courses-python.jsp" class="card card-wide card-link">
+        <a href="${pageContext.request.contextPath}/courses?category=python" class="card card-wide card-link">
           <img src="${pageContext.request.contextPath}/assets/img/Index/python.png" alt="Khóa học Python" class="card-img" />
           <div class="card-body">
             <h3 class="card-title">Lập trình Python</h3>
             <p class="card-text">Học Python từ cơ bản đến nâng cao, xây dựng ứng dụng web và phân tích dữ liệu.</p>
           </div>
         </a>
-        <a href="${pageContext.request.contextPath}/courses-blockchain.jsp" class="card card-wide card-link">
+        <a href="${pageContext.request.contextPath}/courses?category=blockchain" class="card card-wide card-link">
           <img src="${pageContext.request.contextPath}/assets/img/Index/blockchian.png" alt="Khóa học Blockchain" class="card-img" />
           <div class="card-body">
             <h3 class="card-title">Blockchain & Crypto</h3>

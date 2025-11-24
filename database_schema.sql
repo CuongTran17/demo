@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS orders (
     user_id INT NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL,
     payment_method VARCHAR(50),
+    order_note TEXT,
     status VARCHAR(20) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
@@ -363,4 +364,26 @@ UPDATE courses SET thumbnail = 'assets/img/Index/python.png' WHERE category = 'd
 UPDATE courses SET thumbnail = 'assets/img/Index/blockchian.png' WHERE category = 'blockchain';
 UPDATE courses SET thumbnail = 'assets/img/Index/kế toàn cơ bản.png' WHERE category = 'accounting';
 UPDATE courses SET thumbnail = 'assets/img/Index/combo sv kinh tế.png' WHERE category = 'marketing';
+
+-- ============================================
+-- Table: pending_changes
+-- Description: Store pending changes that require admin approval
+-- ============================================
+CREATE TABLE IF NOT EXISTS pending_changes (
+    change_id INT PRIMARY KEY AUTO_INCREMENT,
+    teacher_id INT NOT NULL,
+    change_type VARCHAR(50) NOT NULL,
+    target_id VARCHAR(100),
+    change_data TEXT,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reviewed_by INT,
+    reviewed_at TIMESTAMP NULL,
+    review_note TEXT,
+    FOREIGN KEY (teacher_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewed_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    INDEX idx_teacher_id (teacher_id),
+    INDEX idx_status (status),
+    INDEX idx_change_type (change_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 -- ============================================

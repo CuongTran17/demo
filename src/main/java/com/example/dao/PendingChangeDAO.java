@@ -345,6 +345,25 @@ public class PendingChangeDAO {
                 }
             }
             
+        } else if ("course_delete".equals(changeType)) {
+            // Delete course from both courses and teacher_courses tables
+            // First delete from courses table
+            String sql1 = "DELETE FROM courses WHERE course_id = ? AND course_id IN " +
+                         "(SELECT course_id FROM teacher_courses WHERE teacher_id = ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql1)) {
+                stmt.setString(1, targetId);
+                stmt.setInt(2, change.getTeacherId());
+                stmt.executeUpdate();
+            }
+            
+            // Then delete from teacher_courses table
+            String sql2 = "DELETE FROM teacher_courses WHERE course_id = ? AND teacher_id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql2)) {
+                stmt.setString(1, targetId);
+                stmt.setInt(2, change.getTeacherId());
+                stmt.executeUpdate();
+            }
+            
         } else if ("lesson_create".equals(changeType)) {
             // Parse changeData JSON và insert vào lessons table
             // Ví dụ: {"course_id": "course123", "lesson_title": "Title", "lesson_content": "Content", "lesson_order": 1, "section_id": 1, "video_url": "url", "duration": "10:00"}

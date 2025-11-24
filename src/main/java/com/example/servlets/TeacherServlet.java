@@ -334,17 +334,9 @@ public class TeacherServlet extends HttpServlet {
     private void deleteCourse(HttpServletRequest request, int teacherId) throws SQLException {
         String courseId = request.getParameter("courseId");
         
-        String sql = "DELETE FROM courses WHERE course_id = ? AND course_id IN " +
-                     "(SELECT course_id FROM teacher_courses WHERE teacher_id = ?)";
-        
-        try (Connection conn = DatabaseConnection.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, courseId);
-            stmt.setInt(2, teacherId);
-            
-            stmt.executeUpdate();
-        }
+        // Tạo pending change thay vì delete trực tiếp
+        PendingChangeDAO pendingDAO = new PendingChangeDAO();
+        pendingDAO.createPendingChange(teacherId, "course_delete", courseId, "{}");
     }
     
     private void createLesson(HttpServletRequest request, int teacherId) throws SQLException {
