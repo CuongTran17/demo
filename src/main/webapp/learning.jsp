@@ -100,12 +100,12 @@
             <div class="dd-inner">
               <div class="dd-head">Tất cả các khóa học</div>
               <div class="dd-grid">
-                <a href="${pageContext.request.contextPath}/courses?category=python">Lập trình - CNTT</a>
-                <a href="${pageContext.request.contextPath}/courses?category=finance">Tài chính</a>
-                <a href="${pageContext.request.contextPath}/courses?category=data">Data analyst</a>
-                <a href="${pageContext.request.contextPath}/courses?category=blockchain">Blockchain</a>
-                <a href="${pageContext.request.contextPath}/courses?category=accounting">Kế toán</a>
-                <a href="${pageContext.request.contextPath}/courses?category=marketing">Marketing</a>
+                <a href="${pageContext.request.contextPath}/learning?course=python-basics">Lập trình - CNTT</a>
+                <a href="${pageContext.request.contextPath}/learning?course=finance-basic">Tài chính</a>
+                <a href="${pageContext.request.contextPath}/learning?course=data-basic">Data analyst</a>
+                <a href="${pageContext.request.contextPath}/learning?course=blockchain-basic">Blockchain</a>
+                <a href="${pageContext.request.contextPath}/learning?course=accounting-basic">Kế toán</a>
+                <a href="${pageContext.request.contextPath}/learning?course=content-marketing">Marketing</a>
               </div>
             </div>
           </div>
@@ -145,6 +145,9 @@
           <div class="progress-bar">
             <div class="progress-fill" id="progressFill" style="width: 0%"></div>
           </div>
+        </div>
+        <div class="sidebar-actions">
+          <a href="${pageContext.request.contextPath}/courses" class="btn btn-sm btn-outline">← Quay lại danh sách khóa học</a>
         </div>
       </div>
 
