@@ -91,6 +91,7 @@ public class CheckoutServlet extends HttpServlet {
         }
         
         String paymentMethod = request.getParameter("paymentMethod");
+        String orderNote = request.getParameter("orderNote");
         
         // Load cart from database instead of session
         List<String> cartItems = cartDAO.getUserCart(userId);
@@ -110,11 +111,14 @@ public class CheckoutServlet extends HttpServlet {
                 }
             }
             
-            // Create order
-            int orderId = orderDAO.createOrder(userId, coursesToPurchase, paymentMethod);
+            // Determine order status based on payment method
+            String orderStatus = "vietqr".equals(paymentMethod) ? "pending_payment" : "completed";
+            
+            // Create order with note and status
+            int orderId = orderDAO.createOrderWithNote(userId, coursesToPurchase, paymentMethod, orderNote, orderStatus);
             
             if (orderId > 0) {
-                // Clear cart after successful purchase - both database and session
+                // Clear cart after successful order creation
                 cartDAO.clearCart(userId);
                 cartItems.clear();
                 session.setAttribute("cart", cartItems);

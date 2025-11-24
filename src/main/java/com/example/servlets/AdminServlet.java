@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.dao.OrderDAO;
 import com.example.dao.PendingChangeDAO;
 import com.example.dao.UserDAO;
 import com.example.model.PendingChange;
@@ -72,6 +73,11 @@ public class AdminServlet extends HttpServlet {
             request.setAttribute("pendingChanges", pendingChanges);
             request.setAttribute("pendingCount", pendingChanges.size());
             
+            // Get pending payments
+            OrderDAO orderDAO = new OrderDAO();
+            List<OrderDAO.OrderInfo> pendingPayments = orderDAO.getPendingPaymentOrders();
+            request.setAttribute("pendingPayments", pendingPayments);
+            
             // Get reviewed changes history
             List<PendingChange> reviewedChanges = pendingDAO.getReviewedChanges();
             request.setAttribute("reviewedChanges", reviewedChanges);
@@ -123,6 +129,12 @@ public class AdminServlet extends HttpServlet {
                     break;
                 case "rejectChange":
                     rejectChange(request, userId);
+                    break;
+                case "approvePayment":
+                    approvePayment(request, userId);
+                    break;
+                case "rejectPayment":
+                    rejectPayment(request, userId);
                     break;
             }
             
@@ -387,6 +399,28 @@ public class AdminServlet extends HttpServlet {
         
         PendingChangeDAO pendingDAO = new PendingChangeDAO();
         pendingDAO.rejectPendingChange(changeId, adminId, note);
+    }
+    
+    private void approvePayment(HttpServletRequest request, int adminId) throws SQLException {
+        int orderId = Integer.parseInt(request.getParameter("orderId"));
+        
+        OrderDAO orderDAO = new OrderDAO();
+        boolean success = orderDAO.updateOrderStatus(orderId, "completed");
+        
+        if (!success) {
+            throw new SQLException("Không thể cập nhật trạng thái đơn hàng");
+        }
+    }
+    
+    private void rejectPayment(HttpServletRequest request, int adminId) throws SQLException {
+        int orderId = Integer.parseInt(request.getParameter("orderId"));
+        
+        OrderDAO orderDAO = new OrderDAO();
+        boolean success = orderDAO.updateOrderStatus(orderId, "rejected");
+        
+        if (!success) {
+            throw new SQLException("Không thể cập nhật trạng thái đơn hàng");
+        }
     }
     
     // Inner classes for data models

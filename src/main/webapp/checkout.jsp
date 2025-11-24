@@ -68,12 +68,12 @@
             <div class="dd-inner">
               <div class="dd-head">Tất cả các khóa học</div>
               <div class="dd-grid">
-                <a href="${pageContext.request.contextPath}/courses-python.jsp">Lập trình - CNTT</a>
-                <a href="${pageContext.request.contextPath}/courses-finance.jsp">Tài chính</a>
-                <a href="${pageContext.request.contextPath}/courses-data.jsp">Data analyst</a>
-                <a href="${pageContext.request.contextPath}/courses-blockchain.jsp">Blockchain</a>
-                <a href="${pageContext.request.contextPath}/courses-accounting.jsp">Kế toán</a>
-                <a href="${pageContext.request.contextPath}/courses-marketing.jsp">Marketing</a>
+                <a href="${pageContext.request.contextPath}/courses?category=python">Lập trình - CNTT</a>
+                <a href="${pageContext.request.contextPath}/courses?category=finance">Tài chính</a>
+                <a href="${pageContext.request.contextPath}/courses?category=data">Data analyst</a>
+                <a href="${pageContext.request.contextPath}/courses?category=blockchain">Blockchain</a>
+                <a href="${pageContext.request.contextPath}/courses?category=accounting">Kế toán</a>
+                <a href="${pageContext.request.contextPath}/courses?category=marketing">Marketing</a>
               </div>
             </div>
           </div>
@@ -117,25 +117,46 @@
           <h2 class="section-title">Phương thức thanh toán</h2>
           <div class="payment-methods">
             <label class="payment-option">
-              <input type="radio" name="paymentMethod" value="cod" checked />
+              <input type="radio" name="paymentMethod" value="credit_card" checked />
               <div class="payment-content">
                 <span class="payment-icon">💳</span>
                 <div class="payment-info">
-                  <strong>Thanh toán khi giao hàng (COD)</strong>
-                  <p class="payment-desc">Thanh toán bằng tiền mặt khi nhận hàng</p>
+                  <strong>Thanh toán thẻ tín dụng (Trả góp 0%)</strong>
+                  <p class="payment-desc">Thanh toán bằng thẻ tín dụng, hỗ trợ trả góp lãi suất 0%</p>
                 </div>
               </div>
             </label>
             <label class="payment-option">
-              <input type="radio" name="paymentMethod" value="bank" />
+              <input type="radio" name="paymentMethod" value="vietqr" />
               <div class="payment-content">
-                <span class="payment-icon">🏦</span>
+                <span class="payment-icon">📱</span>
                 <div class="payment-info">
-                  <strong>Chuyển khoản qua QR - VCB</strong>
-                  <p class="payment-desc">Quét mã QR để thanh toán</p>
+                  <strong>Chuyển khoản QR VietQR</strong>
+                  <p class="payment-desc">Quét mã QR để thanh toán ngay</p>
                 </div>
               </div>
             </label>
+          </div>
+          
+          <!-- QR Code Display Area -->
+          <div id="qrCodeSection" style="display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+            <h3 style="margin-bottom: 15px; color: #667eea;">Quét mã QR để thanh toán</h3>
+            <div id="qrCodeContainer" style="display: inline-block; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+              <img id="qrCodeImage" src="" alt="QR Code" style="max-width: 300px; width: 100%;" />
+            </div>
+            <div style="margin-top: 15px;">
+              <p style="margin: 5px 0;"><strong>Ngân hàng:</strong> TPBank</p>
+              <p style="margin: 5px 0;"><strong>Số tài khoản:</strong> 03942487601</p>
+              <p style="margin: 5px 0;"><strong>Chủ tài khoản:</strong> TRAN DUC CUONG</p>
+              <p style="margin: 5px 0; color: #e53e3e;"><strong>Số tiền:</strong> <span id="qrAmount"></span></p>
+              <p style="margin: 5px 0; font-size: 0.9em; color: #666;">Nội dung: <span id="qrNote"></span></p>
+            </div>
+            <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107;">
+              <p style="margin: 0; color: #856404; font-size: 0.95em;">
+                ⚠️ Sau khi chuyển khoản, đơn hàng sẽ được gửi tới Admin để duyệt. 
+                Vui lòng chuyển đúng số tiền và nội dung.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -207,6 +228,10 @@
   <%@ include file="/includes/footer.jsp" %>
 
   <script>
+    // Base URL for AJAX requests
+    const baseUrl = '';
+    console.log('baseUrl defined:', baseUrl, 'timestamp:', Date.now());
+    
     // Hamburger menu
     const btn = document.getElementById('hamburger');
     const menu = document.querySelector('.menu');
@@ -273,17 +298,59 @@
       }
     }
 
-    // Place order
-    const baseUrl = '${pageContext.request.contextPath}';
+    const totalAmount = <%= total != null ? total.longValue() : 0 %>;
+    
+    // Payment method change handler
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const qrSection = document.getElementById('qrCodeSection');
+        if (this.value === 'vietqr') {
+          // Generate QR code using VietQR API
+          generateVietQR();
+          qrSection.style.display = 'block';
+        } else {
+          qrSection.style.display = 'none';
+        }
+      });
+    });
+    
+    // Generate VietQR code
+    function generateVietQR() {
+      // Get current total (after discount if any)
+      const totalText = document.getElementById('totalAmount').textContent;
+      const amount = parseInt(totalText.replace(/[^\d]/g, ''));
+      
+      // Generate unique order note
+      const orderNote = 'PTIT' + Date.now().toString().slice(-8);
+      
+      // VietQR API parameters
+      const BANK_ID = '970423'; // TPBank
+      const ACCOUNT_NO = '03942487601';
+      const ACCOUNT_NAME = 'TRAN DUC CUONG';
+      const TEMPLATE = 'compact'; // or 'compact2', 'qr_only'
+      
+      // Build VietQR API URL using JavaScript concatenation
+      const qrUrl = 'https://img.vietqr.io/image/' + BANK_ID + '-' + ACCOUNT_NO + '-' + TEMPLATE + '.png?amount=' + amount + '&addInfo=' + encodeURIComponent(orderNote) + '&accountName=' + encodeURIComponent(ACCOUNT_NAME);
+      
+      // Display QR code
+      document.getElementById('qrCodeImage').src = qrUrl;
+      document.getElementById('qrAmount').textContent = formatPrice(amount);
+      document.getElementById('qrNote').textContent = orderNote;
+      
+      // Store order note for submission
+      document.getElementById('orderNote').value = orderNote;
+    }
     
     function placeOrder() {
-      <% if (cartCourses.isEmpty()) { %>
-        alert('❌ Giỏ hàng trống! Vui lòng thêm sản phẩm vào giỏ hàng.');
-        window.location.href = baseUrl + '/';
-        return;
-      <% } %>
-
       const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+      
+      // Show confirmation for VietQR payment
+      if (paymentMethod === 'vietqr') {
+        const confirmed = confirm('⚠️ Vui lòng xác nhận:\n\n✓ Bạn đã chuyển khoản theo mã QR\n✓ Đơn hàng sẽ được gửi tới Admin để duyệt\n✓ Bạn sẽ nhận được thông báo khi đơn hàng được duyệt\n\nNhấn OK để tiếp tục.');
+        if (!confirmed) {
+          return;
+        }
+      }
       
       // Submit order to servlet
       const form = document.createElement('form');
@@ -295,6 +362,12 @@
       paymentInput.name = 'paymentMethod';
       paymentInput.value = paymentMethod;
       form.appendChild(paymentInput);
+      
+      const noteInput = document.createElement('input');
+      noteInput.type = 'hidden';
+      noteInput.name = 'orderNote';
+      noteInput.value = document.getElementById('orderNote').value;
+      form.appendChild(noteInput);
       
       document.body.appendChild(form);
       form.submit();

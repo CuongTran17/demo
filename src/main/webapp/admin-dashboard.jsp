@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.servlets.AdminServlet" %>
+<%@ page import="com.example.dao.OrderDAO" %>
 <%@ page import="com.example.model.PendingChange" %>
 <%@ page import="java.math.BigDecimal" %>
 <%@ page import="java.text.NumberFormat" %>
@@ -23,11 +24,14 @@
     List<AdminServlet.TeacherInfo> teachers = (List<AdminServlet.TeacherInfo>) request.getAttribute("teachers");
     @SuppressWarnings("unchecked")
     List<AdminServlet.CourseInfo> courses = (List<AdminServlet.CourseInfo>) request.getAttribute("courses");
+    @SuppressWarnings("unchecked")
+    List<OrderDAO.OrderInfo> pendingPayments = (List<OrderDAO.OrderInfo>) request.getAttribute("pendingPayments");
     
     if (stats == null) stats = new AdminServlet.AdminStats();
     if (users == null) users = new java.util.ArrayList<>();
     if (teachers == null) teachers = new java.util.ArrayList<>();
     if (courses == null) courses = new java.util.ArrayList<>();
+    if (pendingPayments == null) pendingPayments = new java.util.ArrayList<>();
     
     NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
 %>
@@ -279,6 +283,25 @@
       background: #c53030;
     }
     
+    .btn-success {
+      background: #38a169;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #2f855a;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .action-buttons form {
+      margin: 0;
+    }
+    
     .modal {
       display: none;
       position: fixed;
@@ -466,6 +489,7 @@
       <button class="tab-btn" onclick="openTab('teachers')">👨‍🏫 Giáo viên</button>
       <button class="tab-btn" onclick="openTab('courses')">📚 Khóa học</button>
       <button class="tab-btn" onclick="openTab('pending')">⏳ Duyệt thay đổi</button>
+      <button class="tab-btn" onclick="openTab('payments')">💳 Duyệt thanh toán</button>
       <button class="tab-btn" onclick="openTab('history')">📜 Lịch sử duyệt</button>
     </div>
 
@@ -857,6 +881,76 @@
             <tr>
               <td colspan="10" style="text-align: center; padding: 30px; color: #64748b;">
                 Chưa có lịch sử duyệt thay đổi
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Payments Tab -->
+    <div id="payments" class="tab-content">
+      <div class="section-header">
+        <h2>Đơn hàng chờ duyệt thanh toán</h2>
+        <div class="section-actions">
+          <span class="badge badge-warning"><%= pendingPayments.size() %> đơn hàng chờ duyệt</span>
+        </div>
+      </div>
+      
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Đơn hàng</th>
+              <th>Khách hàng</th>
+              <th>Email</th>
+              <th>Số điện thoại</th>
+              <th>Tổng tiền</th>
+              <th>Phương thức</th>
+              <th>Ghi chú</th>
+              <th>Ngày đặt</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% 
+            if (pendingPayments != null && !pendingPayments.isEmpty()) {
+              for (OrderDAO.OrderInfo payment : pendingPayments) { 
+            %>
+            <tr>
+              <td>#<%= payment.orderId %></td>
+              <td><%= payment.userFullname %></td>
+              <td><%= payment.userEmail %></td>
+              <td><%= payment.userPhone %></td>
+              <td class="price"><%= currencyFormat.format(payment.totalAmount) %> VND</td>
+              <td>
+                <span class="badge badge-info"><%= payment.paymentMethod.equals("vietqr") ? "VietQR" : payment.paymentMethod %></span>
+              </td>
+              <td><%= payment.orderNote != null ? payment.orderNote : "Không có ghi chú" %></td>
+              <td><%= payment.createdAt %></td>
+              <td>
+                <div class="action-buttons">
+                  <form method="post" action="${pageContext.request.contextPath}/admin" style="display: inline;">
+                    <input type="hidden" name="action" value="approvePayment">
+                    <input type="hidden" name="orderId" value="<%= payment.orderId %>">
+                    <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Bạn có chắc muốn duyệt đơn hàng này?')">✓ Duyệt</button>
+                  </form>
+                  <form method="post" action="${pageContext.request.contextPath}/admin" style="display: inline;">
+                    <input type="hidden" name="action" value="rejectPayment">
+                    <input type="hidden" name="orderId" value="<%= payment.orderId %>">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn từ chối đơn hàng này?')">✗ Từ chối</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <% 
+              }
+            } else {
+            %>
+            <tr>
+              <td colspan="9" style="text-align: center; padding: 30px; color: #64748b;">
+                Không có đơn hàng nào chờ duyệt thanh toán
               </td>
             </tr>
             <% } %>
