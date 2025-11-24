@@ -942,6 +942,7 @@
     if(ddTrigger && ddParent){
       ddTrigger.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         const wasOpen = ddParent.classList.contains('open');
         document.querySelectorAll('.dropdown.open').forEach(function(d) {
           d.classList.remove('open');
@@ -954,6 +955,15 @@
         } else {
           ddTrigger.setAttribute('aria-expanded','false');
         }
+      });
+      
+      // Allow links inside dropdown to be clicked
+      const ddLinks = ddParent.querySelectorAll('.dd a');
+      ddLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.stopPropagation();
+          // Let the link navigate normally
+        });
       });
       
       document.addEventListener('click', function(e) {
