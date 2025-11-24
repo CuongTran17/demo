@@ -135,6 +135,8 @@ public class UserDAO {
     public boolean emailExists(String email) {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         
+        System.out.println("UserDAO.emailExists: Checking email: " + email);
+        
         try (Connection conn = DatabaseConnection.getNewConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
@@ -142,10 +144,13 @@ public class UserDAO {
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
-                return rs.getInt(1) > 0;
+                int count = rs.getInt(1);
+                System.out.println("UserDAO.emailExists: Count for " + email + " = " + count);
+                return count > 0;
             }
             
         } catch (SQLException e) {
+            System.err.println("UserDAO.emailExists: Error checking email: " + e.getMessage());
             e.printStackTrace();
         }
         

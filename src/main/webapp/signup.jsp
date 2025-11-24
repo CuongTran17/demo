@@ -81,6 +81,16 @@
     </aside>
   </main>
 
+  <!-- Modal for error notification -->
+  <div id="errorModal" class="modal">
+    <div class="modal-content error-modal">
+      <div class="modal-icon">⚠️</div>
+      <h2 class="modal-title">Đăng ký không thành công</h2>
+      <p class="modal-message" id="errorModalMessage"></p>
+      <button class="btn btn-primary" onclick="closeErrorModal()">Đã hiểu</button>
+    </div>
+  </div>
+
   <script>
     const btn = document.getElementById('hamburger');
     const menu = document.querySelector('.menu');
@@ -105,6 +115,31 @@
       });
     }
 
+    // Show error modal on page load if error exists
+    <% if (error != null) { %>
+      showErrorModal('<%= error %>');
+    <% } %>
+
+    function showErrorModal(message) {
+      const modal = document.getElementById('errorModal');
+      const messageEl = document.getElementById('errorModalMessage');
+      messageEl.textContent = message;
+      modal.style.display = 'flex';
+    }
+
+    function closeErrorModal() {
+      const modal = document.getElementById('errorModal');
+      modal.style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('errorModal');
+      if (event.target === modal) {
+        closeErrorModal();
+      }
+    }
+
     // ===== FORM VALIDATION =====
     const form = document.getElementById('signupForm');
     const fields = {
@@ -114,6 +149,10 @@
       password: document.getElementById('password'),
       confirmPassword: document.getElementById('confirmPassword')
     };
+
+    let emailCheckTimeout;
+    let emailExists = false;
+    let isCheckingEmail = false;
 
     // Validation rules
     const validators = {
@@ -126,6 +165,7 @@
         if (!value.trim()) return 'Vui lòng nhập email';
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) return 'Email không hợp lệ';
+        if (emailExists) return 'Email đã tồn tại';
         return '';
       },
       phone: (value) => {
@@ -147,6 +187,29 @@
         return '';
       }
     };
+
+    // Check email exists via AJAX
+    function checkEmailExists(email) {
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        emailExists = false;
+        return;
+      }
+
+      isCheckingEmail = true;
+      fetch('${pageContext.request.contextPath}/api/check-email?email=' + encodeURIComponent(email))
+        .then(response => response.json())
+        .then(data => {
+          emailExists = data.exists;
+          isCheckingEmail = false;
+          // Re-validate to update UI
+          validateField('email');
+        })
+        .catch(error => {
+          console.error('Error checking email:', error);
+          emailExists = false;
+          isCheckingEmail = false;
+        });
+    }
 
     // Show error/success
     function setFieldState(field, error) {
@@ -179,10 +242,12 @@
     Object.keys(fields).forEach(fieldName => {
       const field = fields[fieldName];
       
-      // Validate on blur
-      field.addEventListener('blur', () => {
-        validateField(fieldName);
-      });
+      // Validate on blur - but skip email as it has special handling
+      if (fieldName !== 'email') {
+        field.addEventListener('blur', () => {
+          validateField(fieldName);
+        });
+      }
       
       // Validate on input (for password match)
       field.addEventListener('input', () => {
@@ -194,6 +259,42 @@
           validateField('confirmPassword');
         }
       });
+    });
+
+    // Email real-time check
+    fields.email.addEventListener('input', () => {
+      clearTimeout(emailCheckTimeout);
+      emailExists = false; // Reset immediately when typing
+      
+      const emailValue = fields.email.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      // Remove success state immediately when typing
+      const fieldLabel = fields.email.closest('.field');
+      fieldLabel.classList.remove('success');
+      
+      // Only check if email format is valid
+      if (emailRegex.test(emailValue)) {
+        emailCheckTimeout = setTimeout(() => {
+          checkEmailExists(emailValue);
+        }, 500); // Debounce 500ms
+      }
+    });
+    
+    // Also check on blur
+    fields.email.addEventListener('blur', () => {
+      const emailValue = fields.email.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (emailRegex.test(emailValue)) {
+        // Force immediate check on blur and wait for result
+        clearTimeout(emailCheckTimeout);
+        emailExists = false;
+        checkEmailExists(emailValue);
+      } else {
+        // Validate immediately if format is invalid
+        validateField('email');
+      }
     });
 
     // Form submit validation
@@ -263,6 +364,78 @@
       color: #27ae60;
       font-weight: bold;
       font-size: 18px;
+    }
+    
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { 
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to { 
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 40px;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      animation: slideUp 0.3s ease;
+    }
+    
+    .error-modal {
+      border-top: 5px solid #e74c3c;
+    }
+    
+    .modal-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 16px;
+    }
+    
+    .modal-message {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    
+    .modal-content .btn {
+      min-width: 150px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
     }
   </style>
 </body>

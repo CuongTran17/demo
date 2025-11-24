@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost:3306/ptit_learning?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "123456789"; // MySQL password
+    private static final String PASSWORD = "NTHair935@"; // MySQL password
     
     private static DatabaseConnection instance;
     private Connection connection;

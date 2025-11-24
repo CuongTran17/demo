@@ -56,7 +56,8 @@ public class RegisterServlet extends HttpServlet {
         
         // Check if email already exists
         if (userDAO.emailExists(email)) {
-            request.setAttribute("error", "Email đã được sử dụng!");
+            request.setAttribute("error", "Tài khoản với email \"" + email + "\" đã tồn tại!");
+            request.setAttribute("email", email);
             request.setAttribute("phone", phone);
             request.setAttribute("fullname", fullname);
             request.getRequestDispatcher("/signup.jsp").forward(request, response);
