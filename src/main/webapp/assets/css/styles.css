@@ -184,7 +184,39 @@ a{color:inherit;text-decoration:none}
 .grid-3{grid-template-columns:repeat(3,1fr)}
 .grid-2{grid-template-columns:repeat(2,1fr)}
 @media (max-width: 1000px){.grid-3{grid-template-columns:repeat(2,1fr)}}
-@media (max-width: 640px){.grid-3,.grid-2{grid-template-columns:1fr}}
+@media (max-width: 640px){
+  .grid-3,.grid-2{
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(0,0,0,0.2) transparent;
+    gap:16px;
+    padding-bottom:8px;
+  }
+  .grid-3::-webkit-scrollbar,.grid-2::-webkit-scrollbar{
+    height:6px;
+  }
+  .grid-3::-webkit-scrollbar-track,.grid-2::-webkit-scrollbar-track{
+    background:transparent;
+  }
+  .grid-3::-webkit-scrollbar-thumb,.grid-2::-webkit-scrollbar-thumb{
+    background:rgba(0,0,0,0.2);
+    border-radius:3px;
+  }
+  .grid-3::-webkit-scrollbar-thumb:hover,.grid-2::-webkit-scrollbar-thumb:hover{
+    background:rgba(0,0,0,0.3);
+  }
+  .grid-3 > *,.grid-2 > *{
+    flex:0 0 280px;
+    scroll-snap-align:start;
+  }
+  .grid-3.cards-compact > *{
+    flex:0 0 260px;
+  }
+}
 
 /* Cards */
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s ease,box-shadow .3s ease;box-shadow:0 2px 8px rgba(0,0,0,.08)}
