@@ -221,30 +221,6 @@
   <%@ include file="/includes/footer.jsp" %>
 
   <script>
-    // Hamburger menu
-    const btn = document.getElementById('hamburger');
-    const menu = document.querySelector('.menu');
-    if(btn && menu){
-      btn.addEventListener('click', () => {
-        const open = btn.getAttribute('aria-expanded') === 'true';
-        btn.setAttribute('aria-expanded', String(!open));
-        menu.classList.toggle('open');
-      });
-    }
-
-    // Dropdown menu (mobile only)
-    const ddTrigger = document.querySelector('.menu .has-dd');
-    const ddParent = ddTrigger?.closest('.dropdown');
-    if(ddTrigger && ddParent){
-      ddTrigger.addEventListener('click', (e) => {
-        if(window.matchMedia('(max-width: 900px)').matches){
-          e.preventDefault();
-          ddParent.classList.toggle('open');
-          ddTrigger.setAttribute('aria-expanded', String(ddParent.classList.contains('open')));
-        }
-      });
-    }
-
     // Tab switching
     document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
       item.addEventListener('click', (e) => {

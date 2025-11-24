@@ -435,10 +435,24 @@
         font-size: 0.9rem;
       }
       
+      .admin-dashboard {
+        padding: 10px;
+      }
+      
       .data-table th,
       .data-table td {
         padding: 10px;
         font-size: 0.85rem;
+      }
+      
+      .data-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        display: block;
+      }
+      
+      .data-table table {
+        min-width: 800px;
       }
     }
   </style>
@@ -491,6 +505,7 @@
       <button class="tab-btn" onclick="openTab('pending')">⏳ Duyệt thay đổi</button>
       <button class="tab-btn" onclick="openTab('payments')">💳 Duyệt thanh toán</button>
       <button class="tab-btn" onclick="openTab('history')">📜 Lịch sử duyệt</button>
+      <button class="tab-btn" onclick="openTab('payment-history')">💰 Lịch sử thanh toán</button>
     </div>
 
     <!-- Users Tab -->
@@ -951,6 +966,85 @@
             <tr>
               <td colspan="9" style="text-align: center; padding: 30px; color: #64748b;">
                 Không có đơn hàng nào chờ duyệt thanh toán
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Payment History Tab -->
+    <div id="payment-history" class="tab-content">
+      <div class="section-header">
+        <h2>Lịch sử duyệt thanh toán</h2>
+        <div class="section-actions">
+          <span class="badge badge-info">100 giao dịch gần nhất</span>
+        </div>
+      </div>
+      
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Đơn hàng</th>
+              <th>Khách hàng</th>
+              <th>Số tiền</th>
+              <th>Phương thức</th>
+              <th>Hành động</th>
+              <th>Trạng thái cũ</th>
+              <th>Trạng thái mới</th>
+              <th>Người duyệt</th>
+              <th>Ghi chú</th>
+              <th>Thời gian</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% 
+            @SuppressWarnings("unchecked")
+            List<OrderDAO.PaymentApprovalHistory> paymentHistory = (List<OrderDAO.PaymentApprovalHistory>) request.getAttribute("paymentHistory");
+            if (paymentHistory != null && !paymentHistory.isEmpty()) {
+              for (OrderDAO.PaymentApprovalHistory history : paymentHistory) { 
+            %>
+            <tr>
+              <td>#<%= history.historyId %></td>
+              <td>#<%= history.orderId %></td>
+              <td><%= history.userFullname %></td>
+              <td class="price"><%= currencyFormat.format(history.totalAmount) %> VND</td>
+              <td>
+                <span class="badge badge-info"><%= history.paymentMethod.equals("vietqr") ? "VietQR" : history.paymentMethod %></span>
+              </td>
+              <td>
+                <% if ("approved".equals(history.action)) { %>
+                  <span class="badge badge-success">✓ Đã duyệt</span>
+                <% } else if ("rejected".equals(history.action)) { %>
+                  <span class="badge badge-danger">✗ Từ chối</span>
+                <% } else { %>
+                  <span class="badge badge-secondary"><%= history.action %></span>
+                <% } %>
+              </td>
+              <td><span class="badge badge-warning"><%= history.oldStatus %></span></td>
+              <td>
+                <% if ("completed".equals(history.newStatus)) { %>
+                  <span class="badge badge-success"><%= history.newStatus %></span>
+                <% } else if ("rejected".equals(history.newStatus)) { %>
+                  <span class="badge badge-danger"><%= history.newStatus %></span>
+                <% } else { %>
+                  <span class="badge badge-info"><%= history.newStatus %></span>
+                <% } %>
+              </td>
+              <td><strong><%= history.adminFullname %></strong></td>
+              <td><%= history.note != null && !history.note.isEmpty() ? history.note : "-" %></td>
+              <td><%= history.createdAt %></td>
+            </tr>
+            <% 
+              }
+            } else {
+            %>
+            <tr>
+              <td colspan="11" style="text-align: center; padding: 30px; color: #64748b;">
+                Chưa có lịch sử duyệt thanh toán
               </td>
             </tr>
             <% } %>

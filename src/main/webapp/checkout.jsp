@@ -228,7 +228,7 @@
 
   <script>
     // Base URL for AJAX requests
-    const baseUrl = '';
+    const baseUrl = window.location.origin;
     console.log('baseUrl defined:', baseUrl, 'timestamp:', Date.now());
     
     // Hamburger menu

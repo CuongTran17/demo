@@ -78,6 +78,10 @@ public class AdminServlet extends HttpServlet {
             List<OrderDAO.OrderInfo> pendingPayments = orderDAO.getPendingPaymentOrders();
             request.setAttribute("pendingPayments", pendingPayments);
             
+            // Get payment approval history
+            List<OrderDAO.PaymentApprovalHistory> paymentHistory = orderDAO.getPaymentApprovalHistory();
+            request.setAttribute("paymentHistory", paymentHistory);
+            
             // Get reviewed changes history
             List<PendingChange> reviewedChanges = pendingDAO.getReviewedChanges();
             request.setAttribute("reviewedChanges", reviewedChanges);
@@ -403,8 +407,14 @@ public class AdminServlet extends HttpServlet {
     
     private void approvePayment(HttpServletRequest request, int adminId) throws SQLException {
         int orderId = Integer.parseInt(request.getParameter("orderId"));
+        String note = request.getParameter("note");
+        if (note == null) note = "";
         
         OrderDAO orderDAO = new OrderDAO();
+        
+        // Log the approval action
+        orderDAO.logPaymentApproval(orderId, adminId, "approved", "pending_payment", "completed", note);
+        
         boolean success = orderDAO.updateOrderStatus(orderId, "completed");
         
         if (!success) {
@@ -414,8 +424,14 @@ public class AdminServlet extends HttpServlet {
     
     private void rejectPayment(HttpServletRequest request, int adminId) throws SQLException {
         int orderId = Integer.parseInt(request.getParameter("orderId"));
+        String note = request.getParameter("note");
+        if (note == null) note = "";
         
         OrderDAO orderDAO = new OrderDAO();
+        
+        // Log the rejection action
+        orderDAO.logPaymentApproval(orderId, adminId, "rejected", "pending_payment", "rejected", note);
+        
         boolean success = orderDAO.updateOrderStatus(orderId, "rejected");
         
         if (!success) {

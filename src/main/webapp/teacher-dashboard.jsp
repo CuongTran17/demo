@@ -304,14 +304,30 @@
         flex-direction: column;
       }
       
+      .dashboard-header {
+        padding: 20px;
+      }
+      
+      .dashboard-header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .teacher-dashboard {
+        padding: 10px;
+      }
+      
       .course-table, .student-table, .data-table {
         font-size: 0.9rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        display: block;
       }
       
       .course-table th, .course-table td,
       .student-table th, .student-table td,
       .data-table th, .data-table td {
         padding: 10px;
+        white-space: nowrap;
       }
     }
     

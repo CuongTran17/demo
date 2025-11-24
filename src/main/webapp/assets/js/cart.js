@@ -1,5 +1,5 @@
 // Cart utility functions - shared across all course pages
-const baseUrl = window.location.origin + '/demo';
+const baseUrl = window.location.origin;
 
 function addToCart(courseId, courseName, price, redirectPage) {
   fetch(baseUrl + '/cart?action=add&courseId=' + courseId, {

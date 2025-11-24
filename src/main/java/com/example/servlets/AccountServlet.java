@@ -68,7 +68,8 @@ public class AccountServlet extends HttpServlet {
                      "FROM orders o " +
                      "JOIN order_items oi ON o.order_id = oi.order_id " +
                      "JOIN courses c ON oi.course_id = c.course_id " +
-                     "WHERE o.user_id = ? ORDER BY o.created_at DESC";
+                     "WHERE o.user_id = ? " +
+                     "ORDER BY o.created_at DESC";
         
         try (Connection conn = DatabaseConnection.getNewConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -111,6 +112,7 @@ public class AccountServlet extends HttpServlet {
                 stats.totalCourses = rs.getInt("total_courses");
                 stats.completedCourses = rs.getInt("completed_courses");
                 stats.totalHours = rs.getDouble("total_hours");
+                System.out.println("DEBUG AccountServlet - User " + userId + ": total_courses=" + stats.totalCourses + ", completed=" + stats.completedCourses + ", hours=" + stats.totalHours);
             }
             
         } catch (SQLException e) {

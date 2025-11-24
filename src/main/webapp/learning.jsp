@@ -95,7 +95,7 @@
       
       <nav class="menu" aria-label="Chính">
         <div class="dropdown">
-          <a href="javascript:void(0)" class="has-dd" id="coursesMenu" aria-haspopup="true" aria-expanded="false">Các khóa học</a>
+          <a href="javascript:void(0)" class="has-dd" id="coursesMenuLearning" aria-haspopup="true" aria-expanded="false">Các khóa học</a>
           <div class="dd" role="menu" aria-labelledby="coursesMenu">
             <div class="dd-inner">
               <div class="dd-head">Tất cả các khóa học</div>
@@ -934,7 +934,7 @@
     }
 
     // Dropdown menu toggle
-    const ddTrigger = document.querySelector('.menu .has-dd');
+    const ddTrigger = document.getElementById('coursesMenuLearning');
     const ddParent = ddTrigger ? ddTrigger.closest('.dropdown') : null;
     if(ddTrigger && ddParent){
       ddTrigger.addEventListener('click', function(e) {
