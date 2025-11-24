@@ -255,19 +255,19 @@ CREATE TABLE submissions (
 -- Password Hashes:
 -- 123456 -> 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
 -- admin123 -> 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
--- teacher123 -> 8a2ea2b02e1478c0e8c802bc380c52e867024690c14c934e6c76c2265c6f3ec6
+-- teacher123 -> cde383eee8ee7a4400adf7a15f716f179a2eb97646b37e089eb8d6d04e663416
 
 INSERT INTO users (email, phone, password_hash, fullname) VALUES
 -- System Accounts
 ('admin@ptit.edu.vn', NULL, '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Administrator'),
 
 -- Teacher Accounts (6 teachers)
-('teacher1@ptit.edu.vn', '0901234567', '8a2ea2b02e1478c0e8c802bc380c52e867024690c14c934e6c76c2265c6f3ec6', 'Nguyen Van Python'),
-('teacher2@ptit.edu.vn', '0901234568', '8a2ea2b02e1478c0e8c802bc380c52e867024690c14c934e6c76c2265c6f3ec6', 'Tran Thi Finance'),
-('teacher3@ptit.edu.vn', '0901234569', '8a2ea2b02e1478c0e8c802bc380c52e867024690c14c934e6c76c2265c6f3ec6', 'Le Van Data'),
-('teacher4@ptit.edu.vn', '0901234570', '8a2ea2b02e1478c0e8c802bc380c52e867024690c14c934e6c76c2265c6f3ec6', 'Pham Thi Blockchain'),
-('teacher5@ptit.edu.vn', '0901234571', '8a2ea2b02e1478c0e8c802bc380c52e867024690c14c934e6c76c2265c6f3ec6', 'Hoang Van Accounting'),
-('teacher6@ptit.edu.vn', '0901234572', '8a2ea2b02e1478c0e8c802bc380c52e867024690c14c934e6c76c2265c6f3ec6', 'Vu Thi Marketing'),
+('teacher1@ptit.edu.vn', '0901234567', 'cde383eee8ee7a4400adf7a15f716f179a2eb97646b37e089eb8d6d04e663416', 'Nguyen Van Python'),
+('teacher2@ptit.edu.vn', '0901234568', 'cde383eee8ee7a4400adf7a15f716f179a2eb97646b37e089eb8d6d04e663416', 'Tran Thi Finance'),
+('teacher3@ptit.edu.vn', '0901234569', 'cde383eee8ee7a4400adf7a15f716f179a2eb97646b37e089eb8d6d04e663416', 'Le Van Data'),
+('teacher4@ptit.edu.vn', '0901234570', 'cde383eee8ee7a4400adf7a15f716f179a2eb97646b37e089eb8d6d04e663416', 'Pham Thi Blockchain'),
+('teacher5@ptit.edu.vn', '0901234571', 'cde383eee8ee7a4400adf7a15f716f179a2eb97646b37e089eb8d6d04e663416', 'Hoang Van Accounting'),
+('teacher6@ptit.edu.vn', '0901234572', 'cde383eee8ee7a4400adf7a15f716f179a2eb97646b37e089eb8d6d04e663416', 'Vu Thi Marketing'),
 
 -- Student Accounts (2 students for testing)
 ('tranduccuong17@gmail.com', '0123456789', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Trần Đức Cường'),
