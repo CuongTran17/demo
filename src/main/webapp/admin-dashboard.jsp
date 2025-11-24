@@ -617,7 +617,8 @@
                 <span class="badge badge-info">
                   <% 
                   String type = change.getChangeType();
-                  if ("course_update".equals(type)) out.print("Cập nhật khóa học");
+                  if ("course_create".equals(type)) out.print("Tạo khóa học");
+                  else if ("course_update".equals(type)) out.print("Cập nhật khóa học");
                   else if ("lesson_create".equals(type)) out.print("Tạo bài học");
                   else if ("lesson_update".equals(type)) out.print("Cập nhật bài học");
                   else if ("lesson_delete".equals(type)) out.print("Xóa bài học");
@@ -629,7 +630,9 @@
                 <% 
                 String targetDisplay = "";
                 String changeType = change.getChangeType();
-                if ("course_update".equals(changeType)) {
+                if ("course_create".equals(changeType)) {
+                  targetDisplay = "Khóa học mới: " + change.getTargetId();
+                } else if ("course_update".equals(changeType)) {
                   targetDisplay = "Khóa học: " + change.getTargetId();
                 } else if (changeType.contains("lesson")) {
                   targetDisplay = "Bài học: " + change.getTargetId();
@@ -640,16 +643,56 @@
                 <%= targetDisplay %>
               </td>
               <td>
-                <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
-                     title="<%= change.getChangeData() %>">
+                <div style="max-width: 300px;">
                   <% 
                   String data = change.getChangeData();
+                  System.out.println("DEBUG - Change ID " + change.getChangeId() + " data: " + data);
                   if ("{}".equals(data)) {
                     out.print("Không có dữ liệu");
                   } else {
-                    out.print(data);
-                  }
+                    // Check if data contains image_filename for image preview
+                    if (data != null && data.contains("image_filename")) {
+                      System.out.println("DEBUG - Found image_filename in data");
+                      // Extract image path - handle both escaped and unescaped quotes
+                      String imgPattern = "image_filename";
+                      int imgStart = data.indexOf(imgPattern);
+                      if (imgStart >= 0) {
+                        // Find the colon after image_filename
+                        int colonPos = data.indexOf(":", imgStart);
+                        if (colonPos > 0) {
+                          // Find the opening quote
+                          int quoteStart = data.indexOf("\"", colonPos);
+                          if (quoteStart > 0) {
+                            quoteStart++; // Move past the quote
+                            // Find the closing quote
+                            int quoteEnd = data.indexOf("\"", quoteStart);
+                            if (quoteEnd > quoteStart) {
+                              String imgPath = data.substring(quoteStart, quoteEnd);
+                              System.out.println("DEBUG - Extracted image path: " + imgPath);
                   %>
+                          <div style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                            <strong style="color: #667eea;">📷 Hình ảnh mới:</strong><br>
+                            <img src="<%= request.getContextPath() + "/" + imgPath %>" 
+                                 alt="Preview" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                                 style="max-width: 200px; max-height: 150px; border: 2px solid #667eea; border-radius: 4px; margin-top: 4px; display: block;">
+                            <div style="display: none; color: #e53e3e; margin-top: 4px;">❌ Không thể tải ảnh</div>
+                          </div>
+                  <%    
+                            }
+                          }
+                        }
+                      }
+                    }
+                    // Display JSON data in a collapsed format
+                  %>
+                  <details style="cursor: pointer;">
+                    <summary style="color: #666; font-size: 0.9em;">📄 Chi tiết JSON</summary>
+                    <div style="overflow: auto; max-height: 100px; padding: 4px; background: #f5f5f5; border-radius: 4px; margin-top: 4px; font-size: 0.85em; word-break: break-all;">
+                      <%= data %>
+                    </div>
+                  </details>
+                  <% } %>
                 </div>
               </td>
               <td><%= change.getCreatedAt() != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(change.getCreatedAt()) : "-" %></td>
@@ -720,7 +763,8 @@
                 <span class="badge badge-info">
                   <% 
                   String type = change.getChangeType();
-                  if ("course_update".equals(type)) out.print("Cập nhật khóa học");
+                  if ("course_create".equals(type)) out.print("Tạo khóa học");
+                  else if ("course_update".equals(type)) out.print("Cập nhật khóa học");
                   else if ("lesson_create".equals(type)) out.print("Tạo bài học");
                   else if ("lesson_update".equals(type)) out.print("Cập nhật bài học");
                   else if ("lesson_delete".equals(type)) out.print("Xóa bài học");
@@ -732,7 +776,9 @@
                 <% 
                 String targetDisplay = "";
                 String changeType = change.getChangeType();
-                if ("course_update".equals(changeType)) {
+                if ("course_create".equals(changeType)) {
+                  targetDisplay = "Khóa học mới: " + change.getTargetId();
+                } else if ("course_update".equals(changeType)) {
                   targetDisplay = "Khóa học: " + change.getTargetId();
                 } else if (changeType.contains("lesson")) {
                   targetDisplay = "Bài học: " + change.getTargetId();
@@ -743,16 +789,53 @@
                 <%= targetDisplay %>
               </td>
               <td>
-                <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
-                     title="<%= change.getChangeData() %>">
+                <div style="max-width: 200px;">
                   <% 
-                  String data = change.getChangeData();
-                  if ("{}".equals(data)) {
+                  String dataHist = change.getChangeData();
+                  if ("{}".equals(dataHist)) {
                     out.print("Không có dữ liệu");
                   } else {
-                    out.print(data);
-                  }
+                    // Check if data contains image_filename for image preview
+                    if (dataHist != null && dataHist.contains("image_filename")) {
+                      // Extract image path - handle both escaped and unescaped quotes
+                      String imgPatternHist = "image_filename";
+                      int imgStartHist = dataHist.indexOf(imgPatternHist);
+                      if (imgStartHist >= 0) {
+                        // Find the colon after image_filename
+                        int colonPosHist = dataHist.indexOf(":", imgStartHist);
+                        if (colonPosHist > 0) {
+                          // Find the opening quote
+                          int quoteStartHist = dataHist.indexOf("\"", colonPosHist);
+                          if (quoteStartHist > 0) {
+                            quoteStartHist++; // Move past the quote
+                            // Find the closing quote
+                            int quoteEndHist = dataHist.indexOf("\"", quoteStartHist);
+                            if (quoteEndHist > quoteStartHist) {
+                              String imgPathHist = dataHist.substring(quoteStartHist, quoteEndHist);
                   %>
+                          <div style="margin-bottom: 8px; padding: 6px; background: #f8f9fa; border-radius: 4px;">
+                            <strong style="color: #667eea;">📷 Hình ảnh:</strong><br>
+                            <img src="<%= request.getContextPath() + "/" + imgPathHist %>" 
+                                 alt="Preview" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                                 style="max-width: 150px; max-height: 100px; border: 2px solid #667eea; border-radius: 4px; margin-top: 4px; display: block;">
+                            <div style="display: none; color: #e53e3e; margin-top: 4px; font-size: 0.85em;">❌ Lỗi tải ảnh</div>
+                          </div>
+                  <%    
+                            }
+                          }
+                        }
+                      }
+                    }
+                    // Display JSON data in a collapsed format
+                  %>
+                  <details style="cursor: pointer;">
+                    <summary style="color: #666; font-size: 0.85em;">📄 Chi tiết</summary>
+                    <div style="overflow: auto; max-height: 80px; padding: 4px; background: #f5f5f5; border-radius: 4px; margin-top: 4px; font-size: 0.8em; word-break: break-all;">
+                      <%= dataHist %>
+                    </div>
+                  </details>
+                  <% } %>
                 </div>
               </td>
               <td>

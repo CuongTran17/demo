@@ -107,6 +107,7 @@ public class TeacherServlet extends HttpServlet {
             switch (action) {
                 case "createCourse":
                     createCourse(request, userId);
+                    session.setAttribute("successMessage", "Yêu cầu tạo khóa học đã được gửi cho admin duyệt!");
                     break;
                 case "updateCourse":
                     updateCourse(request, userId);
@@ -280,37 +281,26 @@ public class TeacherServlet extends HttpServlet {
         String description = request.getParameter("description");
         String priceStr = request.getParameter("price");
         
-        BigDecimal price = new BigDecimal(priceStr);
+        // Tạo JSON data cho pending change
+        StringBuilder changeData = new StringBuilder();
+        changeData.append("{");
+        changeData.append("\"course_id\":\"").append(courseId.replace("\"", "\\\"")).append("\",");
+        changeData.append("\"course_name\":\"").append(courseName.replace("\"", "\\\"")).append("\",");
+        changeData.append("\"category\":\"").append(category.replace("\"", "\\\"")).append("\",");
+        changeData.append("\"description\":\"").append(description.replace("\"", "\\\"")).append("\",");
+        changeData.append("\"price\":").append(priceStr);
+        changeData.append("}");
         
-        Connection conn = DatabaseConnection.getNewConnection();
-        conn.setAutoCommit(false);
-        
-        try {
-            // Insert course
-            String sql1 = "INSERT INTO courses (course_id, course_name, category, description, price) VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(sql1)) {
-                stmt.setString(1, courseId);
-                stmt.setString(2, courseName);
-                stmt.setString(3, category);
-                stmt.setString(4, description);
-                stmt.setBigDecimal(5, price);
-                stmt.executeUpdate();
-            }
-            
-            // Assign teacher to course
-            String sql2 = "INSERT INTO teacher_courses (teacher_id, course_id) VALUES (?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(sql2)) {
+        // Tạo pending change cho admin duyệt
+        try (Connection conn = DatabaseConnection.getNewConnection()) {
+            String sql = "INSERT INTO pending_changes (teacher_id, change_type, target_id, change_data, status) VALUES (?, ?, ?, ?, 'pending')";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, teacherId);
-                stmt.setString(2, courseId);
+                stmt.setString(2, "course_create");
+                stmt.setString(3, courseId);
+                stmt.setString(4, changeData.toString());
                 stmt.executeUpdate();
             }
-            
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.close();
         }
     }
     
@@ -476,6 +466,13 @@ public class TeacherServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=UTF-8");
         
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            response.getWriter().write("{\"success\": false, \"message\": \"Not logged in\"}");
+            return;
+        }
+        
         try {
             String imageUrl = request.getParameter("imageUrl");
             String courseId = request.getParameter("courseId");
@@ -497,8 +494,8 @@ public class TeacherServlet extends HttpServlet {
                 }
             }
             
-            // Generate unique filename
-            String fileName = "course_" + courseId + "_" + System.currentTimeMillis() + ".jpg";
+            // Generate unique filename with "pending_" prefix to distinguish from approved images
+            String fileName = "pending_course_" + courseId + "_" + System.currentTimeMillis() + ".jpg";
             String relativePath = "assets/img/course-uploads/" + fileName;
             
             // Decode image once
@@ -514,7 +511,7 @@ public class TeacherServlet extends HttpServlet {
                 fos.write(imageBytes);
             }
             
-            // Also save to deployed directory (for immediate display)
+            // Also save to deployed directory (for preview in pending changes)
             String deployedPath = getServletContext().getRealPath("/") + relativePath;
             java.io.File deployedDir = new java.io.File(deployedPath).getParentFile();
             if (!deployedDir.exists()) {
@@ -524,20 +521,17 @@ public class TeacherServlet extends HttpServlet {
                 fos.write(imageBytes);
             }
             
-            // Update database with file path
-            String sql = "UPDATE courses SET thumbnail = ? WHERE course_id = ?";
-            try (Connection conn = DatabaseConnection.getNewConnection();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-                
-                stmt.setString(1, relativePath);
-                stmt.setString(2, courseId);
-                stmt.executeUpdate();
-            }
+            // Create pending change instead of direct update
+            StringBuilder changeData = new StringBuilder();
+            changeData.append("{\"image_filename\":\"").append(relativePath).append("\"}");
+            
+            PendingChangeDAO pendingDAO = new PendingChangeDAO();
+            pendingDAO.createPendingChange(userId, "course_update", courseId, changeData.toString());
             
             // Return success response
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("success", true);
-            jsonResponse.put("message", "Image uploaded successfully");
+            jsonResponse.put("message", "Yêu cầu thay đổi hình ảnh đã được gửi cho admin duyệt");
             jsonResponse.put("thumbnailUrl", relativePath);
             response.getWriter().write(jsonResponse.toString());
             

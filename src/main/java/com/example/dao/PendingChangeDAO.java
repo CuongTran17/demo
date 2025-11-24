@@ -239,13 +239,44 @@ public class PendingChangeDAO {
         // Parse JSON và apply change dựa vào changeType
         // Sử dụng JSON parsing đơn giản (có thể cần thư viện JSON như Gson)
         
-        if ("course_update".equals(changeType)) {
+        if ("course_create".equals(changeType)) {
+            // Parse changeData JSON và insert vào courses table
+            // Ví dụ: {"course_id": "python-basics", "course_name": "Python Cơ bản", "category": "python", "description": "Khóa học...", "price": 1200000}
+            String courseId = extractJsonValue(changeData, "course_id");
+            String courseName = extractJsonValue(changeData, "course_name");
+            String category = extractJsonValue(changeData, "category");
+            String description = extractJsonValue(changeData, "description");
+            String priceStr = extractJsonValue(changeData, "price");
+            
+            if (courseId != null && courseName != null && category != null && priceStr != null) {
+                // Insert course
+                String sql1 = "INSERT INTO courses (course_id, course_name, category, description, price, created_at) VALUES (?, ?, ?, ?, ?, NOW())";
+                try (PreparedStatement stmt = conn.prepareStatement(sql1)) {
+                    stmt.setString(1, courseId);
+                    stmt.setString(2, courseName);
+                    stmt.setString(3, category);
+                    stmt.setString(4, description != null ? description : "");
+                    stmt.setBigDecimal(5, new BigDecimal(priceStr));
+                    stmt.executeUpdate();
+                }
+                
+                // Assign teacher to course
+                String sql2 = "INSERT INTO teacher_courses (teacher_id, course_id) VALUES (?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(sql2)) {
+                    stmt.setInt(1, change.getTeacherId());
+                    stmt.setString(2, courseId);
+                    stmt.executeUpdate();
+                }
+            }
+            
+        } else if ("course_update".equals(changeType)) {
             // Parse changeData JSON và update courses table
-            // Ví dụ: {"course_name": "New Name", "description": "New Desc", "price": 100.0, "image_url": "path/to/image.jpg"}
+            // Ví dụ: {"course_name": "New Name", "description": "New Desc", "price": 100.0, "image_url": "path/to/image.jpg", "image_filename": "path/to/image.jpg"}
             String courseName = extractJsonValue(changeData, "course_name");
             String description = extractJsonValue(changeData, "description");
             String priceStr = extractJsonValue(changeData, "price");
             String imageUrl = extractJsonValue(changeData, "image_url");
+            String imageFilename = extractJsonValue(changeData, "image_filename");
             
             // Debug logging
             System.out.println("=== DEBUG course_update ===");
@@ -254,6 +285,7 @@ public class PendingChangeDAO {
             System.out.println("description: [" + description + "]");
             System.out.println("priceStr: [" + priceStr + "]");
             System.out.println("imageUrl: [" + imageUrl + "]");
+            System.out.println("imageFilename: [" + imageFilename + "]");
             
             StringBuilder sql = new StringBuilder("UPDATE courses SET ");
             List<String> updates = new ArrayList<>();
@@ -282,6 +314,12 @@ public class PendingChangeDAO {
                 updates.add("image_url = ?");
                 params.add(imageUrl);
                 System.out.println("Added imageUrl param");
+            }
+            // Handle image_filename (for uploaded images)
+            if (imageFilename != null && !imageFilename.trim().isEmpty()) {
+                updates.add("thumbnail = ?");
+                params.add(imageFilename);
+                System.out.println("Added imageFilename param for thumbnail");
             }
             
             if (!updates.isEmpty()) {

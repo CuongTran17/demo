@@ -385,7 +385,24 @@
       <button class="tab-button" onclick="showTab('students')">👥 Quản lý học viên</button>
       <button class="tab-button" onclick="showTab('content')">📝 Quản lý nội dung</button>
       <button class="tab-button" onclick="showTab('analytics')">📊 Thống kê</button>
-      <button class="tab-button" onclick="showTab('pending')">⏳ Duyệt thay đổi</button>
+      <button class="tab-button" onclick="showTab('pending')">
+        ⏳ Duyệt thay đổi
+        <% 
+        @SuppressWarnings("unchecked")
+        List<PendingChange> allPendingChanges = (List<PendingChange>) request.getAttribute("pendingChanges");
+        int pendingCount = 0;
+        if (allPendingChanges != null) {
+          for (PendingChange pc : allPendingChanges) {
+            if ("pending".equals(pc.getStatus())) {
+              pendingCount++;
+            }
+          }
+        }
+        if (pendingCount > 0) {
+          out.print("<span class='badge badge-warning' style='margin-left: 8px;'>" + pendingCount + "</span>");
+        }
+        %>
+      </button>
     </div>
 
     <!-- Courses Tab -->
@@ -567,7 +584,8 @@
                 <span class="badge badge-info">
                   <% 
                   String type = change.getChangeType();
-                  if ("course_update".equals(type)) out.print("Cập nhật khóa học");
+                  if ("course_create".equals(type)) out.print("Tạo khóa học");
+                  else if ("course_update".equals(type)) out.print("Cập nhật khóa học");
                   else if ("lesson_create".equals(type)) out.print("Tạo bài học");
                   else if ("lesson_update".equals(type)) out.print("Cập nhật bài học");
                   else if ("lesson_delete".equals(type)) out.print("Xóa bài học");
@@ -1140,11 +1158,14 @@
     // Show success message popup
     <% if (successMessage != null) { %>
     window.onload = function() {
-      showSuccessPopup('<%= successMessage.replace("'", "\\'") %>');
+      const msg = '<%= successMessage.replace("'", "\\'") %>';
+      console.log('Success message:', msg);
+      showSuccessPopup(msg);
     }
     <% } %>
     
     function showSuccessPopup(message) {
+      console.log('showSuccessPopup called with:', message);
       // Create popup element
       const popup = document.createElement('div');
       popup.style.cssText = `
@@ -1153,24 +1174,38 @@
         right: 20px;
         background: #4CAF50;
         color: white;
-        padding: 15px 20px;
+        padding: 16px 24px;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         z-index: 10000;
         font-family: 'Be Vietnam Pro', sans-serif;
-        font-size: 14px;
+        font-size: 15px;
+        font-weight: 500;
         max-width: 400px;
         animation: slideIn 0.3s ease-out;
       `;
       
-      popup.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 18px;">✓</span>
-          <span>${message}</span>
-          <button onclick="this.parentElement.parentElement.remove()" 
-                  style="background: none; border: none; color: white; cursor: pointer; font-size: 18px; margin-left: auto;">×</button>
-        </div>
-      `;
+      // Create inner HTML using DOM methods instead of template literal
+      const container = document.createElement('div');
+      container.style.cssText = 'display: flex; align-items: center; gap: 12px;';
+      
+      const checkmark = document.createElement('span');
+      checkmark.style.cssText = 'font-size: 20px; font-weight: bold;';
+      checkmark.textContent = '✓';
+      
+      const messageSpan = document.createElement('span');
+      messageSpan.style.cssText = 'flex: 1;';
+      messageSpan.textContent = message;
+      
+      const closeBtn = document.createElement('button');
+      closeBtn.style.cssText = 'background: none; border: none; color: white; cursor: pointer; font-size: 20px; margin-left: 8px; padding: 0; line-height: 1;';
+      closeBtn.textContent = '×';
+      closeBtn.onclick = function() { popup.remove(); };
+      
+      container.appendChild(checkmark);
+      container.appendChild(messageSpan);
+      container.appendChild(closeBtn);
+      popup.appendChild(container);
       
       document.body.appendChild(popup);
       
