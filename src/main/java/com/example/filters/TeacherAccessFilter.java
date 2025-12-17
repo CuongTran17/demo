@@ -8,7 +8,6 @@ import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -17,7 +16,7 @@ import jakarta.servlet.http.HttpSession;
  * Filter to restrict teacher account access to only teacher pages
  * Teacher can only access /teacher and /logout, cannot access student pages
  */
-@WebFilter("/*")
+// @WebFilter("/*") - Disabled: Using web.xml configuration instead
 public class TeacherAccessFilter implements Filter {
     
     @Override

@@ -65,6 +65,12 @@ public class TeacherServlet extends HttpServlet {
             CourseStats stats = getCourseStats(userId);
             request.setAttribute("stats", stats);
             
+            // Get course and category revenues
+            List<CourseRevenue> courseRevenues = getTeacherCourseRevenues(userId);
+            List<CategoryRevenue> categoryRevenues = getTeacherCategoryRevenues(userId);
+            request.setAttribute("courseRevenues", courseRevenues);
+            request.setAttribute("categoryRevenues", categoryRevenues);
+            
             // Get pending changes for this teacher
             PendingChangeDAO pendingDAO = new PendingChangeDAO();
             List<PendingChange> pendingChanges = pendingDAO.getPendingChangesByTeacher(userId);
@@ -274,6 +280,64 @@ public class TeacherServlet extends HttpServlet {
         return stats;
     }
     
+    private List<CourseRevenue> getTeacherCourseRevenues(int teacherId) {
+        List<CourseRevenue> revenues = new ArrayList<>();
+        String sql = "SELECT c.course_id, c.course_name, COALESCE(SUM(oi.price), 0) as revenue " +
+                    "FROM courses c " +
+                    "INNER JOIN teacher_courses tc ON c.course_id = tc.course_id " +
+                    "LEFT JOIN order_items oi ON c.course_id = oi.course_id " +
+                    "LEFT JOIN orders o ON oi.order_id = o.order_id AND o.status = 'completed' " +
+                    "WHERE tc.teacher_id = ? " +
+                    "GROUP BY c.course_id, c.course_name " +
+                    "ORDER BY revenue DESC " +
+                    "LIMIT 10";
+        
+        try (Connection conn = DatabaseConnection.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, teacherId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                CourseRevenue cr = new CourseRevenue();
+                cr.courseId = rs.getString("course_id");
+                cr.courseName = rs.getString("course_name");
+                cr.revenue = rs.getBigDecimal("revenue");
+                revenues.add(cr);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return revenues;
+    }
+    
+    private List<CategoryRevenue> getTeacherCategoryRevenues(int teacherId) {
+        List<CategoryRevenue> revenues = new ArrayList<>();
+        String sql = "SELECT c.category, COALESCE(SUM(oi.price), 0) as revenue " +
+                    "FROM courses c " +
+                    "INNER JOIN teacher_courses tc ON c.course_id = tc.course_id " +
+                    "LEFT JOIN order_items oi ON c.course_id = oi.course_id " +
+                    "LEFT JOIN orders o ON oi.order_id = o.order_id AND o.status = 'completed' " +
+                    "WHERE tc.teacher_id = ? " +
+                    "GROUP BY c.category " +
+                    "ORDER BY revenue DESC";
+        
+        try (Connection conn = DatabaseConnection.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, teacherId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                CategoryRevenue cr = new CategoryRevenue();
+                cr.category = rs.getString("category");
+                cr.revenue = rs.getBigDecimal("revenue");
+                revenues.add(cr);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return revenues;
+    }
+    
     private void createCourse(HttpServletRequest request, int teacherId) throws SQLException {
         String courseId = request.getParameter("courseId");
         String courseName = request.getParameter("courseName");
@@ -293,12 +357,13 @@ public class TeacherServlet extends HttpServlet {
         
         // Tạo pending change cho admin duyệt
         try (Connection conn = DatabaseConnection.getNewConnection()) {
-            String sql = "INSERT INTO pending_changes (teacher_id, change_type, target_id, change_data, status) VALUES (?, ?, ?, ?, 'pending')";
+            String sql = "INSERT INTO pending_changes (requested_by, table_name, change_type, target_id, change_data, status) VALUES (?, ?, ?, ?, ?, 'pending')";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, teacherId);
-                stmt.setString(2, "course_create");
-                stmt.setString(3, courseId);
-                stmt.setString(4, changeData.toString());
+                stmt.setString(2, "courses");
+                stmt.setString(3, "course_create");
+                stmt.setString(4, courseId);
+                stmt.setString(5, changeData.toString());
                 stmt.executeUpdate();
             }
         }
@@ -451,6 +516,17 @@ public class TeacherServlet extends HttpServlet {
         public int totalCourses = 0;
         public int totalStudents = 0;
         public BigDecimal totalRevenue = BigDecimal.ZERO;
+    }
+    
+    public static class CourseRevenue {
+        public String courseId;
+        public String courseName;
+        public BigDecimal revenue;
+    }
+    
+    public static class CategoryRevenue {
+        public String category;
+        public BigDecimal revenue;
     }
     
     private void uploadCourseImage(HttpServletRequest request, HttpServletResponse response) 

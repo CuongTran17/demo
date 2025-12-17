@@ -86,6 +86,13 @@ public class AdminServlet extends HttpServlet {
             List<PendingChange> reviewedChanges = pendingDAO.getReviewedChanges();
             request.setAttribute("reviewedChanges", reviewedChanges);
             
+            // Get revenue statistics
+            List<CourseRevenue> courseRevenues = getCourseRevenues();
+            request.setAttribute("courseRevenues", courseRevenues);
+            
+            List<CategoryRevenue> categoryRevenues = getCategoryRevenues();
+            request.setAttribute("categoryRevenues", categoryRevenues);
+            
             request.getRequestDispatcher("/admin-dashboard.jsp").forward(request, response);
             
         } catch (Exception e) {
@@ -145,8 +152,11 @@ public class AdminServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/admin");
             
         } catch (Exception e) {
-            e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi xử lý: " + e.getMessage());
+            // Log error but show user-friendly message
+            System.err.println("Admin action error: " + e.getMessage());
+            // Set error message in session to show alert
+            request.getSession().setAttribute("errorMessage", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/admin");
         }
     }
     
@@ -371,6 +381,8 @@ public class AdminServlet extends HttpServlet {
             stmt.setInt(1, teacherId);
             stmt.setString(2, courseId);
             stmt.executeUpdate();
+        } catch (java.sql.SQLIntegrityConstraintViolationException e) {
+            throw new SQLException("Giáo viên này đã được gắn khóa học này rồi!", e);
         }
     }
     
@@ -439,6 +451,67 @@ public class AdminServlet extends HttpServlet {
         }
     }
     
+    private List<CourseRevenue> getCourseRevenues() {
+        List<CourseRevenue> revenues = new ArrayList<>();
+        String sql = "SELECT c.course_id, c.course_name, c.category, " +
+                     "COUNT(oi.order_item_id) as order_count, " +
+                     "COALESCE(SUM(oi.price), 0) as total_revenue " +
+                     "FROM courses c " +
+                     "LEFT JOIN order_items oi ON c.course_id = oi.course_id " +
+                     "LEFT JOIN orders o ON oi.order_id = o.order_id AND o.status = 'completed' " +
+                     "GROUP BY c.course_id, c.course_name, c.category " +
+                     "ORDER BY total_revenue DESC " +
+                     "LIMIT 10";
+        
+        try (Connection conn = DatabaseConnection.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                CourseRevenue cr = new CourseRevenue();
+                cr.courseId = rs.getString("course_id");
+                cr.courseName = rs.getString("course_name");
+                cr.category = rs.getString("category");
+                cr.orderCount = rs.getInt("order_count");
+                cr.totalRevenue = rs.getBigDecimal("total_revenue");
+                revenues.add(cr);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return revenues;
+    }
+    
+    private List<CategoryRevenue> getCategoryRevenues() {
+        List<CategoryRevenue> revenues = new ArrayList<>();
+        String sql = "SELECT c.category, " +
+                     "COUNT(DISTINCT oi.order_item_id) as order_count, " +
+                     "COALESCE(SUM(oi.price), 0) as total_revenue " +
+                     "FROM courses c " +
+                     "LEFT JOIN order_items oi ON c.course_id = oi.course_id " +
+                     "LEFT JOIN orders o ON oi.order_id = o.order_id AND o.status = 'completed' " +
+                     "GROUP BY c.category " +
+                     "ORDER BY total_revenue DESC";
+        
+        try (Connection conn = DatabaseConnection.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                CategoryRevenue cr = new CategoryRevenue();
+                cr.category = rs.getString("category");
+                cr.orderCount = rs.getInt("order_count");
+                cr.totalRevenue = rs.getBigDecimal("total_revenue");
+                revenues.add(cr);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return revenues;
+    }
+    
     // Inner classes for data models
     public static class AdminStats {
         public int totalUsers;
@@ -469,5 +542,19 @@ public class AdminServlet extends HttpServlet {
         public String category;
         public BigDecimal price;
         public int enrolledCount;
+    }
+    
+    public static class CourseRevenue {
+        public String courseId;
+        public String courseName;
+        public String category;
+        public int orderCount;
+        public BigDecimal totalRevenue = BigDecimal.ZERO;
+    }
+    
+    public static class CategoryRevenue {
+        public String category;
+        public int orderCount;
+        public BigDecimal totalRevenue = BigDecimal.ZERO;
     }
 }

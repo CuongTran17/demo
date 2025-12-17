@@ -17,8 +17,8 @@ public class PendingChangeDAO {
      * Tạo một pending change mới
      */
     public int createPendingChange(int teacherId, String changeType, String targetId, String changeData) throws SQLException {
-        String sql = "INSERT INTO pending_changes (teacher_id, change_type, target_id, change_data, status) " +
-                     "VALUES (?, ?, ?, ?, 'pending')";
+        String sql = "INSERT INTO pending_changes (requested_by, change_type, target_id, change_data, table_name, status) " +
+                     "VALUES (?, ?, ?, ?, ?, 'pending')";
         
         try (Connection conn = DatabaseConnection.getNewConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -27,6 +27,9 @@ public class PendingChangeDAO {
             stmt.setString(2, changeType);
             stmt.setString(3, targetId);
             stmt.setString(4, changeData);
+            // Determine table_name from targetId or changeType
+            String tableName = changeType.contains("course") || targetId.contains("-") ? "courses" : "lessons";
+            stmt.setString(5, tableName);
             
             stmt.executeUpdate();
             

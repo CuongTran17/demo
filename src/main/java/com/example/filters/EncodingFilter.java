@@ -30,18 +30,15 @@ public class EncodingFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         
-        // Set request encoding
-        if (httpRequest.getCharacterEncoding() == null) {
-            httpRequest.setCharacterEncoding(encoding);
-        }
+        // Force UTF-8 encoding for all requests
+        httpRequest.setCharacterEncoding(encoding);
+        httpResponse.setCharacterEncoding(encoding);
         
         String requestURI = httpRequest.getRequestURI();
         
-        // Only set content type for JSP/HTML files, not for CSS/JS/images or servlets
+        // Set content type for JSP/HTML files
         if (requestURI.endsWith(".jsp") || requestURI.endsWith(".html") || requestURI.equals("/") || 
-            (!requestURI.contains(".") && !requestURI.startsWith("/teacher"))) {
-            // Set response encoding only for HTML/JSP pages
-            httpResponse.setCharacterEncoding(encoding);
+            (!requestURI.contains(".") && !requestURI.startsWith("/teacher") && !requestURI.startsWith("/api"))) {
             httpResponse.setContentType("text/html; charset=" + encoding);
         }
         

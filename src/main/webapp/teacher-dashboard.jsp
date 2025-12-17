@@ -3,6 +3,7 @@
 <%@ page import="com.example.servlets.TeacherServlet" %>
 <%@ page import="com.example.model.PendingChange" %>
 <%@ page import="java.math.BigDecimal" %>
+<%@ page import="com.google.gson.Gson" %>
 <%
     Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
     String userEmail = (String) session.getAttribute("userEmail");
@@ -368,8 +369,6 @@
   </style>
 </head>
 <body>
-  <%@ include file="/includes/header.jsp" %>
-
   <main class="container teacher-dashboard">
     <div class="dashboard-header">
       <div class="dashboard-header-content">
@@ -525,46 +524,231 @@
 
     <!-- Analytics Tab -->
     <div class="tab-content" id="analytics-tab">
-      <h2>Thống kê chi tiết</h2>
-      
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number"><%= teacherCourses.size() %></div>
-          <div class="stat-label">Khóa học đang giảng dạy</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number"><%= students.size() %></div>
-          <div class="stat-label">Tổng lượt đăng ký</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">
-            <% 
-            int totalProgress = 0;
-            int studentCount = students.size();
-            for (TeacherServlet.StudentInfo student : students) {
-                totalProgress += student.progress;
-            }
-            int avgProgress = studentCount > 0 ? totalProgress / studentCount : 0;
-            %>
-            <%= avgProgress %>%
+      <!-- PHẦN 1: THÔNG TIN TỔNG QUAN -->
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 15px; margin-bottom: 40px;">
+        <h2 style="color: white; margin: 0 0 25px 0; font-size: 1.8rem;">📊 Thông tin tổng quan</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+          <!-- Số khóa học -->
+          <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+              <div style="background: rgba(255, 255, 255, 0.2); width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px;">📚</div>
+              <div>
+                <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 5px;">Khóa học</div>
+                <div style="color: white; font-size: 2rem; font-weight: 700;"><%= teacherCourses.size() %></div>
+              </div>
+            </div>
+            <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; margin-top: 10px;">Đang giảng dạy</div>
           </div>
-          <div class="stat-label">Tiến độ trung bình</div>
+          
+          <!-- Số học viên -->
+          <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+              <div style="background: rgba(255, 255, 255, 0.2); width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px;">👥</div>
+              <div>
+                <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 5px;">Học viên</div>
+                <div style="color: white; font-size: 2rem; font-weight: 700;"><%= students.size() %></div>
+              </div>
+            </div>
+            <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; margin-top: 10px;">Tổng lượt đăng ký</div>
+          </div>
+          
+          <!-- Tiến độ trung bình -->
+          <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+              <div style="background: rgba(255, 255, 255, 0.2); width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px;">📈</div>
+              <div>
+                <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 5px;">Tiến độ</div>
+                <div style="color: white; font-size: 2rem; font-weight: 700;">
+                  <% 
+                  int totalProgress = 0;
+                  int studentCount = students.size();
+                  for (TeacherServlet.StudentInfo student : students) {
+                      totalProgress += student.progress;
+                  }
+                  int avgProgress = studentCount > 0 ? totalProgress / studentCount : 0;
+                  %>
+                  <%= avgProgress %>%
+                </div>
+              </div>
+            </div>
+            <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; margin-top: 10px;">Trung bình lớp học</div>
+          </div>
+          
+          <!-- Tổng doanh thu -->
+          <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+              <div style="background: rgba(255, 255, 255, 0.2); width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px;">💰</div>
+              <div>
+                <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; margin-bottom: 5px;">Doanh thu</div>
+                <div style="color: white; font-size: 1.5rem; font-weight: 700;"><%= String.format("%,d", stats.totalRevenue.longValue()) %>₫</div>
+              </div>
+            </div>
+            <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; margin-top: 10px;">Tổng thu nhập</div>
+          </div>
         </div>
       </div>
       
-      <div style="background: white; padding: 20px; border-radius: 12px; margin-top: 20px;">
-        <h3>Hiệu suất khóa học</h3>
-        <% for (TeacherServlet.TeacherCourse course : teacherCourses) { %>
-        <div style="margin-bottom: 15px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <span><%= course.courseName %></span>
-            <span><%= course.enrolledCount %> học viên</span>
+      <!-- PHẦN 2: THỐNG KÊ DOANH THU -->
+      <div style="margin-bottom: 30px;">
+        <h2 style="color: #2d3748; margin: 0 0 25px 0; font-size: 1.8rem; display: flex; align-items: center; gap: 10px;">
+          <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">💵 Phân tích doanh thu</span>
+        </h2>
+        
+        <%
+          @SuppressWarnings("unchecked")
+          List<TeacherServlet.CourseRevenue> courseRevenues = (List<TeacherServlet.CourseRevenue>) request.getAttribute("courseRevenues");
+          @SuppressWarnings("unchecked")
+          List<TeacherServlet.CategoryRevenue> categoryRevenues = (List<TeacherServlet.CategoryRevenue>) request.getAttribute("categoryRevenues");
+          
+          if (courseRevenues == null) courseRevenues = new java.util.ArrayList<>();
+          if (categoryRevenues == null) categoryRevenues = new java.util.ArrayList<>();
+        %>
+        
+        <!-- Biểu đồ doanh thu -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; margin-bottom: 25px;">
+          <!-- Category Revenue Pie Chart -->
+          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+              <span style="background: #667eea; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;">📊</span>
+              Doanh thu theo danh mục
+            </h3>
+            <canvas id="categoryRevenueChart" style="max-height: 300px;"></canvas>
           </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: <%= Math.min(course.enrolledCount * 10, 100) %>%;"></div>
+          
+          <!-- Top Courses Bar Chart -->
+          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+              <span style="background: #48bb78; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;">🏆</span>
+              Top khóa học bán chạy
+            </h3>
+            <canvas id="courseRevenueChart" style="max-height: 300px;"></canvas>
           </div>
         </div>
-        <% } %>
+        
+        <!-- Bảng thông tin học viên và tiến độ -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px;">
+          <!-- Students List Table -->
+          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 1.1rem;">👥 Danh sách học viên</h3>
+            <div style="max-height: 500px; overflow-y: auto;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <thead style="position: sticky; top: 0; background: white; z-index: 10;">
+                  <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <th style="padding: 14px 12px; text-align: left; color: white; font-weight: 600; border-radius: 8px 0 0 0;">Học viên</th>
+                    <th style="padding: 14px 12px; text-align: left; color: white; font-weight: 600;">Khóa học</th>
+                    <th style="padding: 14px 12px; text-align: center; color: white; font-weight: 600; border-radius: 0 8px 0 0;">Tiến độ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% 
+                  if (students != null && !students.isEmpty()) {
+                    for (TeacherServlet.StudentInfo student : students) { 
+                  %>
+                  <tr style="border-bottom: 1px solid #e2e8f0; transition: background 0.2s;">
+                    <td style="padding: 14px 12px;">
+                      <div>
+                        <div style="font-weight: 600; color: #2d3748; margin-bottom: 4px;"><%= student.fullname %></div>
+                        <div style="font-size: 0.85rem; color: #718096;"><%= student.email %></div>
+                      </div>
+                    </td>
+                    <td style="padding: 14px 12px;">
+                      <div style="font-weight: 500; color: #4a5568; line-height: 1.4;"><%= student.courseName %></div>
+                    </td>
+                    <td style="padding: 14px 12px; text-align: center;">
+                      <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <div style="width: 60px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                          <div style="width: <%= student.progress %>%; height: 100%; background: <%= student.progress >= 80 ? "#48bb78" : student.progress >= 50 ? "#667eea" : "#ed8936" %>; transition: width 0.5s ease;"></div>
+                        </div>
+                        <span style="font-weight: 600; color: #2d3748; min-width: 40px; font-size: 0.9rem;"><%= student.progress %>%</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <% 
+                    }
+                  } else {
+                  %>
+                  <tr>
+                    <td colspan="3" style="padding: 40px; text-align: center; color: #a0aec0;">
+                      <div style="font-size: 3rem; margin-bottom: 10px;">📚</div>
+                      <div>Chưa có học viên nào đăng ký khóa học</div>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Student Progress by Course Table -->
+          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 1.1rem;">📈 Tiến độ theo khóa học</h3>
+            <div style="max-height: 500px; overflow-y: auto;">
+              <% 
+              // Group students by course
+              java.util.Map<String, java.util.List<TeacherServlet.StudentInfo>> courseStudentsMap = new java.util.LinkedHashMap<>();
+              if (students != null) {
+                for (TeacherServlet.StudentInfo student : students) {
+                  courseStudentsMap.computeIfAbsent(student.courseName, k -> new java.util.ArrayList<>()).add(student);
+                }
+              }
+              
+              if (!courseStudentsMap.isEmpty()) {
+                int courseIndex = 0;
+                for (java.util.Map.Entry<String, java.util.List<TeacherServlet.StudentInfo>> entry : courseStudentsMap.entrySet()) {
+                  String courseName = entry.getKey();
+                  java.util.List<TeacherServlet.StudentInfo> courseStudents = entry.getValue();
+                  
+                  // Calculate average progress
+                  int courseTotalProgress = 0;
+                  for (TeacherServlet.StudentInfo s : courseStudents) {
+                    courseTotalProgress += s.progress;
+                  }
+                  int courseAvgProgress = courseStudents.size() > 0 ? courseTotalProgress / courseStudents.size() : 0;
+                  courseIndex++;
+              %>
+              <div style="margin-bottom: 25px; padding: 20px; background: #f7fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <div style="font-weight: 600; color: #2d3748; font-size: 1rem;"><%= courseName %></div>
+                  <div style="background: <%= courseAvgProgress >= 80 ? "#48bb78" : courseAvgProgress >= 50 ? "#667eea" : "#ed8936" %>; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                    <%= courseAvgProgress %>% TB
+                  </div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-size: 0.85rem; color: #718096;"><%= courseStudents.size() %> học viên</span>
+                    <span style="font-size: 0.85rem; color: #718096;">Tiến độ trung bình</span>
+                  </div>
+                  <div style="width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden;">
+                    <div style="width: <%= courseAvgProgress %>%; height: 100%; background: linear-gradient(90deg, <%= courseAvgProgress >= 80 ? "#48bb78, #38a169" : courseAvgProgress >= 50 ? "#667eea, #764ba2" : "#ed8936, #dd6b20" %>); transition: width 0.5s ease;"></div>
+                  </div>
+                </div>
+                <div style="display: grid; gap: 8px; margin-top: 12px;">
+                  <% for (TeacherServlet.StudentInfo s : courseStudents) { %>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <span style="font-size: 0.9rem; color: #4a5568; font-weight: 500;"><%= s.fullname %></span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <div style="width: 60px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                        <div style="width: <%= s.progress %>%; height: 100%; background: <%= s.progress >= 80 ? "#48bb78" : s.progress >= 50 ? "#667eea" : "#ed8936" %>;"></div>
+                      </div>
+                      <span style="font-size: 0.85rem; font-weight: 600; color: #2d3748; min-width: 35px; text-align: right;"><%= s.progress %>%</span>
+                    </div>
+                  </div>
+                  <% } %>
+                </div>
+              </div>
+              <% 
+                }
+              } else {
+              %>
+              <div style="padding: 40px; text-align: center; color: #a0aec0;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">📊</div>
+                <div>Chưa có dữ liệu tiến độ học tập</div>
+              </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1247,6 +1431,139 @@
       }
     `;
     document.head.appendChild(style);
+  </script>
+  
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    // Wait for DOM and Chart.js to load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Convert Java data to JavaScript - Get directly from request attributes
+      const categoryData = <%= new com.google.gson.Gson().toJson(request.getAttribute("categoryRevenues")) %>;
+      const courseData = <%= new com.google.gson.Gson().toJson(request.getAttribute("courseRevenues")) %>;
+      
+      console.log('Category Data:', categoryData);
+      console.log('Course Data:', courseData);
+      
+      // Category Revenue Pie Chart
+      if (categoryData && categoryData.length > 0) {
+        const ctxCategory = document.getElementById('categoryRevenueChart');
+        if (ctxCategory) {
+          console.log('Creating category chart...');
+          new Chart(ctxCategory, {
+            type: 'pie',
+            data: {
+              labels: categoryData.map(item => item.category),
+              datasets: [{
+              data: categoryData.map(item => item.revenue),
+              backgroundColor: [
+                '#667eea',
+                '#764ba2',
+                '#f093fb',
+                '#4facfe',
+                '#43e97b',
+                '#fa709a'
+              ],
+              borderWidth: 2,
+              borderColor: '#fff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  padding: 15,
+                  font: {
+                    size: 12
+                  }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const label = context.label || '';
+                    const value = context.parsed || 0;
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const percentage = ((value / total) * 100).toFixed(1);
+                    return label + ': ' + value.toLocaleString('vi-VN') + '₫ (' + percentage + '%)';
+                  }
+                }
+              }
+            }
+          }
+        });
+      } else {
+        console.log('Category chart canvas not found');
+      }
+    } else {
+      console.log('No category data available');
+    }
+    
+    // Course Revenue Bar Chart
+    if (courseData && courseData.length > 0) {
+      const ctxCourse = document.getElementById('courseRevenueChart');
+      if (ctxCourse) {
+        console.log('Creating course chart...');
+        new Chart(ctxCourse, {
+          type: 'bar',
+          data: {
+            labels: courseData.map(item => item.courseName),
+            datasets: [{
+              label: 'Doanh thu (₫)',
+              data: courseData.map(item => item.revenue),
+              backgroundColor: 'rgba(102, 126, 234, 0.8)',
+              borderColor: 'rgba(102, 126, 234, 1)',
+              borderWidth: 2,
+              borderRadius: 8
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return 'Doanh thu: ' + context.parsed.x.toLocaleString('vi-VN') + '₫';
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return (value / 1000000).toFixed(1) + 'M';
+                  }
+                }
+              },
+              y: {
+                ticks: {
+                  autoSkip: false,
+                  font: {
+                    size: 11
+                  }
+                }
+              }
+            }
+          }
+        });
+      } else {
+        console.log('Course chart canvas not found');
+      }
+    } else {
+      console.log('No course data available');
+    }
+    
+    }); // End DOMContentLoaded
   </script>
 </body>
 </html>

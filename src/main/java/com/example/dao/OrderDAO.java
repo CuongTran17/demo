@@ -408,8 +408,8 @@ public class OrderDAO {
      * Log payment approval action to history
      */
     public void logPaymentApproval(int orderId, int adminId, String action, String oldStatus, String newStatus, String note) {
-        String sql = "INSERT INTO payment_approval_history (order_id, admin_id, action, old_status, new_status, note) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO payment_approval_history (order_id, admin_id, action, note) " +
+                    "VALUES (?, ?, ?, ?)";
         
         try (Connection conn = DatabaseConnection.getNewConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -417,9 +417,7 @@ public class OrderDAO {
             stmt.setInt(1, orderId);
             stmt.setInt(2, adminId);
             stmt.setString(3, action);
-            stmt.setString(4, oldStatus);
-            stmt.setString(5, newStatus);
-            stmt.setString(6, note);
+            stmt.setString(4, note);
             stmt.executeUpdate();
             
         } catch (SQLException e) {
@@ -438,7 +436,7 @@ public class OrderDAO {
                     "JOIN orders o ON h.order_id = o.order_id " +
                     "JOIN users u ON o.user_id = u.user_id " +
                     "JOIN users a ON h.admin_id = a.user_id " +
-                    "ORDER BY h.created_at DESC LIMIT 100";
+                    "ORDER BY h.action_time DESC LIMIT 100";
         
         try (Connection conn = DatabaseConnection.getNewConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -446,14 +444,14 @@ public class OrderDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 PaymentApprovalHistory item = new PaymentApprovalHistory();
-                item.historyId = rs.getInt("history_id");
+                item.historyId = rs.getInt("id");
                 item.orderId = rs.getInt("order_id");
                 item.adminId = rs.getInt("admin_id");
                 item.action = rs.getString("action");
-                item.oldStatus = rs.getString("old_status");
-                item.newStatus = rs.getString("new_status");
+                item.oldStatus = ""; // Not in schema anymore
+                item.newStatus = ""; // Not in schema anymore
                 item.note = rs.getString("note");
-                item.createdAt = rs.getTimestamp("created_at");
+                item.createdAt = rs.getTimestamp("action_time");
                 item.userFullname = rs.getString("user_fullname");
                 item.adminFullname = rs.getString("admin_fullname");
                 item.totalAmount = rs.getBigDecimal("total_amount");

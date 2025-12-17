@@ -458,8 +458,19 @@
   </style>
 </head>
 <body>
-  <%@ include file="/includes/header.jsp" %>
-
+  <%
+    // Check for error message
+    String errorMessage = (String) session.getAttribute("errorMessage");
+    if (errorMessage != null) {
+        session.removeAttribute("errorMessage");
+  %>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      alert('❌ <%= errorMessage.replace("'", "\\'") %>');
+    });
+  </script>
+  <% } %>
+  
   <main class="container admin-dashboard">
     <div class="dashboard-header">
       <div class="dashboard-header-content">
@@ -499,17 +510,127 @@
 
     <!-- Tabs -->
     <div class="tab-navigation">
-      <button class="tab-btn active" onclick="openTab('users')">👥 Người dùng</button>
+      <button class="tab-btn active" onclick="openTab('stats')">📊 Thống kê</button>
+      <button class="tab-btn" onclick="openTab('users')">👥 Người dùng</button>
       <button class="tab-btn" onclick="openTab('teachers')">👨‍🏫 Giáo viên</button>
       <button class="tab-btn" onclick="openTab('courses')">📚 Khóa học</button>
-      <button class="tab-btn" onclick="openTab('pending')">⏳ Duyệt thay đổi</button>
+      <button class="tab-btn" onclick="openTab('pending')">⏳ Duyệt thay đổi <span class="badge" style="background:#ff9800;color:#fff;"><%= request.getAttribute("pendingCount") != null ? request.getAttribute("pendingCount") : 0 %></span></button>
       <button class="tab-btn" onclick="openTab('payments')">💳 Duyệt thanh toán</button>
       <button class="tab-btn" onclick="openTab('history')">📜 Lịch sử duyệt</button>
       <button class="tab-btn" onclick="openTab('payment-history')">💰 Lịch sử thanh toán</button>
     </div>
+    
+    <%
+        @SuppressWarnings("unchecked")
+        List<AdminServlet.CourseRevenue> courseRevenues = (List<AdminServlet.CourseRevenue>) request.getAttribute("courseRevenues");
+        @SuppressWarnings("unchecked")
+        List<AdminServlet.CategoryRevenue> categoryRevenues = (List<AdminServlet.CategoryRevenue>) request.getAttribute("categoryRevenues");
+        
+        if (courseRevenues == null) courseRevenues = new java.util.ArrayList<>();
+        if (categoryRevenues == null) categoryRevenues = new java.util.ArrayList<>();
+    %>
+
+    <!-- Statistics Tab -->
+    <div id="stats" class="tab-content active">
+      <div class="section-header">
+        <h2>Thống kê doanh thu</h2>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 30px; margin-bottom: 30px;">
+        <!-- Revenue by Category Chart -->
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
+          <h3 style="margin: 0 0 20px 0; font-size: 1.3rem; color: #1e293b;">Doanh thu theo danh mục</h3>
+          <canvas id="categoryRevenueChart"></canvas>
+        </div>
+        
+        <!-- Top Courses Chart -->
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
+          <h3 style="margin: 0 0 20px 0; font-size: 1.3rem; color: #1e293b;">Top 10 khóa học bán chạy</h3>
+          <canvas id="topCoursesChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Revenue Table -->
+      <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); margin-bottom: 30px;">
+        <h3 style="margin: 0 0 20px 0; font-size: 1.3rem; color: #1e293b;">Chi tiết doanh thu theo danh mục</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+              <th style="padding: 12px; text-align: left; font-weight: 600;">Danh mục</th>
+              <th style="padding: 12px; text-align: right; font-weight: 600;">Số đơn</th>
+              <th style="padding: 12px; text-align: right; font-weight: 600;">Doanh thu</th>
+              <th style="padding: 12px; text-align: right; font-weight: 600;">% Doanh thu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% 
+            BigDecimal totalRevenueSum = BigDecimal.ZERO;
+            for (AdminServlet.CategoryRevenue cr : categoryRevenues) {
+                totalRevenueSum = totalRevenueSum.add(cr.totalRevenue);
+            }
+            
+            for (AdminServlet.CategoryRevenue cr : categoryRevenues) { 
+                double percentage = totalRevenueSum.compareTo(BigDecimal.ZERO) > 0 
+                    ? cr.totalRevenue.multiply(new BigDecimal("100")).divide(totalRevenueSum, 2, BigDecimal.ROUND_HALF_UP).doubleValue() 
+                    : 0;
+            %>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 12px;"><%= cr.category %></td>
+              <td style="padding: 12px; text-align: right;"><%= cr.orderCount %></td>
+              <td style="padding: 12px; text-align: right; font-weight: 600; color: #10b981;"><%= currencyFormat.format(cr.totalRevenue) %>đ</td>
+              <td style="padding: 12px; text-align: right;">
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                  <div style="flex: 0 0 100px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                    <div style="width: <%= percentage %>%; height: 100%; background: linear-gradient(90deg, #10b981, #059669);"></div>
+                  </div>
+                  <span style="font-weight: 600; color: #10b981;"><%= String.format("%.1f", percentage) %>%</span>
+                </div>
+              </td>
+            </tr>
+            <% } %>
+            <tr style="background: #f8fafc; font-weight: 600; font-size: 1.1rem;">
+              <td style="padding: 12px;">Tổng cộng</td>
+              <td style="padding: 12px; text-align: right;"><%= categoryRevenues.stream().mapToInt(cr -> cr.orderCount).sum() %></td>
+              <td style="padding: 12px; text-align: right; color: #ef4444;"><%= currencyFormat.format(totalRevenueSum) %>đ</td>
+              <td style="padding: 12px; text-align: right;">100%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Top Courses Table -->
+      <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
+        <h3 style="margin: 0 0 20px 0; font-size: 1.3rem; color: #1e293b;">Top 10 khóa học doanh thu cao nhất</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+              <th style="padding: 12px; text-align: left; font-weight: 600;">#</th>
+              <th style="padding: 12px; text-align: left; font-weight: 600;">Khóa học</th>
+              <th style="padding: 12px; text-align: left; font-weight: 600;">Danh mục</th>
+              <th style="padding: 12px; text-align: right; font-weight: 600;">Số đơn</th>
+              <th style="padding: 12px; text-align: right; font-weight: 600;">Doanh thu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% 
+            int rank = 1;
+            for (AdminServlet.CourseRevenue cr : courseRevenues) { 
+            %>
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 12px;"><%= rank++ %></td>
+              <td style="padding: 12px;"><%= cr.courseName %></td>
+              <td style="padding: 12px;"><span class="badge badge-info"><%= cr.category %></span></td>
+              <td style="padding: 12px; text-align: right;"><%= cr.orderCount %></td>
+              <td style="padding: 12px; text-align: right; font-weight: 600; color: #10b981;"><%= currencyFormat.format(cr.totalRevenue) %>đ</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <!-- Users Tab -->
-    <div id="users" class="tab-content active">
+    <div id="users" class="tab-content">
       <div class="section-header">
         <h2>Danh sách người dùng</h2>
       </div>
@@ -1118,6 +1239,108 @@
     </div>
   </div>
 
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <script>
+    // Category Revenue Chart Data
+    const categoryLabels = <%= new com.google.gson.Gson().toJson(categoryRevenues.stream().map(cr -> cr.category).toArray()) %>;
+    const categoryData = <%= new com.google.gson.Gson().toJson(categoryRevenues.stream().map(cr -> cr.totalRevenue).toArray()) %>;
+    
+    // Top Courses Chart Data
+    const courseLabels = <%= new com.google.gson.Gson().toJson(courseRevenues.stream().limit(10).map(cr -> cr.courseName).toArray()) %>;
+    const courseData = <%= new com.google.gson.Gson().toJson(courseRevenues.stream().limit(10).map(cr -> cr.totalRevenue).toArray()) %>;
+    
+    // Category Revenue Pie Chart
+    const ctxCategory = document.getElementById('categoryRevenueChart').getContext('2d');
+    new Chart(ctxCategory, {
+      type: 'pie',
+      data: {
+        labels: categoryLabels,
+        datasets: [{
+          data: categoryData,
+          backgroundColor: [
+            '#3b82f6',
+            '#10b981',
+            '#f59e0b',
+            '#ef4444',
+            '#8b5cf6',
+            '#ec4899'
+          ],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              font: {
+                size: 13
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const value = new Intl.NumberFormat('vi-VN').format(context.parsed);
+                return context.label + ': ' + value + 'đ';
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    // Top Courses Bar Chart
+    const ctxCourses = document.getElementById('topCoursesChart').getContext('2d');
+    new Chart(ctxCourses, {
+      type: 'bar',
+      data: {
+        labels: courseLabels,
+        datasets: [{
+          label: 'Doanh thu (đ)',
+          data: courseData,
+          backgroundColor: 'rgba(59, 130, 246, 0.8)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        indexAxis: 'y',
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const value = new Intl.NumberFormat('vi-VN').format(context.parsed.x);
+                return 'Doanh thu: ' + value + 'đ';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return new Intl.NumberFormat('vi-VN', {notation: 'compact'}).format(value) + 'đ';
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+  
   <script>
     function openTab(tabName) {
       const tabs = document.querySelectorAll('.tab-content');

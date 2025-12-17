@@ -8,7 +8,7 @@ import java.sql.SQLException;
  * Database connection utility using singleton pattern
  */
 public class DatabaseConnection {
-    private static final String URL = "jdbc:mysql://localhost:3306/ptit_learning?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true";
+    private static final String URL = "jdbc:mysql://localhost:3306/ptit_learning?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true&connectionCollation=utf8mb4_unicode_ci";
     private static final String USERNAME = "ptit_user"; // MySQL username
     private static final String PASSWORD = "123456789"; // MySQL password
     
