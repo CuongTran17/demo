@@ -10,6 +10,10 @@ public class User {
     private String fullname;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private boolean isLocked;
+    private String lockedReason;
+    private Integer lockedBy;
+    private Timestamp lockedAt;
     
     // Constructors
     public User() {}
@@ -76,5 +80,37 @@ public class User {
     
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    public boolean isLocked() {
+        return isLocked;
+    }
+    
+    public void setLocked(boolean locked) {
+        isLocked = locked;
+    }
+    
+    public String getLockedReason() {
+        return lockedReason;
+    }
+    
+    public void setLockedReason(String lockedReason) {
+        this.lockedReason = lockedReason;
+    }
+    
+    public Integer getLockedBy() {
+        return lockedBy;
+    }
+    
+    public void setLockedBy(Integer lockedBy) {
+        this.lockedBy = lockedBy;
+    }
+    
+    public Timestamp getLockedAt() {
+        return lockedAt;
+    }
+    
+    public void setLockedAt(Timestamp lockedAt) {
+        this.lockedAt = lockedAt;
     }
 }

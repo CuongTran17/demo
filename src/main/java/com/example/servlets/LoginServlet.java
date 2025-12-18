@@ -50,6 +50,15 @@ public class LoginServlet extends HttpServlet {
         User user = userDAO.loginUser(emailOrPhone.trim(), password);
         
         if (user != null) {
+            // Check if account is locked
+            if (user.isLocked()) {
+                request.setAttribute("error", "Tài khoản bị khóa, vui lòng liên hệ admin để được hỗ trợ.");
+                request.setAttribute("locked", true);
+                request.setAttribute("emailOrPhone", emailOrPhone);
+                request.getRequestDispatcher("/login.jsp").forward(request, response);
+                return;
+            }
+            
             // Login successful - create session
             HttpSession session = request.getSession();
             session.setAttribute("loggedIn", true);
@@ -146,6 +155,15 @@ public class LoginServlet extends HttpServlet {
                             // Verify user exists
                             User user = userDAO.getUserByEmail(email);
                             if (user != null) {
+                                // Check if account is locked
+                                if (user.isLocked()) {
+                                    // Delete cookie if account is locked
+                                    cookie.setMaxAge(0);
+                                    cookie.setPath(request.getContextPath() + "/");
+                                    response.addCookie(cookie);
+                                    continue;
+                                }
+                                
                                 // Auto-login: create session
                                 session = request.getSession();
                                 session.setAttribute("loggedIn", true);

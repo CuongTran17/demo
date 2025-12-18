@@ -463,7 +463,10 @@
 
     <!-- Students Tab -->
     <div class="tab-content" id="students-tab">
-      <h2>Quản lý học viên</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Quản lý học viên</h2>
+        <button class="btn-primary" onclick="loadLockRequests()">📋 Xem yêu cầu khóa TK</button>
+      </div>
       
       <table class="student-table">
         <thead>
@@ -493,6 +496,7 @@
             <td>
               <button class="btn-secondary" onclick="viewStudent(<%= student.userId %>)">👁️ Xem</button>
               <button class="btn-secondary" onclick="messageStudent(<%= student.userId %>)">💬 Nhắn tin</button>
+              <button class="btn-secondary btn-danger" onclick="requestLockAccount(<%= student.userId %>, '<%= student.fullname %>')">🔒 Yêu cầu khóa</button>
             </td>
           </tr>
           <% } %>
@@ -1564,6 +1568,153 @@
     }
     
     }); // End DOMContentLoaded
+  </script>
+  
+  <!-- Account Lock Modals and Scripts -->
+  <!-- Request Lock Account Modal -->
+  <div id="requestLockModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('requestLockModal')">&times;</span>
+      <h2>🔒 Yêu cầu khóa tài khoản học viên</h2>
+      <p id="lockStudentNameDisplay" style="margin-bottom: 20px; color: #666;"></p>
+      <form id="requestLockForm">
+        <input type="hidden" id="requestLockUserId" name="userId">
+        
+        <div class="form-group">
+          <label>Lý do yêu cầu khóa tài khoản: <span style="color: red;">*</span></label>
+          <textarea name="reason" rows="4" required placeholder="Nhập lý do yêu cầu khóa tài khoản (vi phạm nội quy, gian lận, ...)"></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" class="btn-secondary" onclick="closeModal('requestLockModal')">Hủy</button>
+          <button type="submit" class="btn-primary" style="background: #e53e3e;">Gửi yêu cầu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- My Lock Requests Modal -->
+  <div id="myLockRequestsModal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+      <span class="close" onclick="closeModal('myLockRequestsModal')">&times;</span>
+      <h2>📋 Yêu cầu khóa tài khoản của tôi</h2>
+      
+      <div style="max-height: 500px; overflow-y: auto; margin-top: 20px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Học viên</th>
+              <th>Lý do</th>
+              <th>Trạng thái</th>
+              <th>Thời gian</th>
+              <th>Ghi chú duyệt</th>
+            </tr>
+          </thead>
+          <tbody id="myRequestsTableBody">
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 20px;">Đang tải...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Account Lock Functions
+    function requestLockAccount(userId, userName) {
+      document.getElementById('requestLockUserId').value = userId;
+      document.getElementById('lockStudentNameDisplay').textContent = 'Học viên: ' + userName;
+      openModal('requestLockModal');
+    }
+    
+    // Handle request lock form submission
+    document.getElementById('requestLockForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      formData.append('action', 'request');
+      formData.append('requestType', 'lock');
+      
+      fetch('${pageContext.request.contextPath}/account-lock', {
+        method: 'POST',
+        body: new URLSearchParams(formData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('✓ ' + data.message);
+          closeModal('requestLockModal');
+          document.getElementById('requestLockForm').reset();
+        } else {
+          alert('❌ ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Lỗi kết nối: ' + error.message);
+      });
+    });
+    
+    function loadLockRequests() {
+      fetch('${pageContext.request.contextPath}/account-lock?action=getMyRequests')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const requests = data.requests;
+            const tbody = document.getElementById('myRequestsTableBody');
+            
+            if (requests.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #999;">Bạn chưa có yêu cầu nào</td></tr>';
+            } else {
+              tbody.innerHTML = requests.map(req => {
+                let statusBadge = '';
+                let statusText = '';
+                
+                if (req.status === 'pending') {
+                  statusBadge = 'badge-warning';
+                  statusText = '⏳ Chờ duyệt';
+                } else if (req.status === 'approved') {
+                  statusBadge = 'badge-success';
+                  statusText = '✓ Đã duyệt';
+                } else {
+                  statusBadge = 'badge-danger';
+                  statusText = '❌ Từ chối';
+                }
+                
+                const requestTypeText = req.requestType === 'lock' ? '🔒 Khóa' : '🔓 Mở khóa';
+                const reviewedAtHtml = req.reviewedAt ? '<br><small>Duyệt: ' + new Date(req.reviewedAt).toLocaleString('vi-VN') + '</small>' : '';
+                const reviewerHtml = req.reviewerFullname ? '<br><small>Bởi: ' + req.reviewerFullname + '</small>' : '';
+                
+                return '<tr>' +
+                  '<td>' +
+                    '<strong>' + req.targetFullname + '</strong><br>' +
+                    '<small>' + req.targetEmail + '</small>' +
+                  '</td>' +
+                  '<td style="max-width: 300px; word-wrap: break-word;">' + req.reason + '</td>' +
+                  '<td><span class="badge ' + statusBadge + '">' + statusText + '</span></td>' +
+                  '<td>' +
+                    '<small>Yêu cầu: ' + new Date(req.createdAt).toLocaleString('vi-VN') + '</small>' +
+                    reviewedAtHtml +
+                  '</td>' +
+                  '<td style="max-width: 250px; word-wrap: break-word;">' +
+                    (req.reviewNote ? req.reviewNote : '-') +
+                    reviewerHtml +
+                  '</td>' +
+                '</tr>';
+              }).join('');
+            }
+            
+            openModal('myLockRequestsModal');
+          } else {
+            alert('❌ ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('❌ Lỗi tải dữ liệu: ' + error.message);
+        });
+    }
   </script>
 </body>
 </html>

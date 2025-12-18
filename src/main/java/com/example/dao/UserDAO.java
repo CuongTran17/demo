@@ -88,6 +88,11 @@ public class UserDAO {
                 user.setFullname(rs.getString("fullname"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
                 user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                // Load lock status
+                user.setLocked(rs.getBoolean("is_locked"));
+                user.setLockedReason(rs.getString("locked_reason"));
+                user.setLockedBy(rs.getObject("locked_by", Integer.class));
+                user.setLockedAt(rs.getTimestamp("locked_at"));
                 return user;
             }
             
@@ -119,6 +124,10 @@ public class UserDAO {
                 user.setFullname(rs.getString("fullname"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
                 user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                user.setLocked(rs.getBoolean("is_locked"));
+                user.setLockedReason(rs.getString("locked_reason"));
+                user.setLockedBy(rs.getObject("locked_by", Integer.class));
+                user.setLockedAt(rs.getTimestamp("locked_at"));
                 return user;
             }
             
@@ -200,6 +209,10 @@ public class UserDAO {
                 user.setPasswordHash(rs.getString("password_hash"));
                 user.setFullname(rs.getString("fullname"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setLocked(rs.getBoolean("is_locked"));
+                user.setLockedReason(rs.getString("locked_reason"));
+                user.setLockedBy(rs.getObject("locked_by", Integer.class));
+                user.setLockedAt(rs.getTimestamp("locked_at"));
                 return user;
             }
             
@@ -244,6 +257,48 @@ public class UserDAO {
             
             stmt.setString(1, newPasswordHash);
             stmt.setInt(2, userId);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Lock user account (Admin only - no approval needed)
+     */
+    public boolean lockUserAccount(int targetUserId, String reason, int adminId) {
+        String sql = "UPDATE users SET is_locked = 1, locked_reason = ?, locked_by = ?, locked_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+        
+        try (Connection conn = DatabaseConnection.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, reason);
+            stmt.setInt(2, adminId);
+            stmt.setInt(3, targetUserId);
+            
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Unlock user account
+     */
+    public boolean unlockUserAccount(int targetUserId) {
+        String sql = "UPDATE users SET is_locked = 0, locked_reason = NULL, locked_by = NULL, locked_at = NULL WHERE user_id = ?";
+        
+        try (Connection conn = DatabaseConnection.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, targetUserId);
             
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;

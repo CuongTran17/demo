@@ -514,10 +514,9 @@
       <button class="tab-btn" onclick="openTab('users')">👥 Người dùng</button>
       <button class="tab-btn" onclick="openTab('teachers')">👨‍🏫 Giáo viên</button>
       <button class="tab-btn" onclick="openTab('courses')">📚 Khóa học</button>
+      <button class="tab-btn" onclick="openTab('lock-requests')">🔒 Yêu cầu khóa TK <span id="lockRequestsBadge" class="badge" style="background:#ef4444;color:#fff;display:none;">0</span></button>
       <button class="tab-btn" onclick="openTab('pending')">⏳ Duyệt thay đổi <span class="badge" style="background:#ff9800;color:#fff;"><%= request.getAttribute("pendingCount") != null ? request.getAttribute("pendingCount") : 0 %></span></button>
       <button class="tab-btn" onclick="openTab('payments')">💳 Duyệt thanh toán</button>
-      <button class="tab-btn" onclick="openTab('history')">📜 Lịch sử duyệt</button>
-      <button class="tab-btn" onclick="openTab('payment-history')">💰 Lịch sử thanh toán</button>
     </div>
     
     <%
@@ -643,6 +642,7 @@
               <th>Email</th>
               <th>Họ tên</th>
               <th>Số điện thoại</th>
+              <th>Trạng thái</th>
               <th>Ngày tạo</th>
               <th>Thao tác</th>
             </tr>
@@ -654,12 +654,41 @@
               <td><%= user.email %></td>
               <td><%= user.fullname != null ? user.fullname : "-" %></td>
               <td><%= user.phone != null ? user.phone : "-" %></td>
+              <td>
+                <% 
+                // Check if user is locked by querying the database
+                boolean isLocked = false;
+                String lockedReason = "";
+                try (java.sql.Connection conn = com.example.util.DatabaseConnection.getNewConnection();
+                     java.sql.PreparedStatement stmt = conn.prepareStatement("SELECT is_locked, locked_reason FROM users WHERE user_id = ?")) {
+                  stmt.setInt(1, user.userId);
+                  java.sql.ResultSet rs = stmt.executeQuery();
+                  if (rs.next()) {
+                    isLocked = rs.getBoolean("is_locked");
+                    lockedReason = rs.getString("locked_reason");
+                  }
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
+                
+                if (isLocked) { 
+                %>
+                  <span class="badge badge-danger" title="<%= lockedReason != null ? lockedReason : "" %>">🔒 Đã khóa</span>
+                <% } else { %>
+                  <span class="badge badge-success">✓ Hoạt động</span>
+                <% } %>
+              </td>
               <td><%= user.createdAt != null ? new java.text.SimpleDateFormat("dd/MM/yyyy").format(user.createdAt) : "-" %></td>
               <td>
                 <% if (!"admin@ptit.edu.vn".equals(user.email)) { %>
-                <button class="btn btn-danger btn-sm" onclick="deleteUser(<%= user.userId %>)">Xóa</button>
+                  <% if (isLocked) { %>
+                    <button class="btn btn-success btn-sm" onclick="unlockAccount(<%= user.userId %>, '<%= user.fullname %>')">Mở khóa</button>
+                  <% } else { %>
+                    <button class="btn btn-warning btn-sm" onclick="lockAccount(<%= user.userId %>, '<%= user.fullname %>')">Khóa TK</button>
+                  <% } %>
+                  <button class="btn btn-danger btn-sm" onclick="deleteUser(<%= user.userId %>)">Xóa</button>
                 <% } else { %>
-                <span class="badge badge-success">Admin</span>
+                  <span class="badge badge-success">Admin</span>
                 <% } %>
               </td>
             </tr>
@@ -704,6 +733,41 @@
       </div>
     </div>
 
+    <!-- Lock Requests Tab -->
+    <div id="lock-requests" class="tab-content">
+      <div class="section-header">
+        <h2>Yêu cầu khóa tài khoản từ giáo viên</h2>
+        <div class="section-actions">
+          <button class="btn btn-secondary" onclick="loadLockHistory()" style="margin-right: 10px;">📜 Xem lịch sử</button>
+          <span class="badge badge-danger" id="pendingLockCount">Đang tải...</span>
+        </div>
+      </div>
+      
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Giáo viên yêu cầu</th>
+              <th>Tài khoản đích</th>
+              <th>Loại yêu cầu</th>
+              <th>Lý do</th>
+              <th>Thời gian</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="lockRequestsTableBody">
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 20px;">
+                <div class="spinner"></div>
+                <p>Đang tải dữ liệu...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Courses Tab -->
     <div id="courses" class="tab-content">
       <div class="section-header">
@@ -741,6 +805,7 @@
       <div class="section-header">
         <h2>Yêu cầu duyệt thay đổi</h2>
         <div class="section-actions">
+          <button class="btn btn-secondary" onclick="openModal('changesHistoryModal')" style="margin-right: 10px;">📜 Xem lịch sử</button>
           <span class="badge badge-warning"><%= request.getAttribute("pendingCount") %> yêu cầu chờ duyệt</span>
         </div>
       </div>
@@ -879,160 +944,15 @@
       </div>
     </div>
 
-    <!-- History Tab -->
-    <div id="history" class="tab-content">
-      <div class="section-header">
-        <h2>Lịch sử duyệt thay đổi</h2>
-        <div class="section-actions">
-          <span class="badge badge-info">Tất cả các thay đổi đã được xử lý</span>
-        </div>
-      </div>
-      
-      <div class="data-table">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Giáo viên</th>
-              <th>Loại thay đổi</th>
-              <th>Đối tượng</th>
-              <th>Nội dung thay đổi</th>
-              <th>Trạng thái</th>
-              <th>Ngày gửi</th>
-              <th>Ngày duyệt</th>
-              <th>Người duyệt</th>
-              <th>Ghi chú</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% 
-            @SuppressWarnings("unchecked")
-            List<com.example.model.PendingChange> reviewedChanges = (List<com.example.model.PendingChange>) request.getAttribute("reviewedChanges");
-            if (reviewedChanges != null && !reviewedChanges.isEmpty()) {
-              for (com.example.model.PendingChange change : reviewedChanges) { 
-            %>
-            <tr>
-              <td><%= change.getChangeId() %></td>
-              <td>
-                <div>
-                  <strong><%= change.getTeacherName() %></strong><br>
-                  <small><%= change.getTeacherEmail() %></small>
-                </div>
-              </td>
-              <td>
-                <span class="badge badge-info">
-                  <% 
-                  String type = change.getChangeType();
-                  if ("course_create".equals(type)) out.print("Tạo khóa học");
-                  else if ("course_update".equals(type)) out.print("Cập nhật khóa học");
-                  else if ("lesson_create".equals(type)) out.print("Tạo bài học");
-                  else if ("lesson_update".equals(type)) out.print("Cập nhật bài học");
-                  else if ("lesson_delete".equals(type)) out.print("Xóa bài học");
-                  else out.print(type);
-                  %>
-                </span>
-              </td>
-              <td>
-                <% 
-                String targetDisplay = "";
-                String changeType = change.getChangeType();
-                if ("course_create".equals(changeType)) {
-                  targetDisplay = "Khóa học mới: " + change.getTargetId();
-                } else if ("course_update".equals(changeType)) {
-                  targetDisplay = "Khóa học: " + change.getTargetId();
-                } else if (changeType.contains("lesson")) {
-                  targetDisplay = "Bài học: " + change.getTargetId();
-                } else {
-                  targetDisplay = change.getTargetId();
-                }
-                %>
-                <%= targetDisplay %>
-              </td>
-              <td>
-                <div style="max-width: 200px;">
-                  <% 
-                  String dataHist = change.getChangeData();
-                  if ("{}".equals(dataHist)) {
-                    out.print("Không có dữ liệu");
-                  } else {
-                    // Check if data contains image_filename for image preview
-                    if (dataHist != null && dataHist.contains("image_filename")) {
-                      // Extract image path - handle both escaped and unescaped quotes
-                      String imgPatternHist = "image_filename";
-                      int imgStartHist = dataHist.indexOf(imgPatternHist);
-                      if (imgStartHist >= 0) {
-                        // Find the colon after image_filename
-                        int colonPosHist = dataHist.indexOf(":", imgStartHist);
-                        if (colonPosHist > 0) {
-                          // Find the opening quote
-                          int quoteStartHist = dataHist.indexOf("\"", colonPosHist);
-                          if (quoteStartHist > 0) {
-                            quoteStartHist++; // Move past the quote
-                            // Find the closing quote
-                            int quoteEndHist = dataHist.indexOf("\"", quoteStartHist);
-                            if (quoteEndHist > quoteStartHist) {
-                              String imgPathHist = dataHist.substring(quoteStartHist, quoteEndHist);
-                  %>
-                          <div style="margin-bottom: 8px; padding: 6px; background: #f8f9fa; border-radius: 4px;">
-                            <strong style="color: #667eea;">📷 Hình ảnh:</strong><br>
-                            <img src="<%= request.getContextPath() + "/" + imgPathHist %>" 
-                                 alt="Preview" 
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-                                 style="max-width: 150px; max-height: 100px; border: 2px solid #667eea; border-radius: 4px; margin-top: 4px; display: block;">
-                            <div style="display: none; color: #e53e3e; margin-top: 4px; font-size: 0.85em;">❌ Lỗi tải ảnh</div>
-                          </div>
-                  <%    
-                            }
-                          }
-                        }
-                      }
-                    }
-                    // Display JSON data in a collapsed format
-                  %>
-                  <details style="cursor: pointer;">
-                    <summary style="color: #666; font-size: 0.85em;">📄 Chi tiết</summary>
-                    <div style="overflow: auto; max-height: 80px; padding: 4px; background: #f5f5f5; border-radius: 4px; margin-top: 4px; font-size: 0.8em; word-break: break-all;">
-                      <%= dataHist %>
-                    </div>
-                  </details>
-                  <% } %>
-                </div>
-              </td>
-              <td>
-                <% if ("approved".equals(change.getStatus())) { %>
-                  <span class="badge badge-success">✓ Đã duyệt</span>
-                <% } else if ("rejected".equals(change.getStatus())) { %>
-                  <span class="badge badge-danger">✗ Đã từ chối</span>
-                <% } %>
-              </td>
-              <td><%= change.getCreatedAt() != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(change.getCreatedAt()) : "-" %></td>
-              <td><%= change.getReviewedAt() != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(change.getReviewedAt()) : "-" %></td>
-              <td><%= change.getReviewerName() != null ? change.getReviewerName() : "-" %></td>
-              <td><%= change.getReviewNote() != null ? change.getReviewNote() : "-" %></td>
-            </tr>
-            <% 
-              } 
-            } else {
-            %>
-            <tr>
-              <td colspan="10" style="text-align: center; padding: 30px; color: #64748b;">
-                Chưa có lịch sử duyệt thay đổi
-              </td>
-            </tr>
-            <% } %>
-          </tbody>
-        </table>
+    <!-- Payments Tab -->
+  <div id="payments" class="tab-content">
+    <div class="section-header">
+      <h2>Đơn hàng chờ duyệt thanh toán</h2>
+      <div class="section-actions">
+        <button class="btn btn-secondary" onclick="openModal('paymentsHistoryModal')" style="margin-right: 10px;">📜 Xem lịch sử</button>
+        <span class="badge badge-warning"><%= pendingPayments.size() %> đơn hàng chờ duyệt</span>
       </div>
     </div>
-
-    <!-- Payments Tab -->
-    <div id="payments" class="tab-content">
-      <div class="section-header">
-        <h2>Đơn hàng chờ duyệt thanh toán</h2>
-        <div class="section-actions">
-          <span class="badge badge-warning"><%= pendingPayments.size() %> đơn hàng chờ duyệt</span>
-        </div>
-      </div>
       
       <div class="data-table">
         <table>
@@ -1095,14 +1015,12 @@
       </div>
     </div>
 
-    <!-- Payment History Tab -->
-    <div id="payment-history" class="tab-content">
-      <div class="section-header">
-        <h2>Lịch sử duyệt thanh toán</h2>
-        <div class="section-actions">
-          <span class="badge badge-info">100 giao dịch gần nhất</span>
-        </div>
-      </div>
+    <!-- Payments History Modal -->
+    <div id="paymentsHistoryModal" class="modal">
+      <div class="modal-content" style="max-width: 1200px;">
+        <span class="close" onclick="closeModal('paymentsHistoryModal')">&times;</span>
+        <h2>📜 Lịch sử duyệt thanh toán</h2>
+        <p style="color: #64748b; margin: 10px 0 20px 0;">100 giao dịch gần nhất</p>
       
       <div class="data-table">
         <table>
@@ -1173,9 +1091,10 @@
         </table>
       </div>
     </div>
-  </main>
+  </div>
+</main>
 
-  <!-- Create Teacher Modal -->
+<!-- Create Teacher Modal -->
   <div id="createTeacherModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal('createTeacherModal')">&times;</span>
@@ -1236,6 +1155,245 @@
           <button type="submit" class="btn btn-primary">Gán khóa học</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Lock Account Modal -->
+  <div id="lockAccountModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('lockAccountModal')">&times;</span>
+      <h2>🔒 Khóa tài khoản</h2>
+      <p id="lockUserNameDisplay" style="margin-bottom: 20px; color: #666;"></p>
+      <form id="lockAccountForm">
+        <input type="hidden" id="lockUserId" name="userId">
+        
+        <div class="form-group">
+          <label>Lý do khóa tài khoản *</label>
+          <textarea name="reason" rows="4" required placeholder="Nhập lý do khóa tài khoản..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('lockAccountModal')">Hủy</button>
+          <button type="submit" class="btn btn-warning">Khóa tài khoản</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Review Lock Request Modal -->
+  <div id="reviewLockRequestModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('reviewLockRequestModal')">&times;</span>
+      <h2>Duyệt yêu cầu khóa tài khoản</h2>
+      <div id="requestDetailsDisplay" style="margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px;"></div>
+      <form id="reviewLockRequestForm">
+        <input type="hidden" id="reviewRequestId" name="requestId">
+        
+        <div class="form-group">
+          <label>Ghi chú duyệt</label>
+          <textarea name="reviewNote" rows="3" placeholder="Nhập ghi chú (tùy chọn)..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('reviewLockRequestModal')">Hủy</button>
+          <button type="button" class="btn btn-danger" onclick="reviewRequest('reject')">❌ Từ chối</button>
+          <button type="button" class="btn btn-success" onclick="reviewRequest('approve')">✓ Duyệt</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lock History Modal -->
+  <div id="lockHistoryModal" class="modal">
+    <div class="modal-content" style="max-width: 1000px;">
+      <span class="close" onclick="closeModal('lockHistoryModal')">&times;</span>
+      <h2>📜 Lịch sử duyệt khóa tài khoản</h2>
+      
+      <div style="max-height: 600px; overflow-y: auto; margin-top: 20px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Giáo viên</th>
+              <th>Tài khoản đích</th>
+              <th>Loại</th>
+              <th>Lý do</th>
+              <th>Trạng thái</th>
+              <th>Admin duyệt</th>
+              <th>Ghi chú</th>
+              <th>Thời gian</th>
+            </tr>
+          </thead>
+          <tbody id="lockHistoryTableBody">
+            <tr>
+              <td colspan="9" style="text-align: center; padding: 20px;">Đang tải...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Changes History Modal -->
+  <div id="changesHistoryModal" class="modal">
+    <div class="modal-content" style="max-width: 1200px;">
+      <span class="close" onclick="closeModal('changesHistoryModal')">&times;</span>
+      <h2>📜 Lịch sử duyệt thay đổi</h2>
+      <p style="color: #64748b; margin: 10px 0 20px 0;">Tất cả các thay đổi đã được xử lý</p>
+      
+      <div style="max-height: 600px; overflow-y: auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Giáo viên</th>
+              <th>Loại thay đổi</th>
+              <th>Đối tượng</th>
+              <th>Nội dung thay đổi</th>
+              <th>Trạng thái</th>
+              <th>Ngày gửi</th>
+              <th>Ngày duyệt</th>
+              <th>Người duyệt</th>
+              <th>Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% 
+            @SuppressWarnings("unchecked")
+            List<com.example.model.PendingChange> reviewedChanges = (List<com.example.model.PendingChange>) request.getAttribute("reviewedChanges");
+            if (reviewedChanges != null && !reviewedChanges.isEmpty()) {
+              for (com.example.model.PendingChange change : reviewedChanges) { 
+            %>
+            <tr>
+              <td><%= change.getChangeId() %></td>
+              <td>
+                <div>
+                  <strong><%= change.getTeacherName() %></strong><br>
+                  <small><%= change.getTeacherEmail() %></small>
+                </div>
+              </td>
+              <td>
+                <span class="badge badge-info">
+                  <% 
+                  String type = change.getChangeType();
+                  if ("course_create".equals(type)) out.print("Tạo khóa học");
+                  else if ("course_update".equals(type)) out.print("Cập nhật khóa học");
+                  else if ("lesson_create".equals(type)) out.print("Tạo bài học");
+                  else if ("lesson_update".equals(type)) out.print("Cập nhật bài học");
+                  else if ("lesson_delete".equals(type)) out.print("Xóa bài học");
+                  else out.print(type);
+                  %>
+                </span>
+              </td>
+              <td>
+                <div><strong>ID:</strong> <%= change.getTargetId() %></div>
+              </td>
+              <td style="max-width: 300px; word-wrap: break-word;"><%= change.getChangeData() %></td>
+              <td>
+                <% if ("approved".equals(change.getStatus())) { %>
+                  <span class="badge badge-success">✓ Đã duyệt</span>
+                <% } else if ("rejected".equals(change.getStatus())) { %>
+                  <span class="badge badge-danger">✗ Từ chối</span>
+                <% } else { %>
+                  <span class="badge badge-warning">⏳ Chờ duyệt</span>
+                <% } %>
+              </td>
+              <td><%= change.getCreatedAt() %></td>
+              <td><%= change.getReviewedAt() != null ? change.getReviewedAt() : "-" %></td>
+              <td><%= change.getReviewerName() != null ? change.getReviewerName() : "-" %></td>
+              <td style="max-width: 250px; word-wrap: break-word;"><%= change.getReviewNote() != null ? change.getReviewNote() : "-" %></td>
+            </tr>
+            <% 
+              }
+            } else {
+            %>
+            <tr>
+              <td colspan="10" style="text-align: center; padding: 30px; color: #64748b;">
+                Chưa có lịch sử duyệt thay đổi
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payments History Modal -->
+  <div id="paymentsHistoryModal" class="modal">
+    <div class="modal-content" style="max-width: 1200px;">
+      <span class="close" onclick="closeModal('paymentsHistoryModal')">&times;</span>
+      <h2>📜 Lịch sử duyệt thanh toán</h2>
+      <p style="color: #64748b; margin: 10px 0 20px 0;">100 giao dịch gần nhất</p>
+      
+      <div style="max-height: 600px; overflow-y: auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Đơn hàng</th>
+              <th>Khách hàng</th>
+              <th>Số tiền</th>
+              <th>Phương thức</th>
+              <th>Hành động</th>
+              <th>Trạng thái cũ</th>
+              <th>Trạng thái mới</th>
+              <th>Người duyệt</th>
+              <th>Ghi chú</th>
+              <th>Thời gian</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% 
+            @SuppressWarnings("unchecked")
+            List<OrderDAO.PaymentApprovalHistory> paymentHistoryModal = (List<OrderDAO.PaymentApprovalHistory>) request.getAttribute("paymentHistory");
+            if (paymentHistoryModal != null && !paymentHistoryModal.isEmpty()) {
+              for (OrderDAO.PaymentApprovalHistory history : paymentHistoryModal) { 
+            %>
+            <tr>
+              <td>#<%= history.historyId %></td>
+              <td>#<%= history.orderId %></td>
+              <td><%= history.userFullname %></td>
+              <td class="price"><%= currencyFormat.format(history.totalAmount) %> VND</td>
+              <td>
+                <span class="badge badge-info"><%= history.paymentMethod.equals("vietqr") ? "VietQR" : history.paymentMethod %></span>
+              </td>
+              <td>
+                <% if ("approved".equals(history.action)) { %>
+                  <span class="badge badge-success">✓ Đã duyệt</span>
+                <% } else if ("rejected".equals(history.action)) { %>
+                  <span class="badge badge-danger">✗ Từ chối</span>
+                <% } else { %>
+                  <span class="badge badge-secondary"><%= history.action %></span>
+                <% } %>
+              </td>
+              <td><span class="badge badge-warning"><%= history.oldStatus %></span></td>
+              <td>
+                <% if ("completed".equals(history.newStatus)) { %>
+                  <span class="badge badge-success"><%= history.newStatus %></span>
+                <% } else if ("rejected".equals(history.newStatus)) { %>
+                  <span class="badge badge-danger"><%= history.newStatus %></span>
+                <% } else { %>
+                  <span class="badge badge-warning"><%= history.newStatus %></span>
+                <% } %>
+              </td>
+              <td><%= history.adminFullname != null ? history.adminFullname : "-" %></td>
+              <td style="max-width: 250px; word-wrap: break-word;"><%= history.note != null && !history.note.isEmpty() ? history.note : "-" %></td>
+              <td><%= history.createdAt %></td>
+            </tr>
+            <% 
+              }
+            } else {
+            %>
+            <tr>
+              <td colspan="11" style="text-align: center; padding: 30px; color: #64748b;">
+                Chưa có lịch sử duyệt thanh toán
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -1351,6 +1509,11 @@
       
       document.getElementById(tabName).classList.add('active');
       event.target.classList.add('active');
+      
+      // Load lock requests when opening the lock-requests tab
+      if (tabName === 'lock-requests') {
+        loadLockRequests();
+      }
     }
     
     function openCreateTeacherModal() {
@@ -1365,6 +1528,10 @@
     
     function closeModal(modalId) {
       document.getElementById(modalId).style.display = 'none';
+    }
+    
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
     }
     
     function deleteUser(userId) {
@@ -1389,6 +1556,235 @@
         form.submit();
       }
     }
+    
+    // Account Lock Functions
+    function lockAccount(userId, userName) {
+      document.getElementById('lockUserId').value = userId;
+      document.getElementById('lockUserNameDisplay').textContent = 'Người dùng: ' + userName;
+      document.getElementById('lockAccountModal').style.display = 'block';
+    }
+    
+    function unlockAccount(userId, userName) {
+      if (confirm('Bạn có chắc chắn muốn mở khóa tài khoản của ' + userName + '?')) {
+        fetch('${pageContext.request.contextPath}/account-lock', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'action=unlock&userId=' + userId
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('✓ ' + data.message);
+            location.reload();
+          } else {
+            alert('❌ ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('❌ Lỗi kết nối: ' + error.message);
+        });
+      }
+    }
+    
+    // Handle lock account form submission
+    document.getElementById('lockAccountForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      formData.append('action', 'lock');
+      
+      fetch('${pageContext.request.contextPath}/account-lock', {
+        method: 'POST',
+        body: new URLSearchParams(formData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('✓ ' + data.message);
+          closeModal('lockAccountModal');
+          location.reload();
+        } else {
+          alert('❌ ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Lỗi kết nối: ' + error.message);
+      });
+    });
+    
+    // Load lock requests from teachers
+    function loadLockRequests() {
+      fetch('${pageContext.request.contextPath}/account-lock?action=getPendingRequests')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const requests = data.requests;
+            const tbody = document.getElementById('lockRequestsTableBody');
+            const badge = document.getElementById('lockRequestsBadge');
+            const countSpan = document.getElementById('pendingLockCount');
+            
+            if (requests.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #999;">Không có yêu cầu chờ duyệt</td></tr>';
+              countSpan.textContent = '0 yêu cầu chờ duyệt';
+              badge.style.display = 'none';
+            } else {
+              tbody.innerHTML = requests.map(req => {
+                const requestTypeText = req.requestType === 'lock' ? '🔒 Khóa' : '🔓 Mở khóa';
+                const requestTypeBadge = req.requestType === 'lock' ? 'badge-danger' : 'badge-success';
+                const targetStatus = req.targetIsLocked ? '🔒 Đã khóa' : '✓ Hoạt động';
+                const targetStatusBadge = req.targetIsLocked ? 'badge-danger' : 'badge-success';
+                const createdDate = new Date(req.createdAt).toLocaleString('vi-VN');
+                
+                return `
+                  <tr>
+                    <td>` + req.requestId + `</td>
+                    <td>
+                      <strong>` + req.requesterFullname + `</strong><br>
+                      <small>` + req.requesterEmail + `</small>
+                    </td>
+                    <td>
+                      <strong>` + req.targetFullname + `</strong><br>
+                      <small>` + req.targetEmail + `</small><br>
+                      <small>` + req.targetPhone + `</small><br>
+                      <span class="badge ` + targetStatusBadge + `">` + targetStatus + `</span>
+                    </td>
+                    <td><span class="badge ` + requestTypeBadge + `">` + requestTypeText + `</span></td>
+                    <td style="max-width: 300px; word-wrap: break-word;">` + req.reason + `</td>
+                    <td>` + createdDate + `</td>
+                    <td>
+                      <button class="btn btn-primary btn-sm" onclick='openReviewModal(` + JSON.stringify(req) + `)'>Duyệt</button>
+                    </td>
+                  </tr>
+                `;
+              }).join('');
+              countSpan.textContent = requests.length + ' yêu cầu chờ duyệt';
+              badge.textContent = requests.length;
+              badge.style.display = 'inline-block';
+            }
+          } else {
+            alert('❌ ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('lockRequestsTableBody').innerHTML = 
+            '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #ef4444;">❌ Lỗi tải dữ liệu: ' + error.message + '</td></tr>';
+        });
+    }
+    
+    // Load lock history (approved/rejected requests)
+    function loadLockHistory() {
+      fetch('${pageContext.request.contextPath}/account-lock?action=getReviewedRequests')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const requests = data.requests;
+            const tbody = document.getElementById('lockHistoryTableBody');
+            
+            if (requests.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #999;">Chưa có lịch sử duyệt</td></tr>';
+            } else {
+              tbody.innerHTML = requests.map(req => {
+                const requestTypeText = req.requestType === 'lock' ? '🔒 Khóa' : '🔓 Mở';
+                const requestTypeBadge = req.requestType === 'lock' ? 'badge-danger' : 'badge-success';
+                const statusText = req.status === 'approved' ? '✓ Đã duyệt' : '❌ Từ chối';
+                const statusBadge = req.status === 'approved' ? 'badge-success' : 'badge-danger';
+                const createdDate = new Date(req.createdAt).toLocaleString('vi-VN');
+                const reviewedDate = req.reviewedAt ? new Date(req.reviewedAt).toLocaleString('vi-VN') : '-';
+                
+                return '<tr>' +
+                  '<td>' + req.requestId + '</td>' +
+                  '<td>' +
+                    '<strong>' + req.requesterFullname + '</strong><br>' +
+                    '<small>' + req.requesterEmail + '</small>' +
+                  '</td>' +
+                  '<td>' +
+                    '<strong>' + req.targetFullname + '</strong><br>' +
+                    '<small>' + req.targetEmail + '</small>' +
+                  '</td>' +
+                  '<td><span class="badge ' + requestTypeBadge + '">' + requestTypeText + '</span></td>' +
+                  '<td style="max-width: 200px; word-wrap: break-word;">' + req.reason + '</td>' +
+                  '<td><span class="badge ' + statusBadge + '">' + statusText + '</span></td>' +
+                  '<td>' + (req.reviewerFullname || '-') + '</td>' +
+                  '<td style="max-width: 200px; word-wrap: break-word;">' + (req.reviewNote || '-') + '</td>' +
+                  '<td>' +
+                    '<small>Yêu cầu: ' + createdDate + '</small><br>' +
+                    '<small>Duyệt: ' + reviewedDate + '</small>' +
+                  '</td>' +
+                '</tr>';
+              }).join('');
+            }
+            
+            openModal('lockHistoryModal');
+          } else {
+            alert('❌ ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('❌ Lỗi tải lịch sử: ' + error.message);
+        });
+    }
+    
+    function openReviewModal(request) {
+      document.getElementById('reviewRequestId').value = request.requestId;
+      
+      const requestTypeText = request.requestType === 'lock' ? '🔒 Khóa tài khoản' : '🔓 Mở khóa tài khoản';
+      const targetStatus = request.targetIsLocked ? '🔒 Đã khóa' : '✓ Hoạt động';
+      const createdDate = new Date(request.createdAt).toLocaleString('vi-VN');
+      
+      const details = 
+        '<p><strong>Loại yêu cầu:</strong> ' + requestTypeText + '</p>' +
+        '<p><strong>Giáo viên:</strong> ' + request.requesterFullname + ' (' + request.requesterEmail + ')</p>' +
+        '<p><strong>Tài khoản đích:</strong> ' + request.targetFullname + ' (' + request.targetEmail + ')</p>' +
+        '<p><strong>Trạng thái hiện tại:</strong> ' + targetStatus + '</p>' +
+        '<p><strong>Lý do:</strong> ' + request.reason + '</p>' +
+        '<p><strong>Thời gian yêu cầu:</strong> ' + createdDate + '</p>';
+      
+      document.getElementById('requestDetailsDisplay').innerHTML = details;
+      document.getElementById('reviewLockRequestModal').style.display = 'block';
+    }
+    
+    function reviewRequest(action) {
+      const requestId = document.getElementById('reviewRequestId').value;
+      const reviewNote = document.querySelector('#reviewLockRequestForm textarea[name="reviewNote"]').value;
+      
+      const formData = new URLSearchParams();
+      formData.append('action', action);
+      formData.append('requestId', requestId);
+      formData.append('reviewNote', reviewNote);
+      
+      fetch('${pageContext.request.contextPath}/account-lock', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('✓ ' + data.message);
+          closeModal('reviewLockRequestModal');
+          loadLockRequests();
+        } else {
+          alert('❌ ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Lỗi kết nối: ' + error.message);
+      });
+    }
+    
+    // Load lock requests count on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      loadLockRequests();
+    });
     
     // Close modal when clicking outside
     window.onclick = function(event) {

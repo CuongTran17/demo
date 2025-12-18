@@ -21,9 +21,20 @@
 
       <% 
         String error = (String) request.getAttribute("error");
+        Boolean locked = (Boolean) request.getAttribute("locked");
         if (error != null && !error.isEmpty()) {
+          if (locked != null && locked) {
       %>
+        <div class="error-msg" style="background: #fee; border-color: #c00; padding: 16px; border-radius: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 28px;">🔒</span>
+            <strong style="font-size: 16px;">Tài khoản bị khóa</strong>
+          </div>
+          <p style="margin: 0; font-size: 14px; line-height: 1.5;"><%= error %></p>
+        </div>
+      <% } else { %>
         <div class="error-msg">❌ <%= error %></div>
+      <% } %>
       <% } %>
 
       <form class="auth-form" method="post" action="${pageContext.request.contextPath}/login">
