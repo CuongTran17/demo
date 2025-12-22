@@ -43,8 +43,246 @@
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/styles.css?v=3" />
   <style>
-    .teacher-dashboard {
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f8fafc;
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .hamburger-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+      background: white;
+      border: 1px solid #e2e8f0;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn:hover {
+      background: #f8fafc;
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .hamburger-btn span {
+      width: 20px;
+      height: 2px;
+      background: #333;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn:hover span {
+      background: #667eea;
+    }
+
+    .hamburger-btn.active {
+      background: #f5f3ff;
+      border-color: #667eea;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+      background: #667eea;
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+      background: #667eea;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .teacher-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: white;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar-header {
+      text-align: center;
+    }
+    
+    .sidebar-header .logo {
+      background: white;
+      color: #333;
+      font-size: 1.4rem;
+      font-weight: 700;
+      padding: 25px 20px;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+    
+    .sidebar-header .teacher-info {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 0.85rem;
+      padding: 12px 20px;
+      margin: 0;
+    }
+    
+    .sidebar-nav {
       padding: 20px 0;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 14px 20px;
+      margin: 5px 10px;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      gap: 12px;
+      line-height: 1;
+    }
+
+    .nav-item > span {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+    }
+    
+    .nav-item:hover {
+      background: #f8fafc;
+      border-left-color: #667eea;
+      color: #667eea;
+    }
+    
+    .nav-item.active {
+      background: #f5f3ff;
+      border-left-color: #667eea;
+      color: #667eea;
+    }
+    
+    .nav-item .icon {
+      font-size: 1.4rem;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .nav-item .badge {
+      margin-left: auto;
+      background: #ff9800;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .logout-btn-sidebar {
+      width: 100%;
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+    
+    .logout-btn-sidebar:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .teacher-dashboard {
+      margin-left: 280px;
+      padding: 30px;
+      width: calc(100% - 280px);
+      min-height: 100vh;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+    }
+
+    @media (max-width: 1024px) {
+      .hamburger-btn {
+        display: flex;
+      }
+
+      .teacher-sidebar {
+        transform: translateX(-100%);
+      }
+
+      .teacher-sidebar.active {
+        transform: translateX(0);
+      }
+
+      .teacher-dashboard {
+        margin-left: 0;
+        width: 100%;
+        padding: 85px 20px 30px 20px;
+      }
+    }
+    
+    .teacher-dashboard .container {
+      padding: 0;
     }
     
     .dashboard-header {
@@ -53,7 +291,7 @@
       padding: 30px;
       border-radius: 15px;
       margin-bottom: 30px;
-      display: flex;
+      display: none;
       justify-content: space-between;
       align-items: center;
     }
@@ -125,7 +363,7 @@
     }
     
     .tab-navigation {
-      display: flex;
+      display: none;
       background: white;
       border-radius: 12px;
       padding: 5px;
@@ -369,7 +607,67 @@
   </style>
 </head>
 <body>
-  <main class="container teacher-dashboard">
+  <!-- Hamburger Menu Button -->
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Teacher Sidebar -->
+  <aside class="teacher-sidebar" id="teacherSidebar">
+    <div class="sidebar-header">
+      <div class="logo">🎓 PTIT Learning</div>
+      <p class="teacher-info">Giáo viên: <%= userFullname != null ? userFullname : "Teacher" %></p>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a href="javascript:void(0)" class="nav-item active" onclick="showTab('courses')">
+        <span class="icon">📚</span>
+        <span>Quản lý khóa học</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="showTab('students')">
+        <span class="icon">👥</span>
+        <span>Quản lý học viên</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="showTab('content')">
+        <span class="icon">📝</span>
+        <span>Quản lý nội dung</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="showTab('analytics')">
+        <span class="icon">📊</span>
+        <span>Thống kê</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="showTab('pending')">
+        <span class="icon">⏳</span>
+        <span>Duyệt thay đổi</span>
+        <% 
+        @SuppressWarnings("unchecked")
+        List<PendingChange> allPendingChangesSidebar = (List<PendingChange>) request.getAttribute("pendingChanges");
+        int pendingCountSidebar = 0;
+        if (allPendingChangesSidebar != null) {
+          for (PendingChange pc : allPendingChangesSidebar) {
+            if ("pending".equals(pc.getStatus())) {
+              pendingCountSidebar++;
+            }
+          }
+        }
+        if (pendingCountSidebar > 0) {
+          out.print("<span class='badge'>" + pendingCountSidebar + "</span>");
+        }
+        %>
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="${pageContext.request.contextPath}/logout" class="logout-btn-sidebar">🚪 Đăng xuất</a>
+    </div>
+  </aside>
+
+  <main class="teacher-dashboard">
     <div class="dashboard-header">
       <div class="dashboard-header-content">
         <h1>👨‍🏫 Bảng điều khiển giáo viên</h1>
@@ -489,14 +787,14 @@
             <td><%= new java.text.SimpleDateFormat("dd/MM/yyyy").format(student.enrolledDate) %></td>
             <td>
               <div class="progress-bar">
-                <div class="progress-fill" style="width: <%= student.progress %>%;"></div>
+                <div class="progress-fill" data-width="<%= student.progress %>"></div>
               </div>
               <small><%= student.progress %>% hoàn thành</small>
             </td>
             <td>
-              <button class="btn-secondary" onclick="viewStudent(<%= student.userId %>)">👁️ Xem</button>
-              <button class="btn-secondary" onclick="messageStudent(<%= student.userId %>)">💬 Nhắn tin</button>
-              <button class="btn-secondary btn-danger" onclick="requestLockAccount(<%= student.userId %>, '<%= student.fullname %>')">🔒 Yêu cầu khóa</button>
+              <button class="btn-secondary" data-user-id="<%= student.userId %>" onclick="viewStudent(this.dataset.userId)">👁️ Xem</button>
+              <button class="btn-secondary" data-user-id="<%= student.userId %>" onclick="messageStudent(this.dataset.userId)">💬 Nhắn tin</button>
+              <button class="btn-secondary btn-danger" data-user-id="<%= student.userId %>" data-user-name="<%= student.fullname %>" onclick="requestLockAccount(this.dataset.userId, this.dataset.userName)">🔒 Yêu cầu khóa</button>
             </td>
           </tr>
           <% } %>
@@ -662,7 +960,7 @@
                     <td style="padding: 14px 12px; text-align: center;">
                       <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <div style="width: 60px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                          <div style="width: <%= student.progress %>%; height: 100%; background: <%= student.progress >= 80 ? "#48bb78" : student.progress >= 50 ? "#667eea" : "#ed8936" %>; transition: width 0.5s ease;"></div>
+                          <div data-progress="<%= student.progress %>" style="height: 100%; transition: width 0.5s ease;"></div>
                         </div>
                         <span style="font-weight: 600; color: #2d3748; min-width: 40px; font-size: 0.9rem;"><%= student.progress %>%</span>
                       </div>
@@ -714,7 +1012,7 @@
               <div style="margin-bottom: 25px; padding: 20px; background: #f7fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                   <div style="font-weight: 600; color: #2d3748; font-size: 1rem;"><%= courseName %></div>
-                  <div style="background: <%= courseAvgProgress >= 80 ? "#48bb78" : courseAvgProgress >= 50 ? "#667eea" : "#ed8936" %>; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                  <div data-avg-progress="<%= courseAvgProgress %>" style="color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
                     <%= courseAvgProgress %>% TB
                   </div>
                 </div>
@@ -724,7 +1022,7 @@
                     <span style="font-size: 0.85rem; color: #718096;">Tiến độ trung bình</span>
                   </div>
                   <div style="width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden;">
-                    <div style="width: <%= courseAvgProgress %>%; height: 100%; background: linear-gradient(90deg, <%= courseAvgProgress >= 80 ? "#48bb78, #38a169" : courseAvgProgress >= 50 ? "#667eea, #764ba2" : "#ed8936, #dd6b20" %>); transition: width 0.5s ease;"></div>
+                    <div data-course-progress="<%= courseAvgProgress %>" style="height: 100%; transition: width 0.5s ease;"></div>
                   </div>
                 </div>
                 <div style="display: grid; gap: 8px; margin-top: 12px;">
@@ -733,7 +1031,7 @@
                     <span style="font-size: 0.9rem; color: #4a5568; font-weight: 500;"><%= s.fullname %></span>
                     <div style="display: flex; align-items: center; gap: 8px;">
                       <div style="width: 60px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
-                        <div style="width: <%= s.progress %>%; height: 100%; background: <%= s.progress >= 80 ? "#48bb78" : s.progress >= 50 ? "#667eea" : "#ed8936" %>;"></div>
+                        <div data-student-progress="<%= s.progress %>" style="height: 100%;"></div>
                       </div>
                       <span style="font-size: 0.85rem; font-weight: 600; color: #2d3748; min-width: 35px; text-align: right;"><%= s.progress %>%</span>
                     </div>
@@ -1358,15 +1656,24 @@
         event.target.style.display = 'none';
       }
     }
-    
-    // Show success message popup
-    <% if (successMessage != null) { %>
+  </script>
+  
+  <% if (successMessage != null) { %>
+  <div id="successMessageData" style="display:none;"><%= successMessage %></div>
+  <script>
     window.onload = function() {
-      const msg = '<%= successMessage.replace("'", "\\'") %>';
-      console.log('Success message:', msg);
-      showSuccessPopup(msg);
+      const msgElement = document.getElementById('successMessageData');
+      if (msgElement) {
+        const msg = msgElement.textContent;
+        console.log('Success message:', msg);
+        showSuccessPopup(msg);
+        msgElement.remove();
+      }
     }
-    <% } %>
+  </script>
+  <% } %>
+  
+  <script>
     
     function showSuccessPopup(message) {
       console.log('showSuccessPopup called with:', message);
@@ -1443,8 +1750,8 @@
     // Wait for DOM and Chart.js to load
     document.addEventListener('DOMContentLoaded', function() {
       // Convert Java data to JavaScript - Get directly from request attributes
-      const categoryData = <%= new com.google.gson.Gson().toJson(request.getAttribute("categoryRevenues")) %>;
-      const courseData = <%= new com.google.gson.Gson().toJson(request.getAttribute("courseRevenues")) %>;
+      const categoryData = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("categoryRevenues")) %>');
+      const courseData = JSON.parse('<%= new com.google.gson.Gson().toJson(request.getAttribute("courseRevenues")) %>');
       
       console.log('Category Data:', categoryData);
       console.log('Course Data:', courseData);
@@ -1715,6 +2022,101 @@
           alert('❌ Lỗi tải dữ liệu: ' + error.message);
         });
     }
+    
+    // Set width and colors for all progress bars
+    function applyProgressStyles() {
+      // Helper function to get color based on progress
+      function getProgressColor(progress) {
+        if (progress >= 80) return '#48bb78';
+        if (progress >= 50) return '#667eea';
+        return '#ed8936';
+      }
+      
+      function getProgressGradient(progress) {
+        if (progress >= 80) return 'linear-gradient(90deg, #48bb78, #38a169)';
+        if (progress >= 50) return 'linear-gradient(90deg, #667eea, #764ba2)';
+        return 'linear-gradient(90deg, #ed8936, #dd6b20)';
+      }
+      
+      // Progress bars with data-width attribute
+      document.querySelectorAll('[data-width]').forEach(function(el) {
+        const width = el.getAttribute('data-width');
+        el.style.width = width + '%';
+      });
+      
+      // Progress bars with data-progress attribute
+      document.querySelectorAll('[data-progress]').forEach(function(el) {
+        const progress = parseFloat(el.getAttribute('data-progress'));
+        el.style.width = progress + '%';
+        el.style.background = getProgressColor(progress);
+      });
+      
+      // Course progress bars
+      document.querySelectorAll('[data-course-progress]').forEach(function(el) {
+        const progress = parseFloat(el.getAttribute('data-course-progress'));
+        el.style.width = progress + '%';
+        el.style.background = getProgressGradient(progress);
+      });
+      
+      // Student progress bars in course details
+      document.querySelectorAll('[data-student-progress]').forEach(function(el) {
+        const progress = parseFloat(el.getAttribute('data-student-progress'));
+        el.style.width = progress + '%';
+        el.style.background = getProgressColor(progress);
+      });
+      
+      // Average progress badges
+      document.querySelectorAll('[data-avg-progress]').forEach(function(el) {
+        const progress = parseFloat(el.getAttribute('data-avg-progress'));
+        el.style.background = getProgressColor(progress);
+      });
+    }
+    
+    // Apply styles when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', applyProgressStyles);
+    } else {
+      applyProgressStyles();
+    }
+
+    // Toggle sidebar function for hamburger menu
+    function toggleSidebar() {
+      const sidebar = document.getElementById('teacherSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const hamburger = document.getElementById('hamburgerBtn');
+      
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+      hamburger.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking on nav items on mobile
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        if (window.innerWidth <= 1024) {
+          toggleSidebar();
+        }
+      });
+    });
+
+    // Update showTab to also update sidebar active state
+    const originalShowTab = window.showTab;
+    window.showTab = function(tabName) {
+      originalShowTab(tabName);
+      
+      // Update sidebar nav items
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class to clicked nav item
+      const navItems = document.querySelectorAll('.nav-item');
+      if (tabName === 'courses') navItems[0].classList.add('active');
+      else if (tabName === 'students') navItems[1].classList.add('active');
+      else if (tabName === 'content') navItems[2].classList.add('active');
+      else if (tabName === 'analytics') navItems[3].classList.add('active');
+      else if (tabName === 'pending') navItems[4].classList.add('active');
+    };
   </script>
 </body>
 </html>

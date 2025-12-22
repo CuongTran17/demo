@@ -97,7 +97,11 @@
                 <span class="price-old"><%= currencyFormat.format(course.getOldPrice()) %></span>
               <% } %>
             </div>
-            <button class="btn-add-cart course-action-btn" data-course-id="<%= course.getCourseId() %>" onclick="addToCart('<%= course.getCourseId() %>', '<%= course.getCourseName() %>', <%= course.getPrice() %>)">
+            <button class="btn-add-cart course-action-btn" 
+                    data-course-id="<%= course.getCourseId() %>" 
+                    data-course-name="<%= course.getCourseName().replace("\"", "&quot;") %>" 
+                    data-course-price="<%= course.getPrice() %>"
+                    onclick="addToCart(this.dataset.courseId, this.dataset.courseName, parseFloat(this.dataset.coursePrice))">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -122,10 +126,10 @@
 
   <%@ include file="/includes/footer.jsp" %>
 
+  <% if (loggedIn != null && loggedIn) { %>
   <script>
     // Check purchased courses on page load
     document.addEventListener('DOMContentLoaded', function() {
-      <% if (loggedIn != null && loggedIn) { %>
         fetch('${pageContext.request.contextPath}/api/purchased-courses')
           .then(response => response.json())
           .then(data => {
@@ -145,9 +149,11 @@
             }
           })
           .catch(error => console.error('Error checking purchased courses:', error));
-      <% } %>
     });
-    
+  </script>
+  <% } %>
+
+  <script>
     const btn = document.getElementById('hamburger');
     const menu = document.querySelector('.menu');
     if(btn && menu){

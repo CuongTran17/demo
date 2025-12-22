@@ -10,6 +10,8 @@ import java.util.Base64;
 import java.util.UUID;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.util.DatabaseConnection;
 
@@ -23,6 +25,7 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet("/upload-course-image")
 public class ImageUploadServlet extends HttpServlet {
     
+    private static final Logger logger = LoggerFactory.getLogger(ImageUploadServlet.class);
     private static final String UPLOAD_DIR = "assets/img/course-uploads";
     
     @Override
@@ -88,12 +91,12 @@ public class ImageUploadServlet extends HttpServlet {
             System.out.println("File name: " + fileName);
             System.out.println("Base64 data length: " + base64Image.length());
             
-            if (courseId == null || courseId.isEmpty()) {
+            if (courseId.isEmpty()) {
                 response.getWriter().write("{\"success\": false, \"message\": \"Course ID is required\"}");
                 return;
             }
             
-            if (base64Image == null || base64Image.isEmpty()) {
+            if (base64Image.isEmpty()) {
                 response.getWriter().write("{\"success\": false, \"message\": \"No image data\"}");
                 return;
             }
@@ -153,9 +156,8 @@ public class ImageUploadServlet extends HttpServlet {
             System.out.println("Sending response: " + successResponse.toString());
             response.getWriter().write(successResponse.toString());
             
-        } catch (Exception e) {
-            System.err.println("Error in ImageUploadServlet: " + e.getMessage());
-            e.printStackTrace();
+        } catch (ServletException | IOException e) {
+            logger.error("Servlet error: {}", e.getMessage(), e);
             
             // Return JSON error instead of throwing exception
             try {
@@ -164,10 +166,23 @@ public class ImageUploadServlet extends HttpServlet {
                 errorResponse.put("message", "Error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
                 errorResponse.put("error", e.toString());
                 response.getWriter().write(errorResponse.toString());
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 // Fallback to plain JSON string
-                response.getWriter().write("{\"success\": false, \"message\": \"Error uploading image: " + 
-                    e.getMessage().replace("\"", "'") + "\"}");
+                logger.error("Error writing error response: {}", ex.getMessage(), ex);
+            }
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage(), e);
+            
+            // Return JSON error instead of throwing exception
+            try {
+                JSONObject errorResponse = new JSONObject();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+                errorResponse.put("error", e.toString());
+                response.getWriter().write(errorResponse.toString());
+            } catch (IOException ex) {
+                // Fallback to plain JSON string
+                logger.error("Error writing error response: {}", ex.getMessage(), ex);
             }
         }
     }

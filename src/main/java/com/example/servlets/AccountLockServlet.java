@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.dao.UserDAO;
 import com.example.util.DatabaseConnection;
 import com.google.gson.Gson;
@@ -23,6 +26,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/account-lock")
 public class AccountLockServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AccountLockServlet.class);
     private UserDAO userDAO;
     private Gson gson;
     
@@ -55,142 +59,147 @@ public class AccountLockServlet extends HttpServlet {
         
         try {
             switch (action) {
-                case "lock":
-                    // Admin locks account directly
+                case "lock" -> {
                     if (!"admin@ptit.edu.vn".equals(userEmail)) {
                         result.put("success", false);
                         result.put("message", "Chỉ admin mới có quyền khóa tài khoản trực tiếp");
-                        break;
-                    }
-                    
-                    int targetUserId = Integer.parseInt(request.getParameter("userId"));
-                    String reason = request.getParameter("reason");
-                    
-                    // Check if account is already locked
-                    com.example.model.User targetUser = userDAO.getUserById(targetUserId);
-                    if (targetUser != null && targetUser.isLocked()) {
-                        com.example.model.User lockedByUser = userDAO.getUserById(targetUser.getLockedBy());
-                        String lockedByName = lockedByUser != null ? lockedByUser.getFullname() : "Không rõ";
-                        String lockedDate = targetUser.getLockedAt() != null ? targetUser.getLockedAt().toString() : "Không rõ";
-                        result.put("success", false);
-                        result.put("message", "Tài khoản này đã bị khóa!\n" +
-                                              "Bởi: " + lockedByName + "\n" +
-                                              "Lý do: " + targetUser.getLockedReason() + "\n" +
-                                              "Ngày giờ: " + lockedDate);
-                        break;
-                    }
-                    
-                    if (userDAO.lockUserAccount(targetUserId, reason, currentUserId)) {
-                        result.put("success", true);
-                        result.put("message", "Đã khóa tài khoản thành công");
                     } else {
-                        result.put("success", false);
-                        result.put("message", "Không thể khóa tài khoản");
+                        int targetUserId = Integer.parseInt(request.getParameter("userId"));
+                        String reason = request.getParameter("reason");
+                        
+                        // Check if account is already locked
+                        com.example.model.User targetUser = userDAO.getUserById(targetUserId);
+                        if (targetUser != null && targetUser.isLocked()) {
+                            com.example.model.User lockedByUser = userDAO.getUserById(targetUser.getLockedBy());
+                            String lockedByName = lockedByUser != null ? lockedByUser.getFullname() : "Không rõ";
+                            String lockedDate = targetUser.getLockedAt() != null ? targetUser.getLockedAt().toString() : "Không rõ";
+                            result.put("success", false);
+                            result.put("message", """
+Tài khoản này đã bị khóa!
+Bởi: %s
+Lý do: %s
+Ngày giờ: %s
+""".formatted(lockedByName, targetUser.getLockedReason(), lockedDate));
+                        } else {
+                            if (userDAO.lockUserAccount(targetUserId, reason, currentUserId)) {
+                                result.put("success", true);
+                                result.put("message", "Đã khóa tài khoản thành công");
+                            } else {
+                                result.put("success", false);
+                                result.put("message", "Không thể khóa tài khoản");
+                            }
+                        }
                     }
-                    break;
+                }
                     
-                case "unlock":
-                    // Admin unlocks account
+                case "unlock" -> {
                     if (!"admin@ptit.edu.vn".equals(userEmail)) {
                         result.put("success", false);
                         result.put("message", "Chỉ admin mới có quyền mở khóa tài khoản");
-                        break;
-                    }
-                    
-                    targetUserId = Integer.parseInt(request.getParameter("userId"));
-                    
-                    if (userDAO.unlockUserAccount(targetUserId)) {
-                        result.put("success", true);
-                        result.put("message", "Đã mở khóa tài khoản thành công");
                     } else {
-                        result.put("success", false);
-                        result.put("message", "Không thể mở khóa tài khoản");
+                        int targetUserId = Integer.parseInt(request.getParameter("userId"));
+                        
+                        if (userDAO.unlockUserAccount(targetUserId)) {
+                            result.put("success", true);
+                            result.put("message", "Đã mở khóa tài khoản thành công");
+                        } else {
+                            result.put("success", false);
+                            result.put("message", "Không thể mở khóa tài khoản");
+                        }
                     }
-                    break;
+                }
                     
-                case "request":
-                    // Teacher requests to lock a student account
+                case "request" -> {
                     if (!userEmail.matches("teacher\\d*@ptit\\.edu\\.vn")) {
                         result.put("success", false);
                         result.put("message", "Chỉ giáo viên mới có thể yêu cầu khóa tài khoản học viên");
-                        break;
-                    }
-                    
-                    targetUserId = Integer.parseInt(request.getParameter("userId"));
-                    reason = request.getParameter("reason");
-                    String requestType = request.getParameter("requestType"); // "lock" or "unlock"
-                    
-                    // Check if account is already locked (only for lock requests)
-                    if ("lock".equals(requestType)) {
-                        com.example.model.User targetUserCheck = userDAO.getUserById(targetUserId);
-                        if (targetUserCheck != null && targetUserCheck.isLocked()) {
-                            com.example.model.User lockedByUser = userDAO.getUserById(targetUserCheck.getLockedBy());
-                            String lockedByName = lockedByUser != null ? lockedByUser.getFullname() : "Không rõ";
-                            String lockedDate = targetUserCheck.getLockedAt() != null ? targetUserCheck.getLockedAt().toString() : "Không rõ";
-                            result.put("success", false);
-                            result.put("message", "Tài khoản này đã bị khóa!\n" +
-                                                  "Bởi: " + lockedByName + "\n" +
-                                                  "Lý do: " + targetUserCheck.getLockedReason() + "\n" +
-                                                  "Ngày giờ: " + lockedDate);
-                            break;
+                    } else {
+                        int targetUserId = Integer.parseInt(request.getParameter("userId"));
+                        String reason = request.getParameter("reason");
+                        String requestType = request.getParameter("requestType"); // "lock" or "unlock"
+                        
+                        // Check if account is already locked (only for lock requests)
+                        if ("lock".equals(requestType)) {
+                            com.example.model.User targetUserCheck = userDAO.getUserById(targetUserId);
+                            if (targetUserCheck != null && targetUserCheck.isLocked()) {
+                                com.example.model.User lockedByUser = userDAO.getUserById(targetUserCheck.getLockedBy());
+                                String lockedByName = lockedByUser != null ? lockedByUser.getFullname() : "Không rõ";
+                                String lockedDate = targetUserCheck.getLockedAt() != null ? targetUserCheck.getLockedAt().toString() : "Không rõ";
+                                result.put("success", false);
+                                result.put("message", """
+Tài khoản này đã bị khóa!
+Bởi: %s
+Lý do: %s
+Ngày giờ: %s
+""".formatted(lockedByName, targetUserCheck.getLockedReason(), lockedDate));
+                            } else {
+                                if (createLockRequest(targetUserId, currentUserId, reason, requestType)) {
+                                    result.put("success", true);
+                                    result.put("message", "Đã gửi yêu cầu thành công. Chờ admin duyệt.");
+                                } else {
+                                    result.put("success", false);
+                                    result.put("message", "Không thể gửi yêu cầu");
+                                }
+                            }
+                        } else {
+                            if (createLockRequest(targetUserId, currentUserId, reason, requestType)) {
+                                result.put("success", true);
+                                result.put("message", "Đã gửi yêu cầu thành công. Chờ admin duyệt.");
+                            } else {
+                                result.put("success", false);
+                                result.put("message", "Không thể gửi yêu cầu");
+                            }
                         }
                     }
+                }
                     
-                    if (createLockRequest(targetUserId, currentUserId, reason, requestType)) {
-                        result.put("success", true);
-                        result.put("message", "Đã gửi yêu cầu thành công. Chờ admin duyệt.");
-                    } else {
-                        result.put("success", false);
-                        result.put("message", "Không thể gửi yêu cầu");
-                    }
-                    break;
-                    
-                case "approve":
-                    // Admin approves lock request
+                case "approve" -> {
                     if (!"admin@ptit.edu.vn".equals(userEmail)) {
                         result.put("success", false);
                         result.put("message", "Chỉ admin mới có quyền duyệt yêu cầu");
-                        break;
-                    }
-                    
-                    int requestId = Integer.parseInt(request.getParameter("requestId"));
-                    String reviewNote = request.getParameter("reviewNote");
-                    
-                    if (approveRequest(requestId, currentUserId, reviewNote)) {
-                        result.put("success", true);
-                        result.put("message", "Đã duyệt yêu cầu thành công");
                     } else {
-                        result.put("success", false);
-                        result.put("message", "Không thể duyệt yêu cầu");
+                        int requestId = Integer.parseInt(request.getParameter("requestId"));
+                        String reviewNote = request.getParameter("reviewNote");
+                        
+                        if (approveRequest(requestId, currentUserId, reviewNote)) {
+                            result.put("success", true);
+                            result.put("message", "Đã duyệt yêu cầu thành công");
+                        } else {
+                            result.put("success", false);
+                            result.put("message", "Không thể duyệt yêu cầu");
+                        }
                     }
-                    break;
+                }
                     
-                case "reject":
-                    // Admin rejects lock request
+                case "reject" -> {
                     if (!"admin@ptit.edu.vn".equals(userEmail)) {
                         result.put("success", false);
                         result.put("message", "Chỉ admin mới có quyền từ chối yêu cầu");
-                        break;
-                    }
-                    
-                    requestId = Integer.parseInt(request.getParameter("requestId"));
-                    reviewNote = request.getParameter("reviewNote");
-                    
-                    if (rejectRequest(requestId, currentUserId, reviewNote)) {
-                        result.put("success", true);
-                        result.put("message", "Đã từ chối yêu cầu");
                     } else {
-                        result.put("success", false);
-                        result.put("message", "Không thể từ chối yêu cầu");
+                        int requestId = Integer.parseInt(request.getParameter("requestId"));
+                        String reviewNote = request.getParameter("reviewNote");
+                        
+                        if (rejectRequest(requestId, currentUserId, reviewNote)) {
+                            result.put("success", true);
+                            result.put("message", "Đã từ chối yêu cầu");
+                        } else {
+                            result.put("success", false);
+                            result.put("message", "Không thể từ chối yêu cầu");
+                        }
                     }
-                    break;
+                }
                     
-                default:
+                default -> {
                     result.put("success", false);
                     result.put("message", "Hành động không hợp lệ");
+                }
             }
+        } catch (NumberFormatException e) {
+            logger.error("Invalid number format in request parameters", e);
+            result.put("success", false);
+            result.put("message", "Dữ liệu không hợp lệ: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error processing account lock request", e);
             result.put("success", false);
             result.put("message", "Lỗi hệ thống: " + e.getMessage());
         }
@@ -219,38 +228,47 @@ public class AccountLockServlet extends HttpServlet {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            if ("getPendingRequests".equals(action)) {
-                // Get pending lock requests (for admin)
-                if ("admin@ptit.edu.vn".equals(userEmail)) {
-                    List<Map<String, Object>> requests = getPendingRequests();
+            switch (action) {
+                case "getPendingRequests" -> {
+                    // Get pending lock requests (for admin)
+                    if ("admin@ptit.edu.vn".equals(userEmail)) {
+                        List<Map<String, Object>> requests = getPendingRequests();
+                        result.put("success", true);
+                        result.put("requests", requests);
+                    } else {
+                        result.put("success", false);
+                        result.put("message", "Chỉ admin mới có quyền xem yêu cầu chờ duyệt");
+                    }
+                }
+                case "getMyRequests" -> {
+                    // Get teacher's own requests
+                    int userId = (int) session.getAttribute("userId");
+                    List<Map<String, Object>> requests = getTeacherRequests(userId);
                     result.put("success", true);
                     result.put("requests", requests);
-                } else {
-                    result.put("success", false);
-                    result.put("message", "Chỉ admin mới có quyền xem yêu cầu chờ duyệt");
                 }
-            } else if ("getMyRequests".equals(action)) {
-                // Get teacher's own requests
-                int userId = (int) session.getAttribute("userId");
-                List<Map<String, Object>> requests = getTeacherRequests(userId);
-                result.put("success", true);
-                result.put("requests", requests);
-            } else if ("getReviewedRequests".equals(action)) {
-                // Get reviewed (approved/rejected) lock requests (for admin)
-                if ("admin@ptit.edu.vn".equals(userEmail)) {
-                    List<Map<String, Object>> requests = getReviewedRequests();
-                    result.put("success", true);
-                    result.put("requests", requests);
-                } else {
-                    result.put("success", false);
-                    result.put("message", "Chỉ admin mới có quyền xem lịch sử duyệt");
+                case "getReviewedRequests" -> {
+                    // Get reviewed (approved/rejected) lock requests (for admin)
+                    if ("admin@ptit.edu.vn".equals(userEmail)) {
+                        List<Map<String, Object>> requests = getReviewedRequests();
+                        result.put("success", true);
+                        result.put("requests", requests);
+                    } else {
+                        result.put("success", false);
+                        result.put("message", "Chỉ admin mới có quyền xem lịch sử duyệt");
+                    }
                 }
-            } else {
-                result.put("success", false);
-                result.put("message", "Hành động không hợp lệ");
+                default -> {
+                    result.put("success", false);
+                    result.put("message", "Hành động không hợp lệ");
+                }
             }
+        } catch (NumberFormatException e) {
+            logger.error("Invalid number format in GET request parameters", e);
+            result.put("success", false);
+            result.put("message", "Dữ liệu không hợp lệ: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error processing account lock GET request", e);
             result.put("success", false);
             result.put("message", "Lỗi hệ thống: " + e.getMessage());
         }
@@ -272,7 +290,7 @@ public class AccountLockServlet extends HttpServlet {
             return stmt.executeUpdate() > 0;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error creating lock request", e);
             return false;
         }
     }
@@ -285,8 +303,8 @@ public class AccountLockServlet extends HttpServlet {
             
             // Get request details
             String getSql = "SELECT target_user_id, request_type FROM account_lock_requests WHERE request_id = ? AND status = 'pending'";
-            int targetUserId = 0;
-            String requestType = "";
+            int targetUserId;
+            String requestType;
             
             try (PreparedStatement stmt = conn.prepareStatement(getSql)) {
                 stmt.setInt(1, requestId);
@@ -326,12 +344,12 @@ public class AccountLockServlet extends HttpServlet {
             return true;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error approving lock request", e);
             if (conn != null) {
                 try {
                     conn.rollback();
                 } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    logger.error("Error rolling back transaction", ex);
                 }
             }
             return false;
@@ -341,7 +359,7 @@ public class AccountLockServlet extends HttpServlet {
                     conn.setAutoCommit(true);
                     conn.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Error closing connection", e);
                 }
             }
         }
@@ -360,7 +378,7 @@ public class AccountLockServlet extends HttpServlet {
             return stmt.executeUpdate() > 0;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error rejecting lock request", e);
             return false;
         }
     }
@@ -391,7 +409,7 @@ public class AccountLockServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting pending requests", e);
         }
         
         return requests;
@@ -423,7 +441,7 @@ public class AccountLockServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting teacher requests", e);
         }
         
         return requests;
@@ -458,7 +476,7 @@ public class AccountLockServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting reviewed requests", e);
         }
         
         return requests;

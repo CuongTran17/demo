@@ -7,9 +7,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.util.DatabaseConnection;
 
 public class CartDAO {
+    private static final Logger logger = LoggerFactory.getLogger(CartDAO.class);
     
     /**
      * Add course to user's cart in database
@@ -30,7 +34,7 @@ public class CartDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error checking if course exists in cart", e);
             return false;
         }
         
@@ -46,7 +50,7 @@ public class CartDAO {
             return rows > 0;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error adding course to cart", e);
             return false;
         }
     }
@@ -67,7 +71,7 @@ public class CartDAO {
             return rows > 0;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error removing course from cart", e);
             return false;
         }
     }
@@ -80,18 +84,17 @@ public class CartDAO {
         String sql = "SELECT course_id FROM cart WHERE user_id = ? ORDER BY added_at DESC";
         
         try (Connection conn = DatabaseConnection.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             
             stmt.setInt(1, userId);
-            ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
                 cartItems.add(rs.getString("course_id"));
             }
-            rs.close();
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting user cart", e);
         }
         
         return cartItems;
@@ -112,7 +115,7 @@ public class CartDAO {
             return rows >= 0; // Return true even if cart was already empty
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error clearing cart", e);
             return false;
         }
     }
@@ -129,14 +132,14 @@ public class CartDAO {
             stmt.setInt(1, userId);
             stmt.setString(2, courseId);
             
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("count") > 0;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count") > 0;
+                }
             }
-            rs.close();
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error checking if course is in cart", e);
         }
         
         return false;
@@ -153,14 +156,14 @@ public class CartDAO {
             
             stmt.setInt(1, userId);
             
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("count");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count");
+                }
             }
-            rs.close();
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting cart count", e);
         }
         
         return 0;

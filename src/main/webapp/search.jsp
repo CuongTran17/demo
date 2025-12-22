@@ -362,7 +362,11 @@
                       <% } %>
                       <span class="search-price-current"><%= String.format("%,d", course.getPrice().longValue()) %>₫</span>
                     </div>
-                    <button class="search-add-cart" onclick="addToCart('<%= course.getCourseId() %>', '<%= course.getCourseName() %>', <%= course.getPrice().longValue() %>)">
+                    <button class="search-add-cart" 
+                            data-course-id="<%= course.getCourseId() %>" 
+                            data-course-name="<%= course.getCourseName().replace("\"", "&quot;") %>" 
+                            data-course-price="<%= course.getPrice().longValue() %>"
+                            onclick="addToCart(this.dataset.courseId, this.dataset.courseName, parseInt(this.dataset.coursePrice))">
                       🛒 Thêm vào giỏ
                     </button>
                   </div>

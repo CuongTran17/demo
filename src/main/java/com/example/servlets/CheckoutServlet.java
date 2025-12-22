@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.dao.CartDAO;
 import com.example.dao.CourseDAO;
 import com.example.dao.OrderDAO;
@@ -18,6 +21,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(CheckoutServlet.class);
     private CourseDAO courseDAO;
     private OrderDAO orderDAO;
     private CartDAO cartDAO;
@@ -64,7 +68,7 @@ public class CheckoutServlet extends HttpServlet {
                     cartCourses.add(course);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error getting course details for checkout", e);
             }
         }
         
@@ -131,8 +135,12 @@ public class CheckoutServlet extends HttpServlet {
                 request.getRequestDispatcher("/checkout.jsp").forward(request, response);
             }
             
+        } catch (ServletException | IOException e) {
+            logger.error("Servlet or IO error in checkout", e);
+            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            request.getRequestDispatcher("/checkout.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error in checkout", e);
             request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
             request.getRequestDispatcher("/checkout.jsp").forward(request, response);
         }

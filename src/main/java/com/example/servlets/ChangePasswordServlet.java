@@ -2,6 +2,9 @@ package com.example.servlets;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.dao.UserDAO;
 import com.example.model.User;
 
@@ -14,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/changePassword")
 public class ChangePasswordServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(ChangePasswordServlet.class);
     private UserDAO userDAO;
     
     @Override
@@ -59,7 +63,7 @@ public class ChangePasswordServlet extends HttpServlet {
                 response.getWriter().write("{\"success\": false, \"message\": \"Đổi mật khẩu thất bại\"}");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error changing password", e);
             response.setContentType("application/json; charset=UTF-8");
             response.getWriter().write("{\"success\": false, \"message\": \"Lỗi: " + e.getMessage() + "\"}");
         }

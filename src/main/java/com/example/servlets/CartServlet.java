@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.dao.CartDAO;
 import com.example.dao.CourseDAO;
 import com.example.model.Course;
@@ -17,6 +20,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/cart")
 public class CartServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(CartServlet.class);
     private CourseDAO courseDAO;
     private CartDAO cartDAO;
     
@@ -61,7 +65,7 @@ public class CartServlet extends HttpServlet {
                     cartCourses.add(course);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error getting course details for cart", e);
             }
         }
         
@@ -83,63 +87,65 @@ public class CartServlet extends HttpServlet {
         Integer userId = (Integer) session.getAttribute("userId");
         Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
         
-        if ("add".equals(action)) {
-            // Check if user is logged in
-            if (loggedIn == null || !loggedIn || userId == null) {
-                // User not logged in - require login
+        switch (action) {
+            case "add" -> {
+                // Check if user is logged in
+                if (loggedIn == null || !loggedIn || userId == null) {
+                    // User not logged in - require login
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write("{\"success\": false, \"message\": \"Vui lòng đăng nhập để thêm vào giỏ hàng\", \"requireLogin\": true}");
+                    return;
+                }
+                
+                // Check if user has already purchased this course
+                if (courseDAO.hasUserPurchasedCourse(userId, courseId)) {
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write("{\"success\": false, \"message\": \"Bạn đã mua khóa học này rồi. Vui lòng kiểm tra trong 'Khóa học của tôi'\"}");
+                    return;
+                }
+                
+                // User is logged in - add to cart in database
+                boolean success = cartDAO.addToCart(userId, courseId);
+                
+                if (success) {
+                    // Update session cart
+                    List<String> cartItems = cartDAO.getUserCart(userId);
+                    session.setAttribute("cart", cartItems);
+                }
+                
                 response.setContentType("application/json; charset=UTF-8");
-                response.getWriter().write("{\"success\": false, \"message\": \"Vui lòng đăng nhập để thêm vào giỏ hàng\", \"requireLogin\": true}");
-                return;
+                if (success) {
+                    response.getWriter().write("{\"success\": true, \"message\": \"Đã thêm vào giỏ hàng\"}");
+                } else {
+                    response.getWriter().write("{\"success\": false, \"message\": \"Khóa học đã có trong giỏ hàng\"}");
+                }
             }
-            
-            // Check if user has already purchased this course
-            if (courseDAO.hasUserPurchasedCourse(userId, courseId)) {
-                response.setContentType("application/json; charset=UTF-8");
-                response.getWriter().write("{\"success\": false, \"message\": \"Bạn đã mua khóa học này rồi. Vui lòng kiểm tra trong 'Khóa học của tôi'\"}");
-                return;
+            case "remove" -> {
+                // Remove from cart
+                if (loggedIn != null && loggedIn && userId != null) {
+                    cartDAO.removeFromCart(userId, courseId);
+                }
+                
+                // Also remove from session
+                @SuppressWarnings("unchecked")
+                List<String> cartItems = (List<String>) session.getAttribute("cart");
+                if (cartItems != null) {
+                    cartItems.remove(courseId);
+                    session.setAttribute("cart", cartItems);
+                }
+                
+                response.sendRedirect(request.getContextPath() + "/cart");
             }
-            
-            // User is logged in - add to cart in database
-            boolean success = cartDAO.addToCart(userId, courseId);
-            
-            if (success) {
-                // Update session cart
-                List<String> cartItems = cartDAO.getUserCart(userId);
-                session.setAttribute("cart", cartItems);
+            case "clear" -> {
+                // Clear cart
+                if (loggedIn != null && loggedIn && userId != null) {
+                    cartDAO.clearCart(userId);
+                }
+                
+                // Also clear session
+                session.setAttribute("cart", new ArrayList<String>());
+                response.sendRedirect(request.getContextPath() + "/cart");
             }
-            
-            response.setContentType("application/json; charset=UTF-8");
-            if (success) {
-                response.getWriter().write("{\"success\": true, \"message\": \"Đã thêm vào giỏ hàng\"}");
-            } else {
-                response.getWriter().write("{\"success\": false, \"message\": \"Khóa học đã có trong giỏ hàng\"}");
-            }
-            
-        } else if ("remove".equals(action)) {
-            // Remove from cart
-            if (loggedIn != null && loggedIn && userId != null) {
-                cartDAO.removeFromCart(userId, courseId);
-            }
-            
-            // Also remove from session
-            @SuppressWarnings("unchecked")
-            List<String> cartItems = (List<String>) session.getAttribute("cart");
-            if (cartItems != null) {
-                cartItems.remove(courseId);
-                session.setAttribute("cart", cartItems);
-            }
-            
-            response.sendRedirect(request.getContextPath() + "/cart");
-            
-        } else if ("clear".equals(action)) {
-            // Clear cart
-            if (loggedIn != null && loggedIn && userId != null) {
-                cartDAO.clearCart(userId);
-            }
-            
-            // Also clear session
-            session.setAttribute("cart", new ArrayList<String>());
-            response.sendRedirect(request.getContextPath() + "/cart");
         }
     }
 }

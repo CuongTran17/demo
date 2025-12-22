@@ -8,6 +8,8 @@ import java.sql.SQLException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.util.DatabaseConnection;
 
@@ -20,6 +22,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/api/lesson-progress")
 public class LessonProgressServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(LessonProgressServlet.class);
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -60,7 +63,7 @@ public class LessonProgressServlet extends HttpServlet {
             response.getWriter().write(result.toString());
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting lesson progress", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Database error\"}");
         }
@@ -91,42 +94,46 @@ public class LessonProgressServlet extends HttpServlet {
         }
         
         try (Connection conn = DatabaseConnection.getNewConnection()) {
-            if ("complete".equals(action)) {
-                // Mark lesson as completed
-                String sql = "INSERT INTO lesson_progress (user_id, course_id, lesson_id, completed, completed_at) " +
-                           "VALUES (?, ?, ?, TRUE, NOW()) " +
-                           "ON DUPLICATE KEY UPDATE completed = TRUE, completed_at = NOW()";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setInt(1, userId);
-                stmt.setString(2, courseId);
-                stmt.setString(3, lessonId);
-                stmt.executeUpdate();
-                
-                // Update course progress percentage
-                updateCourseProgress(conn, userId, courseId);
-                
-                response.getWriter().write("{\"success\":true,\"message\":\"Lesson marked as completed\"}");
-            } else if ("reset".equals(action)) {
-                // Reset lesson progress
-                String sql = "DELETE FROM lesson_progress WHERE user_id = ? AND course_id = ? AND lesson_id = ?";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setInt(1, userId);
-                stmt.setString(2, courseId);
-                stmt.setString(3, lessonId);
-                stmt.executeUpdate();
-                
-                // Update course progress percentage
-                updateCourseProgress(conn, userId, courseId);
-                
-                response.getWriter().write("{\"success\":true,\"message\":\"Lesson progress reset\"}");
-            } else {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"error\":\"Invalid action\"}");
+            switch (action != null ? action : "") {
+                case "complete" -> {
+                    // Mark lesson as completed
+                    String sql = "INSERT INTO lesson_progress (user_id, course_id, lesson_id, completed, completed_at) " +
+                               "VALUES (?, ?, ?, TRUE, NOW()) " +
+                               "ON DUPLICATE KEY UPDATE completed = TRUE, completed_at = NOW()";
+                    PreparedStatement stmt = conn.prepareStatement(sql);
+                    stmt.setInt(1, userId);
+                    stmt.setString(2, courseId);
+                    stmt.setString(3, lessonId);
+                    stmt.executeUpdate();
+                    
+                    // Update course progress percentage
+                    updateCourseProgress(conn, userId, courseId);
+                    
+                    response.getWriter().write("{\"success\":true,\"message\":\"Lesson marked as completed\"}");
+                }
+                case "reset" -> {
+                    // Reset lesson progress
+                    String sql = "DELETE FROM lesson_progress WHERE user_id = ? AND course_id = ? AND lesson_id = ?";
+                    PreparedStatement stmt = conn.prepareStatement(sql);
+                    stmt.setInt(1, userId);
+                    stmt.setString(2, courseId);
+                    stmt.setString(3, lessonId);
+                    stmt.executeUpdate();
+                    
+                    // Update course progress percentage
+                    updateCourseProgress(conn, userId, courseId);
+                    
+                    response.getWriter().write("{\"success\":true,\"message\":\"Lesson progress reset\"}");
+                }
+                default -> {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("{\"error\":\"Invalid action\"}");
+                }
             }
             
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error updating lesson progress", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Database error: \" + e.getMessage()}");
         }

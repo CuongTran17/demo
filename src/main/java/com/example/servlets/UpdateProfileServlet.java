@@ -1,8 +1,11 @@
 package com.example.servlets;
 
 import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.dao.UserDAO;
-import com.example.model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/updateProfile")
 public class UpdateProfileServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(UpdateProfileServlet.class);
     private UserDAO userDAO;
     
     @Override
@@ -52,7 +56,7 @@ public class UpdateProfileServlet extends HttpServlet {
                 response.getWriter().write("{\"success\": false, \"message\": \"Cập nhật thất bại\"}");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in UpdateProfileServlet: {}", e.getMessage(), e);
             response.setContentType("application/json");
             response.getWriter().write("{\"success\": false, \"message\": \"Lỗi: " + e.getMessage() + "\"}");
         }

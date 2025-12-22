@@ -115,11 +115,6 @@
       });
     }
 
-    // Show error modal on page load if error exists
-    <% if (error != null) { %>
-      showErrorModal('<%= error %>');
-    <% } %>
-
     function showErrorModal(message) {
       const modal = document.getElementById('errorModal');
       const messageEl = document.getElementById('errorModalMessage');
@@ -317,6 +312,12 @@
       }
     });
   </script>
+  
+  <% if (error != null) { %>
+  <script>
+    showErrorModal('<%= error %>');
+  </script>
+  <% } %>
   
   <style>
     .alert {

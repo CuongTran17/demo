@@ -10,6 +10,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.dao.OrderDAO;
 import com.example.dao.PendingChangeDAO;
 import com.example.dao.UserDAO;
@@ -25,6 +28,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminServlet.class);
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -95,8 +99,11 @@ public class AdminServlet extends HttpServlet {
             
             request.getRequestDispatcher("/admin-dashboard.jsp").forward(request, response);
             
+        } catch (ServletException | IOException e) {
+            logger.error("Servlet or IO error in admin GET request", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi hệ thống: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error in admin GET request", e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi hệ thống: " + e.getMessage());
         }
     }
@@ -120,41 +127,25 @@ public class AdminServlet extends HttpServlet {
         
         try {
             switch (action) {
-                case "createTeacher":
-                    createTeacher(request);
-                    break;
-                case "updateUser":
-                    updateUser(request);
-                    break;
-                case "deleteUser":
-                    deleteUser(request);
-                    break;
-                case "assignCourse":
-                    assignCourseToTeacher(request);
-                    break;
-                case "removeCourse":
-                    removeCourseFromTeacher(request);
-                    break;
-                case "approveChange":
-                    approveChange(request, userId);
-                    break;
-                case "rejectChange":
-                    rejectChange(request, userId);
-                    break;
-                case "approvePayment":
-                    approvePayment(request, userId);
-                    break;
-                case "rejectPayment":
-                    rejectPayment(request, userId);
-                    break;
+                case "createTeacher" -> createTeacher(request);
+                case "updateUser" -> updateUser(request);
+                case "deleteUser" -> deleteUser(request);
+                case "assignCourse" -> assignCourseToTeacher(request);
+                case "removeCourse" -> removeCourseFromTeacher(request);
+                case "approveChange" -> approveChange(request, userId);
+                case "rejectChange" -> rejectChange(request, userId);
+                case "approvePayment" -> approvePayment(request, userId);
+                case "rejectPayment" -> rejectPayment(request, userId);
             }
             
             response.sendRedirect(request.getContextPath() + "/admin");
             
+        } catch (IOException e) {
+            logger.error("IO error in admin POST request", e);
+            request.getSession().setAttribute("errorMessage", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/admin");
         } catch (Exception e) {
-            // Log error but show user-friendly message
-            System.err.println("Admin action error: " + e.getMessage());
-            // Set error message in session to show alert
+            logger.error("Unexpected error in admin POST request", e);
             request.getSession().setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/admin");
         }
@@ -211,7 +202,7 @@ public class AdminServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting admin stats", e);
         }
         
         return stats;
@@ -237,7 +228,7 @@ public class AdminServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting all users", e);
         }
         
         return users;
@@ -266,7 +257,7 @@ public class AdminServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting all teachers", e);
         }
         
         return teachers;
@@ -295,7 +286,7 @@ public class AdminServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting all courses", e);
         }
         
         return courses;
@@ -477,7 +468,7 @@ public class AdminServlet extends HttpServlet {
                 revenues.add(cr);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting course revenues", e);
         }
         
         return revenues;
@@ -506,7 +497,7 @@ public class AdminServlet extends HttpServlet {
                 revenues.add(cr);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting category revenues", e);
         }
         
         return revenues;

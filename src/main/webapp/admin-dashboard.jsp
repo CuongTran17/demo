@@ -54,12 +54,238 @@
       margin: 0;
       padding: 0;
       background: #f8fafc;
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+    }
+    
+    .hamburger-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+      background: white;
+      border: 1px solid #e2e8f0;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn:hover {
+      background: #f8fafc;
+      border-color: #f5576c;
+      box-shadow: 0 4px 12px rgba(245, 87, 108, 0.15);
+    }
+
+    .hamburger-btn span {
+      width: 20px;
+      height: 2px;
+      background: #333;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-btn:hover span {
+      background: #f5576c;
+    }
+
+    .hamburger-btn.active {
+      background: #fff5f7;
+      border-color: #f5576c;
+    }
+
+    .hamburger-btn.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+      background: #f5576c;
+    }
+
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+      background: #f5576c;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .admin-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: white;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar-header {
+      text-align: center;
+    }
+    
+    .sidebar-header .logo {
+      background: white;
+      color: #333;
+      font-size: 1.4rem;
+      font-weight: 700;
+      padding: 25px 20px;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+    
+    .sidebar-header .admin-info {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      font-size: 0.85rem;
+      padding: 12px 20px;
+      margin: 0;
+    }
+    
+    .sidebar-nav {
+      padding: 20px 0;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 14px 20px;
+      margin: 5px 10px;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 2rem;
+      gap: 12px;
+      line-height: 1.5;
+    }
+
+    .nav-item > span {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+    }
+    
+    .nav-item:hover {
+      background: #f8fafc;
+      border-left-color: #f5576c;
+      color: #f5576c;
+    }
+    
+    .nav-item.active {
+      background: #fff5f7;
+      border-left-color: #f5576c;
+      color: #f5576c;
+    }
+    
+    .nav-item .icon {
+      font-size: 1.4rem;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .nav-item .badge {
+      margin-left: auto;
+      background: #ff9800;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .logout-btn-sidebar {
+      width: 100%;
+      background: #f5576c;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+    
+    .logout-btn-sidebar:hover {
+      background: #d63647;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
     }
     
     .admin-dashboard {
-      padding: 20px;
-      max-width: 1400px;
-      margin: 0 auto;
+      margin-left: 280px;
+      padding: 30px;
+      width: calc(100% - 280px);
+      min-height: 100vh;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+    }
+
+    @media (max-width: 1024px) {
+      .hamburger-btn {
+        display: flex;
+      }
+
+      .admin-sidebar {
+        transform: translateX(-100%);
+      }
+
+      .admin-sidebar.active {
+        transform: translateX(0);
+      }
+
+      .admin-dashboard {
+        margin-left: 0;
+        width: 100%;
+        padding: 85px 20px 30px 20px;
+      }
+
+      .stats-grid {
+        margin-top: 10px;
+      }
     }
     
     .dashboard-header {
@@ -396,6 +622,22 @@
     }
     
     @media (max-width: 768px) {
+      .admin-sidebar {
+        width: 250px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .admin-sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .admin-dashboard {
+        margin-left: 0;
+        width: 100%;
+        padding: 10px;
+      }
+      
       .dashboard-header {
         padding: 20px;
       }
@@ -435,10 +677,6 @@
         font-size: 0.9rem;
       }
       
-      .admin-dashboard {
-        padding: 10px;
-      }
-      
       .data-table th,
       .data-table td {
         padding: 10px;
@@ -458,58 +696,77 @@
   </style>
 </head>
 <body>
+  <!-- Hamburger Menu Button -->
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+      <div class="logo">🎓 PTIT Learning</div>
+      <p class="admin-info">Admin: <%= userFullname != null ? userFullname : "Administrator" %></p>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a href="javascript:void(0)" class="nav-item active" onclick="openTab('stats')">
+        <span class="icon">📊</span>
+        <span>Thống kê</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="openTab('users')">
+        <span class="icon">👥</span>
+        <span>Người dùng</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="openTab('teachers')">
+        <span class="icon">👨‍🏫</span>
+        <span>Giáo viên</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="openTab('courses')">
+        <span class="icon">📚</span>
+        <span>Khóa học</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="openTab('lock-requests')">
+        <span class="icon">🔒</span>
+        <span>Yêu cầu khóa TK</span>
+        <span id="lockRequestsBadge" class="badge" style="display:none;">0</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="openTab('pending')">
+        <span class="icon">⏳</span>
+        <span>Duyệt thay đổi</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" onclick="openTab('payments')">
+        <span class="icon">💳</span>
+        <span>Duyệt thanh toán</span>
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="${pageContext.request.contextPath}/logout" class="logout-btn-sidebar">🚪 Đăng xuất</a>
+    </div>
+  </aside>
+  
   <%
     // Check for error message
     String errorMessage = (String) session.getAttribute("errorMessage");
     if (errorMessage != null) {
         session.removeAttribute("errorMessage");
+        String safeMessage = errorMessage.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "");
   %>
   <script>
     window.addEventListener('DOMContentLoaded', function() {
-      alert('❌ <%= errorMessage.replace("'", "\\'") %>');
+      alert('❌ <%= safeMessage %>');
     });
   </script>
   <% } %>
   
-  <main class="container admin-dashboard">
-    <div class="dashboard-header">
-      <div class="dashboard-header-content">
-        <h1>⚙️ Quản trị hệ thống</h1>
-        <p>Chào mừng <%= userFullname != null ? userFullname : "Admin" %> - Quản lý toàn bộ hệ thống PTIT Learning</p>
-      </div>
-      <a href="${pageContext.request.contextPath}/logout" class="logout-btn">🚪 Đăng xuất</a>
-    </div>
-
-    <!-- Statistics -->
-    <div class="stats-grid">
-      <div class="stat-card users">
-        <h3><%= stats.totalUsers %></h3>
-        <p>NGƯỜI DÙNG</p>
-      </div>
-      
-      <div class="stat-card teachers">
-        <h3><%= stats.totalTeachers %></h3>
-        <p>GIÁO VIÊN</p>
-      </div>
-      
-      <div class="stat-card courses">
-        <h3><%= stats.totalCourses %></h3>
-        <p>KHÓA HỌC</p>
-      </div>
-      
-      <div class="stat-card orders">
-        <h3><%= stats.totalOrders %></h3>
-        <p>ĐỢN HÀNG</p>
-      </div>
-      
-      <div class="stat-card revenue">
-        <h3><%= currencyFormat.format(stats.totalRevenue) %>đ</h3>
-        <p>DOANH THU</p>
-      </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tab-navigation">
+  <main class="admin-dashboard">
+    <!-- Tabs (Hidden, replaced by sidebar) -->
+    <div class="tab-navigation" style="display: none;">
       <button class="tab-btn active" onclick="openTab('stats')">📊 Thống kê</button>
       <button class="tab-btn" onclick="openTab('users')">👥 Người dùng</button>
       <button class="tab-btn" onclick="openTab('teachers')">👨‍🏫 Giáo viên</button>
@@ -531,6 +788,39 @@
 
     <!-- Statistics Tab -->
     <div id="stats" class="tab-content active">
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card users">
+          <h3><%= stats.totalUsers %></h3>
+          <p>NGƯỜI DÙNG</p>
+        </div>
+        
+        <div class="stat-card teachers">
+          <h3><%= stats.totalTeachers %></h3>
+          <p>GIÁO VIÊN</p>
+        </div>
+        
+        <div class="stat-card courses">
+          <h3><%= stats.totalCourses %></h3>
+          <p>KHÓA HỌC</p>
+        </div>
+        
+        <div class="stat-card orders">
+          <h3><%= stats.totalOrders %></h3>
+          <p>ĐỢN HÀNG</p>
+        </div>
+        
+        <div class="stat-card revenue">
+          <h3><%= currencyFormat.format(stats.totalRevenue) %>đ</h3>
+          <p>DOANH THU</p>
+        </div>
+        
+        <div class="stat-card" style="border-left-color: #ff9800;">
+          <h3><%= (request.getAttribute("pendingCount") != null ? (Integer)request.getAttribute("pendingCount") : 0) + pendingPayments.size() %></h3>
+          <p>CHỜ DUYỆT</p>
+        </div>
+      </div>
+
       <div class="section-header">
         <h2>Thống kê doanh thu</h2>
       </div>
@@ -572,6 +862,7 @@
                 double percentage = totalRevenueSum.compareTo(BigDecimal.ZERO) > 0 
                     ? cr.totalRevenue.multiply(new BigDecimal("100")).divide(totalRevenueSum, 2, BigDecimal.ROUND_HALF_UP).doubleValue() 
                     : 0;
+                String percentageStr = String.format("%.1f", percentage);
             %>
             <tr style="border-bottom: 1px solid #f1f5f9;">
               <td style="padding: 12px;"><%= cr.category %></td>
@@ -580,9 +871,9 @@
               <td style="padding: 12px; text-align: right;">
                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
                   <div style="flex: 0 0 100px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                    <div style="width: <%= percentage %>%; height: 100%; background: linear-gradient(90deg, #10b981, #059669);"></div>
+                    <div data-percentage="<%= percentageStr %>" style="height: 100%; background: linear-gradient(90deg, #10b981, #059669);"></div>
                   </div>
-                  <span style="font-weight: 600; color: #10b981;"><%= String.format("%.1f", percentage) %>%</span>
+                  <span style="font-weight: 600; color: #10b981;"><%= percentageStr %>%</span>
                 </div>
               </td>
             </tr>
@@ -682,11 +973,11 @@
               <td>
                 <% if (!"admin@ptit.edu.vn".equals(user.email)) { %>
                   <% if (isLocked) { %>
-                    <button class="btn btn-success btn-sm" onclick="unlockAccount(<%= user.userId %>, '<%= user.fullname %>')">Mở khóa</button>
+                    <button class="btn btn-success btn-sm" data-user-id="<%= user.userId %>" data-user-name="<%= user.fullname %>" onclick="unlockAccount(this.getAttribute('data-user-id'), this.getAttribute('data-user-name'))">Mở khóa</button>
                   <% } else { %>
-                    <button class="btn btn-warning btn-sm" onclick="lockAccount(<%= user.userId %>, '<%= user.fullname %>')">Khóa TK</button>
+                    <button class="btn btn-warning btn-sm" data-user-id="<%= user.userId %>" data-user-name="<%= user.fullname %>" onclick="lockAccount(this.getAttribute('data-user-id'), this.getAttribute('data-user-name'))">Khóa TK</button>
                   <% } %>
-                  <button class="btn btn-danger btn-sm" onclick="deleteUser(<%= user.userId %>)">Xóa</button>
+                  <button class="btn btn-danger btn-sm" data-user-id="<%= user.userId %>" onclick="deleteUser(this.getAttribute('data-user-id'))">Xóa</button>
                 <% } else { %>
                   <span class="badge badge-success">Admin</span>
                 <% } %>
@@ -724,7 +1015,7 @@
               <td><%= teacher.fullname != null ? teacher.fullname : "-" %></td>
               <td><span class="badge badge-info"><%= teacher.courseCount %> khóa</span></td>
               <td>
-                <button class="btn btn-secondary btn-sm" onclick="openAssignCourseModal(<%= teacher.userId %>, '<%= teacher.fullname %>')">Gán khóa học</button>
+                <button class="btn btn-secondary btn-sm" data-teacher-id="<%= teacher.userId %>" data-teacher-name="<%= teacher.fullname %>" onclick="openAssignCourseModal(this.getAttribute('data-teacher-id'), this.getAttribute('data-teacher-name'))">Gán khóa học</button>
               </td>
             </tr>
             <% } %>
@@ -1400,14 +1691,21 @@
   <!-- Chart.js Library -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
+  <%
+    com.google.gson.Gson gson = new com.google.gson.Gson();
+    String categoryLabelsJson = gson.toJson(categoryRevenues.stream().map(cr -> cr.category).toArray());
+    String categoryDataJson = gson.toJson(categoryRevenues.stream().map(cr -> cr.totalRevenue).toArray());
+    String courseLabelsJson = gson.toJson(courseRevenues.stream().limit(10).map(cr -> cr.courseName).toArray());
+    String courseDataJson = gson.toJson(courseRevenues.stream().limit(10).map(cr -> cr.totalRevenue).toArray());
+  %>
   <script>
     // Category Revenue Chart Data
-    const categoryLabels = <%= new com.google.gson.Gson().toJson(categoryRevenues.stream().map(cr -> cr.category).toArray()) %>;
-    const categoryData = <%= new com.google.gson.Gson().toJson(categoryRevenues.stream().map(cr -> cr.totalRevenue).toArray()) %>;
+    var categoryLabels = JSON.parse('<%= categoryLabelsJson %>');
+    var categoryData = JSON.parse('<%= categoryDataJson %>');
     
-    // Top Courses Chart Data
-    const courseLabels = <%= new com.google.gson.Gson().toJson(courseRevenues.stream().limit(10).map(cr -> cr.courseName).toArray()) %>;
-    const courseData = <%= new com.google.gson.Gson().toJson(courseRevenues.stream().limit(10).map(cr -> cr.totalRevenue).toArray()) %>;
+    // Top Courses Chart Data  
+    var courseLabels = JSON.parse('<%= courseLabelsJson %>');
+    var courseData = JSON.parse('<%= courseDataJson %>');
     
     // Category Revenue Pie Chart
     const ctxCategory = document.getElementById('categoryRevenueChart').getContext('2d');
@@ -1503,12 +1801,23 @@
     function openTab(tabName) {
       const tabs = document.querySelectorAll('.tab-content');
       const btns = document.querySelectorAll('.tab-btn');
+      const navItems = document.querySelectorAll('.nav-item');
       
       tabs.forEach(tab => tab.classList.remove('active'));
       btns.forEach(btn => btn.classList.remove('active'));
+      navItems.forEach(item => item.classList.remove('active'));
       
       document.getElementById(tabName).classList.add('active');
-      event.target.classList.add('active');
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
+      
+      // Highlight active sidebar item
+      navItems.forEach(item => {
+        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabName)) {
+          item.classList.add('active');
+        }
+      });
       
       // Load lock requests when opening the lock-requests tab
       if (tabName === 'lock-requests') {
@@ -1786,12 +2095,37 @@
       loadLockRequests();
     });
     
+    // Set width for percentage progress bars
+    document.querySelectorAll('[data-percentage]').forEach(function(bar) {
+      bar.style.width = bar.getAttribute('data-percentage') + '%';
+    });
+    
     // Close modal when clicking outside
     window.onclick = function(event) {
       if (event.target.classList.contains('modal')) {
         event.target.style.display = 'none';
       }
     }
+
+    // Toggle sidebar function for hamburger menu
+    function toggleSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const hamburger = document.getElementById('hamburgerBtn');
+      
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+      hamburger.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking on nav items on mobile
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        if (window.innerWidth <= 1024) {
+          toggleSidebar();
+        }
+      });
+    });
   </script>
 </body>
 </html>

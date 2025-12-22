@@ -296,9 +296,9 @@
         alert('❌ Mã khuyến mãi không hợp lệ!');
       }
     }
+  </script>
 
-    const totalAmount = <%= total != null ? total.longValue() : 0 %>;
-    
+  <script>
     // Payment method change handler
     document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
       radio.addEventListener('change', function() {

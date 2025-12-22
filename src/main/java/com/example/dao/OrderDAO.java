@@ -9,10 +9,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.model.Course;
 import com.example.util.DatabaseConnection;
 
 public class OrderDAO {
+    private static final Logger logger = LoggerFactory.getLogger(OrderDAO.class);
     
     /**
      * Create a new order and order items
@@ -90,10 +94,10 @@ public class OrderDAO {
                 try {
                     conn.rollback(); // Rollback on error
                 } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    logger.error("Error rolling back transaction during order creation", ex);
                 }
             }
-            e.printStackTrace();
+            logger.error("Error creating order", e);
             return -1;
         } finally {
             try {
@@ -106,7 +110,7 @@ public class OrderDAO {
                     conn.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Error closing database resources after order creation", e);
             }
         }
     }
@@ -195,10 +199,10 @@ public class OrderDAO {
                 try {
                     conn.rollback(); // Rollback on error
                 } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    logger.error("Error rolling back transaction during order creation", ex);
                 }
             }
-            e.printStackTrace();
+            logger.error("Error creating order", e);
             return -1;
         } finally {
             try {
@@ -211,7 +215,7 @@ public class OrderDAO {
                     conn.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Error closing database resources after order creation", e);
             }
         }
     }
@@ -234,7 +238,7 @@ public class OrderDAO {
             return stmt.executeQuery();
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting user orders", e);
             return null;
         }
     }
@@ -260,7 +264,7 @@ public class OrderDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting purchased courses by user", e);
         }
         
         return purchasedCourses;
@@ -332,10 +336,10 @@ public class OrderDAO {
                 try {
                     conn.rollback();
                 } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    logger.error("Error rolling back transaction in updateOrderStatus", ex);
                 }
             }
-            e.printStackTrace();
+            logger.error("Error updating order status", e);
             return false;
         } finally {
             try {
@@ -348,7 +352,7 @@ public class OrderDAO {
                     conn.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Error closing resources in updateOrderStatus", e);
             }
         }
     }
@@ -383,7 +387,7 @@ public class OrderDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting pending payment orders", e);
         }
         
         return orders;
@@ -421,7 +425,7 @@ public class OrderDAO {
             stmt.executeUpdate();
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error logging payment approval", e);
         }
     }
     
@@ -460,7 +464,7 @@ public class OrderDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting payment approval history", e);
         }
         
         return history;

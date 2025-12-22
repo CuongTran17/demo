@@ -3,6 +3,9 @@ package com.example.servlets;
 import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.dao.CourseDAO;
 import com.example.model.Course;
 
@@ -14,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/courses")
 public class CourseServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(CourseServlet.class);
     private CourseDAO courseDAO;
     
     @Override
@@ -42,38 +46,24 @@ public class CourseServlet extends HttpServlet {
             request.setAttribute("courses", courses);
             
             // Forward to appropriate JSP based on category
-            String targetPage;
-            if (category != null) {
-                switch (category.toLowerCase()) {
-                    case "python":
-                        targetPage = "/courses-python.jsp";
-                        break;
-                    case "finance":
-                        targetPage = "/courses-finance.jsp";
-                        break;
-                    case "marketing":
-                        targetPage = "/courses-marketing.jsp";
-                        break;
-                    case "data":
-                        targetPage = "/courses-data.jsp";
-                        break;
-                    case "blockchain":
-                        targetPage = "/courses-blockchain.jsp";
-                        break;
-                    case "accounting":
-                        targetPage = "/courses-accounting.jsp";
-                        break;
-                    default:
-                        targetPage = "/index.jsp";
-                }
-            } else {
-                targetPage = "/index.jsp";
-            }
+            String targetPage = (category != null) ? switch (category.toLowerCase()) {
+                case "python" -> "/courses-python.jsp";
+                case "finance" -> "/courses-finance.jsp";
+                case "marketing" -> "/courses-marketing.jsp";
+                case "data" -> "/courses-data.jsp";
+                case "blockchain" -> "/courses-blockchain.jsp";
+                case "accounting" -> "/courses-accounting.jsp";
+                default -> "/index.jsp";
+            } : "/index.jsp";
             
             request.getRequestDispatcher(targetPage).forward(request, response);
             
+        } catch (ServletException | IOException e) {
+            logger.error("Servlet or IO error in course loading", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+                "Error loading courses: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error in course loading", e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "Error loading courses: " + e.getMessage());
         }

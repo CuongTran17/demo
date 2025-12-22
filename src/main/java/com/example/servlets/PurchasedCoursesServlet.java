@@ -2,10 +2,13 @@ package com.example.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.example.dao.CourseDAO;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.dao.OrderDAO;
 
 import jakarta.servlet.ServletException;
@@ -15,11 +18,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 @WebServlet("/api/purchased-courses")
 public class PurchasedCoursesServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(PurchasedCoursesServlet.class);
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -58,7 +59,7 @@ public class PurchasedCoursesServlet extends HttpServlet {
             jsonResponse.put("purchasedCourses", coursesArray);
             
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in PurchasedCoursesServlet: {}", e.getMessage(), e);
             jsonResponse.put("loggedIn", true);
             jsonResponse.put("purchasedCourses", new JSONArray());
             jsonResponse.put("error", "Error retrieving purchased courses");

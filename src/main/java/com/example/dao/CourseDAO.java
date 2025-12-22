@@ -8,10 +8,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.model.Course;
 import com.example.util.DatabaseConnection;
 
 public class CourseDAO {
+    private static final Logger logger = LoggerFactory.getLogger(CourseDAO.class);
     
     /**
      * Get all courses
@@ -29,7 +33,7 @@ public class CourseDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting all courses", e);
         }
         
         return courses;
@@ -53,7 +57,7 @@ public class CourseDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting courses by category", e);
         }
         
         return courses;
@@ -76,7 +80,7 @@ public class CourseDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting course by ID", e);
         }
         
         return null;
@@ -104,7 +108,7 @@ public class CourseDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting user courses", e);
         }
         
         return courses;
@@ -130,7 +134,7 @@ public class CourseDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error checking if user purchased course", e);
         }
         
         return false;
@@ -161,37 +165,21 @@ public class CourseDAO {
         // Price filter
         if (priceRange != null && !priceRange.equals("all")) {
             switch (priceRange) {
-                case "free":
-                    sql.append(" AND price = 0");
-                    break;
-                case "under500":
-                    sql.append(" AND price > 0 AND price < 500000");
-                    break;
-                case "500to1000":
-                    sql.append(" AND price >= 500000 AND price <= 1000000");
-                    break;
-                case "over1000":
-                    sql.append(" AND price > 1000000");
-                    break;
+                case "free" -> sql.append(" AND price = 0");
+                case "under500" -> sql.append(" AND price > 0 AND price < 500000");
+                case "500to1000" -> sql.append(" AND price >= 500000 AND price <= 1000000");
+                case "over1000" -> sql.append(" AND price > 1000000");
             }
         }
         
         // Sorting
         if (sortBy != null) {
             switch (sortBy) {
-                case "price-asc":
-                    sql.append(" ORDER BY price ASC");
-                    break;
-                case "price-desc":
-                    sql.append(" ORDER BY price DESC");
-                    break;
-                case "popular":
-                    sql.append(" ORDER BY students_count DESC");
-                    break;
-                case "newest":
-                default:
-                    sql.append(" ORDER BY created_at DESC");
-                    break;
+                case "price-asc" -> sql.append(" ORDER BY price ASC");
+                case "price-desc" -> sql.append(" ORDER BY price DESC");
+                case "popular" -> sql.append(" ORDER BY students_count DESC");
+                case "newest" -> sql.append(" ORDER BY created_at DESC");
+                default -> sql.append(" ORDER BY created_at DESC");
             }
         } else {
             sql.append(" ORDER BY created_at DESC");
@@ -212,7 +200,7 @@ public class CourseDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error searching courses", e);
         }
         
         return courses;

@@ -200,7 +200,7 @@ public class PendingChangeDAO {
             conn.commit();
             return true;
             
-        } catch (Exception e) {
+        } catch (SQLException | NumberFormatException e) {
             if (conn != null) {
                 conn.rollback();
             }
@@ -242,7 +242,8 @@ public class PendingChangeDAO {
         // Parse JSON và apply change dựa vào changeType
         // Sử dụng JSON parsing đơn giản (có thể cần thư viện JSON như Gson)
         
-        if ("course_create".equals(changeType)) {
+        switch (changeType) {
+            case "course_create" -> {
             // Parse changeData JSON và insert vào courses table
             // Ví dụ: {"course_id": "python-basics", "course_name": "Python Cơ bản", "category": "python", "description": "Khóa học...", "price": 1200000}
             String courseId = extractJsonValue(changeData, "course_id");
@@ -272,7 +273,8 @@ public class PendingChangeDAO {
                 }
             }
             
-        } else if ("course_update".equals(changeType)) {
+            }
+            case "course_update" -> {
             // Parse changeData JSON và update courses table
             // Ví dụ: {"course_name": "New Name", "description": "New Desc", "price": 100.0, "image_url": "path/to/image.jpg", "image_filename": "path/to/image.jpg"}
             String courseName = extractJsonValue(changeData, "course_name");
@@ -348,7 +350,8 @@ public class PendingChangeDAO {
                 }
             }
             
-        } else if ("course_delete".equals(changeType)) {
+            }
+            case "course_delete" -> {
             // Delete course from both courses and teacher_courses tables
             // First delete from courses table
             String sql1 = "DELETE FROM courses WHERE course_id = ? AND course_id IN " +
@@ -367,7 +370,8 @@ public class PendingChangeDAO {
                 stmt.executeUpdate();
             }
             
-        } else if ("lesson_create".equals(changeType)) {
+            }
+            case "lesson_create" -> {
             // Parse changeData JSON và insert vào lessons table
             // Ví dụ: {"course_id": "course123", "lesson_title": "Title", "lesson_content": "Content", "lesson_order": 1, "section_id": 1, "video_url": "url", "duration": "10:00"}
             String courseId = extractJsonValue(changeData, "course_id");
@@ -393,7 +397,8 @@ public class PendingChangeDAO {
                 }
             }
             
-        } else if ("lesson_update".equals(changeType)) {
+            }
+            case "lesson_update" -> {
             // Parse changeData JSON và update lessons table
             String lessonTitle = extractJsonValue(changeData, "lesson_title");
             String lessonContent = extractJsonValue(changeData, "lesson_content");
@@ -430,7 +435,8 @@ public class PendingChangeDAO {
                 }
             }
             
-        } else if ("lesson_delete".equals(changeType)) {
+            }
+            case "lesson_delete" -> {
             // Delete lesson
             String sql = "DELETE FROM lessons WHERE lesson_id = ? AND course_id IN " +
                         "(SELECT course_id FROM teacher_courses WHERE teacher_id = ?)";
@@ -438,6 +444,7 @@ public class PendingChangeDAO {
                 stmt.setString(1, targetId);
                 stmt.setInt(2, change.getTeacherId());
                 stmt.executeUpdate();
+            }
             }
         }
     }

@@ -199,15 +199,21 @@
     function updateCart() {
       alert('✅ Giỏ hàng đã được cập nhật!');
     }
+  </script>
 
+  <% if (cartCourses.isEmpty()) { %>
+  <script>
     function checkout() {
-      <% if (cartCourses.isEmpty()) { %>
-        alert('❌ Giỏ hàng trống! Vui lòng thêm khóa học vào giỏ hàng.');
-        return;
-      <% } %>
+      alert('❌ Giỏ hàng trống! Vui lòng thêm khóa học vào giỏ hàng.');
+    }
+  </script>
+  <% } else { %>
+  <script>
+    function checkout() {
       // Redirect to checkout page
       window.location.href = baseUrl + '/checkout.jsp';
     }
   </script>
+  <% } %>
 </body>
 </html>

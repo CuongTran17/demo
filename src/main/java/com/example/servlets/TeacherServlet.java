@@ -13,6 +13,8 @@ import java.util.Base64;
 import java.util.List;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.dao.PendingChangeDAO;
 import com.example.model.PendingChange;
@@ -27,6 +29,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/teacher")
 public class TeacherServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(TeacherServlet.class);
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -79,7 +82,7 @@ public class TeacherServlet extends HttpServlet {
             request.getRequestDispatcher("/teacher-dashboard.jsp").forward(request, response);
             
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in TeacherServlet doGet: {}", e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi hệ thống");
         }
     }
@@ -111,38 +114,40 @@ public class TeacherServlet extends HttpServlet {
         
         try {
             switch (action) {
-                case "createCourse":
+                case "createCourse" -> {
                     createCourse(request, userId);
                     session.setAttribute("successMessage", "Yêu cầu tạo khóa học đã được gửi cho admin duyệt!");
-                    break;
-                case "updateCourse":
+                }
+                case "updateCourse" -> {
                     updateCourse(request, userId);
                     session.setAttribute("successMessage", "Yêu cầu cập nhật khóa học đã được gửi cho admin duyệt!");
-                    break;
-                case "uploadImage":
+                }
+                case "uploadImage" -> {
                     uploadCourseImage(request, response);
                     return; // Don't redirect, return JSON
-                case "deleteCourse":
+                }
+                case "deleteCourse" -> {
                     deleteCourse(request, userId);
-                    break;
-                case "createLesson":
+                    session.setAttribute("successMessage", "Yêu cầu xóa khóa học đã được gửi cho admin duyệt!");
+                }
+                case "createLesson" -> {
                     createLesson(request, userId);
                     session.setAttribute("successMessage", "Yêu cầu tạo bài học đã được gửi cho admin duyệt!");
-                    break;
-                case "updateLesson":
+                }
+                case "updateLesson" -> {
                     updateLesson(request, userId);
                     session.setAttribute("successMessage", "Yêu cầu cập nhật bài học đã được gửi cho admin duyệt!");
-                    break;
-                case "deleteLesson":
+                }
+                case "deleteLesson" -> {
                     deleteLesson(request, userId);
                     session.setAttribute("successMessage", "Yêu cầu xóa bài học đã được gửi cho admin duyệt!");
-                    break;
+                }
             }
             
             response.sendRedirect(request.getContextPath() + "/teacher");
             
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in TeacherServlet doPost: {}", e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi xử lý: " + e.getMessage());
         }
     }
@@ -179,7 +184,7 @@ public class TeacherServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting teacher courses: {}", e.getMessage(), e);
         }
         
         return courses;
@@ -217,7 +222,7 @@ public class TeacherServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting enrolled students: {}", e.getMessage(), e);
         }
         
         return students;
@@ -274,7 +279,7 @@ public class TeacherServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting course stats: {}", e.getMessage(), e);
         }
         
         return stats;
@@ -304,7 +309,7 @@ public class TeacherServlet extends HttpServlet {
                 revenues.add(cr);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting teacher course revenues: {}", e.getMessage(), e);
         }
         
         return revenues;
@@ -332,7 +337,7 @@ public class TeacherServlet extends HttpServlet {
                 revenues.add(cr);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting teacher category revenues: {}", e.getMessage(), e);
         }
         
         return revenues;
@@ -604,7 +609,7 @@ public class TeacherServlet extends HttpServlet {
             response.getWriter().write(jsonResponse.toString());
             
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error updating course image: {}", e.getMessage(), e);
             response.getWriter().write("{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
         }
     }

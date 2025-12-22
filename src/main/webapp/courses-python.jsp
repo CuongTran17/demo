@@ -122,7 +122,11 @@
               <span class="price-old"><%= currencyFormat.format(course.getOldPrice().longValue()) %>₫</span>
               <% } %>
             </div>
-            <button class="btn-add-cart course-action-btn" data-course-id="<%= course.getCourseId() %>" onclick="addToCart('<%= course.getCourseId() %>', '<%= course.getCourseName().replace("'", "\\'") %>', <%= course.getPrice().longValue() %>)">
+            <button class="btn-add-cart course-action-btn" 
+                    data-course-id="<%= course.getCourseId() %>" 
+                    data-course-name="<%= course.getCourseName().replace("\"", "&quot;") %>" 
+                    data-course-price="<%= course.getPrice().longValue() %>"
+                    onclick="addToCart(this.dataset.courseId, this.dataset.courseName, parseInt(this.dataset.coursePrice))">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 2L7 6H3L5 20H19L21 6H17L15 2H9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M9 10V6M15 10V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -146,35 +150,47 @@
   <%@ include file="/includes/footer.jsp" %>
 
   <script>
+    window.contextPath = '${pageContext.request.contextPath}';
+  </script>
+  <% if (loggedIn != null && loggedIn) { %>
+  <script>
+    window.isUserLoggedIn = true;
+    window.userDisplayInfo = '<%= displayInfo %>';
+  </script>
+  <% } else { %>
+  <script>
+    window.isUserLoggedIn = false;
+    window.userDisplayInfo = '';
+  </script>
+  <% } %>
+
+  <% if (loggedIn != null && loggedIn) { %>
+  <script>
     // Check purchased courses on page load
     document.addEventListener('DOMContentLoaded', function() {
-      <% if (loggedIn != null && loggedIn) { %>
-        fetch('${pageContext.request.contextPath}/api/purchased-courses')
-          .then(response => response.json())
-          .then(data => {
-            if (data.purchasedCourses && data.purchasedCourses.length > 0) {
-              const purchasedIds = data.purchasedCourses;
-              
-              document.querySelectorAll('.course-action-btn').forEach(btn => {
-                const courseId = btn.getAttribute('data-course-id');
-                if (purchasedIds.includes(courseId)) {
-                  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Vào học';
-                  btn.className = 'btn-learn-now';
-                  btn.onclick = function() {
-                    window.location.href = '${pageContext.request.contextPath}/learning.jsp?courseId=' + courseId;
-                  };
-                }
-              });
-            }
-          })
-          .catch(error => console.error('Error checking purchased courses:', error));
-      <% } %>
+      fetch('${pageContext.request.contextPath}/api/purchased-courses')
+        .then(response => response.json())
+        .then(data => {
+          if (data.purchasedCourses && data.purchasedCourses.length > 0) {
+            const purchasedIds = data.purchasedCourses;
+            
+            document.querySelectorAll('.course-action-btn').forEach(btn => {
+              const courseId = btn.getAttribute('data-course-id');
+              if (purchasedIds.includes(courseId)) {
+                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Vào học';
+                btn.className = 'btn-learn-now';
+                btn.onclick = function() {
+                  window.location.href = '${pageContext.request.contextPath}/learning.jsp?courseId=' + courseId;
+                };
+              }
+            });
+          }
+        })
+        .catch(error => console.error('Error checking purchased courses:', error));
     });
-    
-    // Set context variables for shared scripts
-    window.contextPath = '${pageContext.request.contextPath}';
-    window.isUserLoggedIn = <%= loggedIn != null && loggedIn ? "true" : "false" %>;
   </script>
+  <% } %>
+
   <script src="${pageContext.request.contextPath}/assets/js/common.js"></script>
   <script src="${pageContext.request.contextPath}/assets/js/cart.js"></script>
   <script>

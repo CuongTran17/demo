@@ -8,10 +8,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.model.User;
 import com.example.util.DatabaseConnection;
 
 public class UserDAO {
+    private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
     
     /**
      * Hash password using SHA-256
@@ -58,7 +62,7 @@ public class UserDAO {
             return false;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error registering user", e);
             return false;
         }
     }
@@ -97,7 +101,7 @@ public class UserDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error logging in user", e);
         }
         
         return null;
@@ -132,7 +136,7 @@ public class UserDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting user by ID", e);
         }
         
         return null;
@@ -160,7 +164,7 @@ public class UserDAO {
             
         } catch (SQLException e) {
             System.err.println("UserDAO.emailExists: Error checking email: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error checking if email exists", e);
         }
         
         return false;
@@ -183,7 +187,7 @@ public class UserDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error checking if phone exists", e);
         }
         
         return false;
@@ -217,7 +221,7 @@ public class UserDAO {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting user by email", e);
         }
         
         return null;
@@ -241,7 +245,7 @@ public class UserDAO {
             return rowsAffected > 0;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error updating user profile", e);
             return false;
         }
     }
@@ -262,7 +266,7 @@ public class UserDAO {
             return rowsAffected > 0;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error updating password", e);
             return false;
         }
     }
@@ -284,7 +288,7 @@ public class UserDAO {
             return rowsAffected > 0;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error locking user account", e);
             return false;
         }
     }
@@ -304,7 +308,7 @@ public class UserDAO {
             return rowsAffected > 0;
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error unlocking user account", e);
             return false;
         }
     }

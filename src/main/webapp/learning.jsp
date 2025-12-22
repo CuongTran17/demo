@@ -233,14 +233,6 @@
   </div>
 
   <script>
-    // ============ DEBUG SESSION INFO ============
-    console.log('=== SESSION DEBUG ===');
-    console.log('Logged in:', <%= loggedIn != null && loggedIn %>);
-    console.log('User ID:', <%= userId != null ? userId : "null" %>);
-    console.log('User email:', '<%= userEmail != null ? userEmail : "null" %>');
-    console.log('====================');
-    // ============================================
-
     // Load lessons from API instead of hardcoded data
     let courseData = null;
     let currentLesson = null;

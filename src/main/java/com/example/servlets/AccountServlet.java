@@ -9,7 +9,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.dao.CourseDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.example.util.DatabaseConnection;
 
 import jakarta.servlet.ServletException;
@@ -21,12 +23,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/account")
 public class AccountServlet extends HttpServlet {
-    private CourseDAO courseDAO;
-    
-    @Override
-    public void init() throws ServletException {
-        courseDAO = new CourseDAO();
-    }
+    private static final Logger logger = LoggerFactory.getLogger(AccountServlet.class);
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -56,8 +53,14 @@ public class AccountServlet extends HttpServlet {
             
             request.getRequestDispatcher("/account.jsp").forward(request, response);
             
+        } catch (ServletException e) {
+            logger.error("Servlet error in account request", e);
+            response.sendRedirect(request.getContextPath() + "/account.jsp");
+        } catch (IOException e) {
+            logger.error("IO error in account request", e);
+            response.sendRedirect(request.getContextPath() + "/account.jsp");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error in account request", e);
             response.sendRedirect(request.getContextPath() + "/account.jsp");
         }
     }
@@ -89,7 +92,7 @@ public class AccountServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting purchased courses", e);
         }
         
         return orders;
@@ -116,7 +119,7 @@ public class AccountServlet extends HttpServlet {
             }
             
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Error getting progress stats", e);
         }
         
         return stats;
