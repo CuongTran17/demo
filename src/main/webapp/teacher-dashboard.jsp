@@ -568,6 +568,42 @@
         padding: 10px;
         white-space: nowrap;
       }
+      
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+      
+      .chart-container {
+        padding: 20px !important;
+      }
+      
+      /* Mobile responsive for analytics tables grid */
+      .analytics-tables-grid {
+        display: block;
+      }
+      
+      /* Mobile responsive for course progress cards */
+      .course-progress-card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .course-progress-card > div {
+        min-width: 300px;
+      }
+      
+      /* Mobile responsive for tables and progress cards */
+      .analytics-tables-grid > div {
+        margin-bottom: 20px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .analytics-tables-grid table {
+        min-width: 600px;
+      }
     }
     
     /* Badge styles */
@@ -674,22 +710,6 @@
         <p>Chào mừng <%= userFullname != null ? userFullname : "Giáo viên" %> đến với hệ thống quản lý khóa học</p>
       </div>
       <a href="${pageContext.request.contextPath}/logout" class="logout-btn">🚪 Đăng xuất</a>
-    </div>
-
-    <!-- Statistics -->
-    <div class="stats-grid">
-      <div class="stat-card courses">
-        <div class="stat-number"><%= stats.totalCourses %></div>
-        <div class="stat-label">Khóa học</div>
-      </div>
-      <div class="stat-card students">
-        <div class="stat-number"><%= stats.totalStudents %></div>
-        <div class="stat-label">Học viên</div>
-      </div>
-      <div class="stat-card revenue">
-        <div class="stat-number"><%= String.format("%,d", stats.totalRevenue.longValue()) %>₫</div>
-        <div class="stat-label">Doanh thu</div>
-      </div>
     </div>
 
     <!-- Tab Navigation -->
@@ -908,9 +928,9 @@
         %>
         
         <!-- Biểu đồ doanh thu -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; margin-bottom: 25px;">
+        <div class="charts-grid" style="gap: 25px; margin-bottom: 25px;">
           <!-- Category Revenue Pie Chart -->
-          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+          <div class="chart-container" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
             <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
               <span style="background: #667eea; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;">📊</span>
               Doanh thu theo danh mục
@@ -919,7 +939,7 @@
           </div>
           
           <!-- Top Courses Bar Chart -->
-          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+          <div class="chart-container" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
             <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
               <span style="background: #48bb78; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;">🏆</span>
               Top khóa học bán chạy
@@ -929,19 +949,20 @@
         </div>
         
         <!-- Bảng thông tin học viên và tiến độ -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px;">
+        <div class="analytics-tables-grid" style="gap: 25px;">
           <!-- Students List Table -->
           <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
             <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 1.1rem;">👥 Danh sách học viên</h3>
             <div style="max-height: 500px; overflow-y: auto;">
-              <table style="width: 100%; border-collapse: collapse;">
-                <thead style="position: sticky; top: 0; background: white; z-index: 10;">
-                  <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <th style="padding: 14px 12px; text-align: left; color: white; font-weight: 600; border-radius: 8px 0 0 0;">Học viên</th>
-                    <th style="padding: 14px 12px; text-align: left; color: white; font-weight: 600;">Khóa học</th>
-                    <th style="padding: 14px 12px; text-align: center; color: white; font-weight: 600; border-radius: 0 8px 0 0;">Tiến độ</th>
-                  </tr>
-                </thead>
+              <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                  <thead style="position: sticky; top: 0; background: white; z-index: 10;">
+                    <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                      <th style="padding: 14px 12px; text-align: left; color: white; font-weight: 600; border-radius: 8px 0 0 0;">Học viên</th>
+                      <th style="padding: 14px 12px; text-align: left; color: white; font-weight: 600;">Khóa học</th>
+                      <th style="padding: 14px 12px; text-align: center; color: white; font-weight: 600; border-radius: 0 8px 0 0;">Tiến độ</th>
+                    </tr>
+                  </thead>
                 <tbody>
                   <% 
                   if (students != null && !students.isEmpty()) {
@@ -979,6 +1000,7 @@
                   <% } %>
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
           
@@ -986,6 +1008,7 @@
           <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
             <h3 style="margin: 0 0 20px 0; color: #2d3748; font-size: 1.1rem;">📈 Tiến độ theo khóa học</h3>
             <div style="max-height: 500px; overflow-y: auto;">
+              <div class="course-progress-card" style="overflow-x: auto;">
               <% 
               // Group students by course
               java.util.Map<String, java.util.List<TeacherServlet.StudentInfo>> courseStudentsMap = new java.util.LinkedHashMap<>();
@@ -1009,8 +1032,8 @@
                   int courseAvgProgress = courseStudents.size() > 0 ? courseTotalProgress / courseStudents.size() : 0;
                   courseIndex++;
               %>
-              <div style="margin-bottom: 25px; padding: 20px; background: #f7fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="margin-bottom: 25px; padding: 20px; background: #f7fafc; border-radius: 10px; border: 1px solid #e2e8f0; min-width: 300px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; min-width: 250px;">
                   <div style="font-weight: 600; color: #2d3748; font-size: 1rem;"><%= courseName %></div>
                   <div data-avg-progress="<%= courseAvgProgress %>" style="color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
                     <%= courseAvgProgress %>% TB
@@ -1027,7 +1050,7 @@
                 </div>
                 <div style="display: grid; gap: 8px; margin-top: 12px;">
                   <% for (TeacherServlet.StudentInfo s : courseStudents) { %>
-                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0; min-width: 250px;">
                     <span style="font-size: 0.9rem; color: #4a5568; font-weight: 500;"><%= s.fullname %></span>
                     <div style="display: flex; align-items: center; gap: 8px;">
                       <div style="width: 60px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
@@ -1048,6 +1071,7 @@
                 <div>Chưa có dữ liệu tiến độ học tập</div>
               </div>
               <% } %>
+            </div>
             </div>
           </div>
         </div>

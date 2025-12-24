@@ -692,6 +692,21 @@
       .data-table table {
         min-width: 800px;
       }
+      
+      /* Charts responsive */
+      .charts-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+      }
+      
+      .chart-container {
+        padding: 20px !important;
+      }
+      
+      .chart-container h3 {
+        font-size: 1.1rem !important;
+        margin-bottom: 15px !important;
+      }
     }
   </style>
 </head>
@@ -825,24 +840,25 @@
         <h2>Thống kê doanh thu</h2>
       </div>
       
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 30px; margin-bottom: 30px;">
+      <div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 30px; margin-bottom: 30px;">
         <!-- Revenue by Category Chart -->
-        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
+        <div class="chart-container" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
           <h3 style="margin: 0 0 20px 0; font-size: 1.3rem; color: #1e293b;">Doanh thu theo danh mục</h3>
           <canvas id="categoryRevenueChart"></canvas>
         </div>
         
         <!-- Top Courses Chart -->
-        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
+        <div class="chart-container" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
           <h3 style="margin: 0 0 20px 0; font-size: 1.3rem; color: #1e293b;">Top 10 khóa học bán chạy</h3>
           <canvas id="topCoursesChart"></canvas>
         </div>
       </div>
       
       <!-- Revenue Table -->
-      <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); margin-bottom: 30px;">
+      <div class="chart-container" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); margin-bottom: 30px;">
         <h3 style="margin: 0 0 20px 0; font-size: 1.3rem; color: #1e293b;">Chi tiết doanh thu theo danh mục</h3>
-        <table style="width: 100%; border-collapse: collapse;">
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
           <thead>
             <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
               <th style="padding: 12px; text-align: left; font-weight: 600;">Danh mục</th>
@@ -886,12 +902,14 @@
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
       
       <!-- Top Courses Table -->
-      <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
+      <div class="chart-container" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
         <h3 style="margin: 0 0 20px 0; font-size: 1.3rem; color: #1e293b;">Top 10 khóa học doanh thu cao nhất</h3>
-        <table style="width: 100%; border-collapse: collapse;">
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
           <thead>
             <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
               <th style="padding: 12px; text-align: left; font-weight: 600;">#</th>
@@ -916,6 +934,7 @@
             <% } %>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
 

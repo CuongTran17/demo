@@ -84,15 +84,13 @@ public class CartDAO {
         String sql = "SELECT course_id FROM cart WHERE user_id = ? ORDER BY added_at DESC";
         
         try (Connection conn = DatabaseConnection.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
-            
-            while (rs.next()) {
-                cartItems.add(rs.getString("course_id"));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    cartItems.add(rs.getString("course_id"));
+                }
             }
-            
         } catch (SQLException e) {
             logger.error("Error getting user cart", e);
         }
