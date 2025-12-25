@@ -907,7 +907,16 @@
       
       <!-- Top Courses Table -->
       <div class="chart-container" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08);">
-        <h3 style="margin: 0 0 20px 0; font-size: 1.3rem; color: #1e293b;">Top 10 khóa học doanh thu cao nhất</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+          <h3 style="margin: 0; font-size: 1.3rem; color: #1e293b;">Top 10 khóa học doanh thu cao nhất</h3>
+          <a href="${pageContext.request.contextPath}/admin/user-revenue" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Xem chi tiết doanh thu theo user
+          </a>
+        </div>
         <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
           <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
           <thead>
